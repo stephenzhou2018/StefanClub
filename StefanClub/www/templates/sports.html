@@ -1,0 +1,450 @@
+{% extends '__base__.html' %}
+
+{% block title %}首页{% endblock %}
+
+{% block beforehead %}
+<style type="text/css" xmlns:backgroudimg="http://www.w3.org/1999/xhtml">
+    .outer {
+    width: 200px;
+    height:114px;
+    border: solid  ;
+    border-style: ridge;
+    position: relative;
+}
+.inner {
+    width: 164px;
+    height:100px;
+    position: absolute;
+    margin:auto;
+    left:0px;
+    right: 0px;
+    top:0px;
+    bottom: 0px;
+}
+.matchbottom {
+    width: 144px;
+    height:20px;
+    position: absolute;
+    margin:auto;
+    left:0px;
+    right: 0px;
+    top:0px;
+    bottom: 0px;
+}
+.matchtext {
+   color:black;
+   opacity:0.7;
+   font-size:85%;
+}
+
+ .banner{
+        background-size:100% 100%;
+        background-position: center;
+        background-repeat: no-repeat;
+        width: 547.5px;
+        height:330px;
+        display:block;
+ }
+
+  .banner a{
+
+    display:block;
+
+    width: 547.5px;
+
+    height:330px;
+
+    cursor:hand;
+
+}
+#myCarousel {
+    width: 547.5px;
+    height:330px;
+}
+.midtab {
+   opacity:0.7;
+   color:black;
+}
+.nav-tabs > li > a:hover {
+
+}
+.nav-tabs > li > a > span:hover {
+
+}
+.nav-tabs >li >a:active{
+
+    background-color: red;
+}
+.hotmatchnewstitle {
+     color:red;
+     font-weight: bold;
+     font-size:75%;
+}
+.hotmattitlesum a {
+     text-decoration:none;
+}
+.hotmatchnewsline {
+     color:black;
+     font-size:100%;
+     text-decoration:none;
+}
+.hotmattitlesum a:hover {
+     color: red;
+}
+.hotmatchnewsli a {
+     text-decoration:none;
+}
+.hotmatchnewsli a:hover {
+     color: red;
+}
+</style>
+<script>
+$(document).ready(function(){
+  $(".midtab").hover(function(){
+    $(this).css("color","#fff");
+    $(this).css("background-color","red");
+    $(this).css("font-weight","bold");
+    },function(){
+    if ($(this).attr('id') != 'firstmidtab')
+    {
+       $(this).css("color","black");
+       $(this).css("background-color","");
+       $(this).css("font-weight","");
+    }
+  });
+});
+
+function switchpage(type)
+{
+    var page = $("#hotmatchpage").text();
+    $.ajax({
+        type: "GET",
+        url: "/api/hotmatches?page="+page+"&swi_type="+type,
+        dataType: "json",
+        contentType: "application/json; charset=utf-8",
+        success: function (data) {
+          lastpage = data.lastpage;
+          firstpage = data.firstpage;
+          currentpage = data.currentpage;
+          if (lastpage == 'TRUE')
+          {
+             $("#posthotmatch").attr("disabled","disabled");
+          }
+          else
+          {
+             $("#posthotmatch").removeAttr("disabled");
+          }
+          if (firstpage == 'TRUE')
+          {
+             $("#prehotmatch").attr("disabled","disabled");
+          }
+          else
+          {
+             $("#prehotmatch").removeAttr("disabled");
+          }
+          matches = data.matches;
+          if (matches.length > 0)
+          {
+             var addBody = "";
+             for(var i = 0; i < matches.length; i++){
+                var addli =  "<li>"
+                 +  "<div class='outer'>"
+                 +      "<div class='inner'>"
+                 +          "<div>"
+                 +          "<a href='" + matches[i].match_url + "'target='_blank' style='text-decoration:none;'>"
+                 +              "<div>"
+                 +                  "<p><span style='color:black;font-weight:bold;'>" + matches[i].title + "</span></p>"
+                 +              "</div>"
+                 +              "<div>"
+                 +                  "<div style='width:140px;height:20px;'>"
+                 +                      "<div class='matchtext' style='float:right;margin:0 -15px 0 0' >";
+                 if ( matches[i].type == 'pre')
+                 {
+                    var  change1 = "<span>" + matches[i].matchdate + "</span>";
+                 }
+                 else
+                 {
+                     var  change1 = "<span>" + matches[i].score1 + "</span>";
+                 }
+                 addli = addli + change1;
+                 addli = addli +                      "</div>"
+                 +                      "<div class='matchtext' style='float:left;padding:1px 0 1px 10px;'>"
+                 +                          "<span>" + matches[i].team1 + "</span>"
+                 +                      "</div>"
+                 +                  "</div>"
+                 +                  "<div style='width:140px;height:20px;'>"
+                 +                      "<div class='matchtext' style='float:right;margin:0 -15px 0 0'>";
+                 if ( matches[i].type == 'pre')
+                 {
+                    var  change2 = "<span>" + matches[i].matchtime + "</span>";
+                 }
+                 else
+                 {
+                     var  change2 = "<span>" + matches[i].score2 + "</span>";
+                 }
+                 addli = addli + change2;
+                 addli = addli +    "</div>"
+                 +                      "<div class='matchtext' style='float:left;padding:1px 30px 1px 10px;'>"
+                 +                          "<span >" + matches[i].team2 + "</span>"
+                 +                      "</div>"
+                 +                  "</div>"
+                 +              "</div>"
+                 +          "</a>"
+                 +          "</div>"
+                 +          "<div style='width:164px;height:30px;position: relative;'>"
+                 +              "<div class='matchbottom'>"
+                 +                  "<ul >"
+                 +                      "<li  style='float:left;padding:3px 15px 0 0;'><a class='matchtext' style='text-decoration:none;' href='" + matches[i].liveurl + "' target='_blank'>图文</a></li>"
+                 +                      "<li  style='float:left;padding:3px 0 0 15px;'><a class='matchtext' style='text-decoration:none;' href='" + matches[i].newsurl + "' target='_blank'>专题</a></li>"
+                 +                  "</ul>"
+                 +              "</div>"
+                 +          "</div>"
+                 +      "</div>"
+                 +  "</div>"
+                 +  "</li>";
+                addBody = addBody + addli;
+              }
+             $("#hotmatchul").html(addBody);
+          }
+          $("#hotmatchpage").html(currentpage);
+        }
+      });
+}
+
+function shiftnews(type)
+{
+    if (type != 'hot')
+    {
+        $.ajax({
+            type: "GET",
+            url: "/api/nbanews?shift_type="+type,
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+               nbanews = data.nbanews;
+               if (nbanews.length > 0)
+               {
+                 var addBody = "";
+                 for(var i = 0; i < nbanews.length; i++){
+                    var adddiv =  "<div>"
+                               +    "<div>"
+                               +      "<div>"
+                               +          "<a href='" + nbanews[i].imgurl + "'target='_blank' style='text-decoration:none;'>"
+                               +              "<img src='" + nbanews[i].imgsrcurl + "'>"
+                               +          "</a>"
+                               +      "</div>"
+                               +    "</div>"
+                               +    "<div>"
+                               +       "<h3>"
+                               +                      "<div class='matchtext' style='float:right;margin:0 -15px 0 0' >";
+                 if ( matches[i].type == 'pre')
+                 {
+                    var  change1 = "<span>" + matches[i].matchdate + "</span>";
+                 }
+                 else
+                 {
+                     var  change1 = "<span>" + matches[i].score1 + "</span>";
+                 }
+                 addli = addli + change1;
+                 addli = addli +                      "</div>"
+                 +                      "<div class='matchtext' style='float:left;padding:1px 0 1px 10px;'>"
+                 +                          "<span>" + matches[i].team1 + "</span>"
+                 +                      "</div>"
+                 +                  "</div>"
+                 +                  "<div style='width:140px;height:20px;'>"
+                 +                      "<div class='matchtext' style='float:right;margin:0 -15px 0 0'>";
+                 if ( matches[i].type == 'pre')
+                 {
+                    var  change2 = "<span>" + matches[i].matchtime + "</span>";
+                 }
+                 else
+                 {
+                     var  change2 = "<span>" + matches[i].score2 + "</span>";
+                 }
+                 addli = addli + change2;
+                 addli = addli +    "</div>"
+                 +                      "<div class='matchtext' style='float:left;padding:1px 30px 1px 10px;'>"
+                 +                          "<span >" + matches[i].team2 + "</span>"
+                 +                      "</div>"
+                 +                  "</div>"
+                 +              "</div>"
+                 +          "</a>"
+                 +          "</div>"
+                 +          "<div style='width:164px;height:30px;position: relative;'>"
+                 +              "<div class='matchbottom'>"
+                 +                  "<ul >"
+                 +                      "<li  style='float:left;padding:3px 15px 0 0;'><a class='matchtext' style='text-decoration:none;' href='" + matches[i].liveurl + "' target='_blank'>图文</a></li>"
+                 +                      "<li  style='float:left;padding:3px 0 0 15px;'><a class='matchtext' style='text-decoration:none;' href='" + matches[i].newsurl + "' target='_blank'>专题</a></li>"
+                 +                  "</ul>"
+                 +              "</div>"
+                 +          "</div>"
+                 +      "</div>"
+                 +  "</div>"
+                 +  "</li>";
+                addBody = addBody + addli;
+              }
+             $("#hotmatchul").html(addBody);
+          }
+          $("#hotmatchpage").html(currentpage);
+        }
+      });
+}
+</script>
+
+
+{% endblock %}
+
+{% block content %}
+
+   <div class="uk-width-medium-2-10">
+       <div style="width: 200px; height: 50px;margin-bottom:5px;">
+           <div style="width:100px;height:35px;display: inline-block;float: left;">
+               <button id="prehotmatch" style="width:100%;height:100%;background-color: red;font-size:110%;color:white;border:none;" onclick="switchpage('pre')" disabled="disabled">上一页</button>
+           </div>
+           <div style="display:none"><span id="hotmatchpage">1</span></div>
+           <div style="width:100px;height:35px;display: inline-block;float: left;">
+               <button id="posthotmatch" style="width:100%;height:100%;background-color: red;font-size:110%;color:white;border:none;" onclick="switchpage('post')">下一页</button>
+           </div>
+       </div>
+       <div class="uk-panel uk-panel-header" style="margin-top:5px;">
+           <ul id="hotmatchul" class="uk-list">
+               {% for hotmatch in hotmatches %}
+               <li>
+                   <div class="outer">
+                       <div class="inner">
+                           <div>
+                           <a href="{{hotmatch.match_url}}" target="_blank" style="text-decoration:none;">
+                               <div>
+                                   <p><span style="color:black;font-weight:bold;">{{hotmatch.title}}</span></p>
+                               </div>
+                               <div>
+                                   <div style="width:140px;height:20px;">
+                                       <div class="matchtext" style="float:right;margin:0 -15px 0 0;" >
+                                           <span>{% if hotmatch.type == 'pre' %}{{hotmatch.matchdate}}{% else %}{{hotmatch.score1}}{% endif %}</span>
+                                       </div>
+                                       <div class="matchtext" style="float:left;padding:1px 0 1px 10px;">
+                                           <span>{{hotmatch.team1}}</span>
+                                       </div>
+
+                                   </div>
+                                   <div style="width:140px;height:20px;">
+                                       <div class="matchtext" style="float:right;margin:0 -15px 0 0;">
+                                           <span >{% if hotmatch.type == 'pre' %}{{hotmatch.matchtime}}{% else %}{{hotmatch.score2}}{% endif %}</span>
+                                       </div>
+                                       <div class="matchtext" style="float:left;padding:1px 30px 1px 10px;">
+                                           <span >{{hotmatch.team2}}</span>
+                                       </div>
+                                   </div>
+                               </div>
+                           </a>
+                           </div>
+                           <div style="width:164px;height:30px;position: relative;">
+                               <div class="matchbottom">
+                                   <ul >
+                                       <li  style="float:left;padding:3px 15px 0 0;"><a class="matchtext" style="text-decoration:none;" href="{{hotmatch.liveurl}}" target="_blank">图文</a></li>
+                                       <li  style="float:left;padding:3px 0 0 15px;"><a class="matchtext" style="text-decoration:none;" href="{{hotmatch.newsurl}}" target="_blank">专题</a></li>
+                                   </ul>
+                               </div>
+                           </div>
+                       </div>
+                   </div>
+               </li>
+               {% endfor %}
+           </ul>
+       </div>
+       <div style="width: 200px; height: 40px;margin-top:5px;">
+           <a style="text-decoration:none" href="//match.sports.sina.com.cn/index.html" target="_blank">
+               <button style="background-color:DodgerBlue;width: 200px; height: 40px;color:white">查看更多比赛</button>
+           </a>
+       </div>
+   </div>
+   <div class="uk-width-medium-5-10">
+       <div id="myCarousel" class="carousel slide" data-ride="carousel">
+           <ol class="carousel-indicators">
+               <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+               <li data-target="#myCarousel" data-slide-to="1"></li>
+               <li data-target="#myCarousel" data-slide-to="2"></li>
+               <li data-target="#myCarousel" data-slide-to="3"></li>
+               <li data-target="#myCarousel" data-slide-to="4"></li>
+               <li data-target="#myCarousel" data-slide-to="5"></li>
+               <li data-target="#myCarousel" data-slide-to="6"></li>
+           </ol>
+           <div class="carousel-inner">
+               <div style="background-image:url({{sinacars1.img_url}});"  class="item active banner">
+                   <a target="_blank" href="{{sinacars1.url}}"></a>
+                   <div class="carousel-caption">{{sinacars1.title}}</div>
+               </div>
+               {% for sinacar in sinacars %}
+               <div style="background-image:url({{sinacar.img_url}});" class="item banner">
+                   <a target="_blank" href="{{sinacar.url}}"></a>
+                   <div class="carousel-caption">{{sinacar.title}}</div>
+               </div>
+               {% endfor %}
+           </div>
+           <a class="carousel-control left" href="#myCarousel"
+              data-slide="prev"><span _ngcontent-c3="" aria-hidden="true" class="glyphicon glyphicon-chevron-left"></span></a>
+           <a class="carousel-control right" href="#myCarousel"
+              data-slide="next"><span _ngcontent-c3="" aria-hidden="true" class="glyphicon glyphicon-chevron-right"></span></a>
+       </div>
+       <div style="margin-top:20px">
+           <ul class="nav nav-tabs nav-justified">
+               <li class="active"><a id="firstmidtab" class="midtab" style="background-color:red;color:#fff;font-weight:bold" href="javascript:void(0)" onclick="shiftnews('hot')"><span>热门</span></a></li>
+               <li><a  class="midtab" href="javascript:void(0)" onclick="shiftnews('nba')"><span>NBA</span></a></li>
+               <li><a class="midtab" href="javascript:void(0)" onclick="shiftnews('intsoc')"><span>国际足球</span></a></li>
+               <li><a class="midtab" href="javascript:void(0)" onclick="shiftnews('chisoc')"><span>中国足球</span></a></li>
+               <li><a class="midtab" href="javascript:void(0)" onclick="shiftnews('cba')"><span>中国篮球</span></a></li>
+               <li><a class="midtab" href="javascript:void(0)" onclick="shiftnews('sum')"><span>综合体育</span></a></li>
+           </ul>
+       </div>
+       <div>
+           <div>
+               {% for hotmatchnews in hotmatchnewss %}
+               <div>
+                   <h3 class="hotmattitlesum">
+                       <a target="_blank" href="{{hotmatchnews.title1url}}" class="hotmatchnewstitle">{{hotmatchnews.title1}}</a>
+                       <a target="_blank" href="{{hotmatchnews.title2url}}" class="hotmatchnewstitle">{{hotmatchnews.title2}}</a>
+                       <a target="_blank" href="{{hotmatchnews.title3url}}" class="hotmatchnewstitle">{{hotmatchnews.title3}}</a>
+                   </h3>
+                   <div style="width:560px;height:100px">
+                       <div style="float:left;width:120px;height:100px">
+                           <div>
+                               <a target="_blank" href="{{hotmatchnews.imgurl}}">
+                                   <img src="{{hotmatchnews.imgsrcurl}}">
+                               </a>
+                           </div>
+                       </div>
+                       <ul style="float:left;width:440px;height:100px" >
+                           {% if hotmatchnews.line1 or hotmatchnews.line2 or hotmatchnews.line3 %}
+                           <li class="hotmatchnewsli">
+                               <a target="_blank" href="{{hotmatchnews.line1url}}" class="hotmatchnewsline">{{hotmatchnews.line1}}</a>
+                               <a target="_blank" href="{{hotmatchnews.line2url}}" class="hotmatchnewsline">{{hotmatchnews.line2}}</a>
+                               <a target="_blank" href="{{hotmatchnews.line3url}}" class="hotmatchnewsline">{{hotmatchnews.line3}}</a>
+                           </li>
+                           {% endif %}
+                           {% if hotmatchnews.line4 or hotmatchnews.line5 or hotmatchnews.line6 %}
+                           <li class="hotmatchnewsli" style="margin-top:10px">
+                               <a target="_blank" href="{{hotmatchnews.line4url}}" class="hotmatchnewsline">{{hotmatchnews.line4}}</a>
+                               <a target="_blank" href="{{hotmatchnews.line5url}}" class="hotmatchnewsline">{{hotmatchnews.line5}}</a>
+                               <a target="_blank" href="{{hotmatchnews.line6url}}" class="hotmatchnewsline">{{hotmatchnews.line6}}</a>
+                           </li>
+                           {% endif %}
+                           {% if hotmatchnews.line7 or hotmatchnews.line8 or hotmatchnews.line9 %}
+                           <li class="hotmatchnewsli" style="margin-top:10px">
+                               <a target="_blank" href="{{hotmatchnews.line7url}}" class="hotmatchnewsline">{{hotmatchnews.line7}}</a>
+                               <a target="_blank" href="{{hotmatchnews.line8url}}" class="hotmatchnewsline">{{hotmatchnews.line8}}</a>
+                               <a target="_blank" href="{{hotmatchnews.line9url}}" class="hotmatchnewsline">{{hotmatchnews.line9}}</a>
+                           </li>
+                           {% endif %}
+                       </ul>
+                   </div>
+
+               </div>
+               {% endfor %}
+           </div>
+       </div>
+    </div>
+    <div class="uk-width-medium-3-10">
+
+    </div>
+
+{% endblock %}
