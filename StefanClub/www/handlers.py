@@ -320,6 +320,14 @@ async def api_nbanews(*, shift_type):
     return dict(nbanews=nbanews)
 
 
+@get('/api/hotmatchnews')
+async def api_hotmatchnews():
+    hotmatchnews = await HotMatchNews.findAll(orderBy='id desc', limit=(0,6))
+    hotmatchnews.sort(key=lambda k: (k.get('id', 0)))
+
+    return dict(hotmatchnews=hotmatchnews)
+
+
 @post('/api/blogs/{id}/comments')
 async def api_create_comment(id, request, *, content):
     user = request.__user__

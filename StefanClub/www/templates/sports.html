@@ -71,9 +71,10 @@
 .nav-tabs > li > a > span:hover {
 
 }
-.nav-tabs >li >a:active{
-
+.midtabclass{
     background-color: red;
+    color:#fff;
+    font-weight:bold;
 }
 .hotmatchnewstitle {
      color:red;
@@ -99,13 +100,22 @@
 }
 </style>
 <script>
+window.onload = function()
+{
+  $("#hota").css('background-color','red');
+  $("#hota").css('color','#fff');
+  $("#hota").css('font-weight','bold');
+}
+
 $(document).ready(function(){
   $(".midtab").hover(function(){
     $(this).css("color","#fff");
     $(this).css("background-color","red");
     $(this).css("font-weight","bold");
     },function(){
-    if ($(this).attr('id') != 'firstmidtab')
+    var thisliid = this.id;
+    thisliid = thisliid.substring(0,thisliid.length-1);
+    if ($("#" + thisliid + "").attr('class') != 'active')
     {
        $(this).css("color","black");
        $(this).css("background-color","");
@@ -226,68 +236,225 @@ function shiftnews(type)
                {
                  var addBody = "";
                  for(var i = 0; i < nbanews.length; i++){
-                    var adddiv =  "<div>"
-                               +    "<div>"
-                               +      "<div>"
-                               +          "<a href='" + nbanews[i].imgurl + "'target='_blank' style='text-decoration:none;'>"
-                               +              "<img src='" + nbanews[i].imgsrcurl + "'>"
-                               +          "</a>"
-                               +      "</div>"
-                               +    "</div>"
-                               +    "<div>"
-                               +       "<h3>"
-                               +                      "<div class='matchtext' style='float:right;margin:0 -15px 0 0' >";
-                 if ( matches[i].type == 'pre')
-                 {
-                    var  change1 = "<span>" + matches[i].matchdate + "</span>";
-                 }
-                 else
-                 {
-                     var  change1 = "<span>" + matches[i].score1 + "</span>";
-                 }
-                 addli = addli + change1;
-                 addli = addli +                      "</div>"
-                 +                      "<div class='matchtext' style='float:left;padding:1px 0 1px 10px;'>"
-                 +                          "<span>" + matches[i].team1 + "</span>"
-                 +                      "</div>"
-                 +                  "</div>"
-                 +                  "<div style='width:140px;height:20px;'>"
-                 +                      "<div class='matchtext' style='float:right;margin:0 -15px 0 0'>";
-                 if ( matches[i].type == 'pre')
-                 {
-                    var  change2 = "<span>" + matches[i].matchtime + "</span>";
-                 }
-                 else
-                 {
-                     var  change2 = "<span>" + matches[i].score2 + "</span>";
-                 }
-                 addli = addli + change2;
-                 addli = addli +    "</div>"
-                 +                      "<div class='matchtext' style='float:left;padding:1px 30px 1px 10px;'>"
-                 +                          "<span >" + matches[i].team2 + "</span>"
-                 +                      "</div>"
-                 +                  "</div>"
-                 +              "</div>"
-                 +          "</a>"
-                 +          "</div>"
-                 +          "<div style='width:164px;height:30px;position: relative;'>"
-                 +              "<div class='matchbottom'>"
-                 +                  "<ul >"
-                 +                      "<li  style='float:left;padding:3px 15px 0 0;'><a class='matchtext' style='text-decoration:none;' href='" + matches[i].liveurl + "' target='_blank'>图文</a></li>"
-                 +                      "<li  style='float:left;padding:3px 0 0 15px;'><a class='matchtext' style='text-decoration:none;' href='" + matches[i].newsurl + "' target='_blank'>专题</a></li>"
-                 +                  "</ul>"
-                 +              "</div>"
-                 +          "</div>"
-                 +      "</div>"
-                 +  "</div>"
-                 +  "</li>";
-                addBody = addBody + addli;
+                    var adddiv =  "<div  style='width:560px;height:100px;margin-top:25px'>";
+                               if (nbanews[i].imgurl != null && nbanews[i].imgurl != "")
+                               {
+                                  adddiv = adddiv  +    "<div style='float:left;width:120px;height:100px;'>"
+                                         +      "<div style='width:120px;height:100px;'>"
+                                         +          "<a href='" + nbanews[i].imgurl + "'target='_blank' style='text-decoration:none;'>"
+                                         +              "<img style='width:100%;height:100%;' src='" + nbanews[i].imgsrcurl + "'>"
+                                         +          "</a>"
+                                         +      "</div>"
+                                         +    "</div>";
+                               }
+                               adddiv = adddiv   +    "<div  style='float:right;width:425px;height:100px;position: relative;'>"
+                               +       "<h3 style='position: absolute;left:0px;right:0px;top:0px;bottom:0px;margin:auto;'>"
+                               +          "<a href='" + nbanews[i].titleurl + "'target='_blank' style='text-decoration:none;font-size:75%;font-weight:bold;color:black;'>" + nbanews[i].title + "</a>"
+                               +       "</h3>"
+                               +       "<p></p>"
+                               +       "<p  style='width:425px;height:15px;position: absolute;left:0px;right:0px;top:0px;bottom:0px;margin:auto;margin-bottom: 5px;'>"
+                               +          "<span>";
+                               var timestr =  nbanews[i].newstime.toString();
+                               adddiv = adddiv + timestr;
+                               adddiv = adddiv
+                                + "</span>"
+                               +          "<span>";
+                               if  (nbanews[i].tag1 != null && nbanews[i].tag1 != "")
+                               {
+                                   adddiv =  adddiv
+                                    +             "<span>"
+                                    +                  "<a href='" + nbanews[i].tag1url + "'target='_blank' style='text-decoration:none;'>" + nbanews[i].tag1 + "</a>"
+                                    +             "</span>";
+                               }
+                               if  (nbanews[i].tag2 != null && nbanews[i].tag2 != "")
+                               {
+                                   adddiv =  adddiv
+                                    +             "<span>"
+                                    +                  "<a href='" + nbanews[i].tag2url + "'target='_blank' style='text-decoration:none;'>" + nbanews[i].tag2 + "</a>"
+                                    +             "</span>";
+                               }
+                               if  (nbanews[i].tag3 != null && nbanews[i].tag3 != "")
+                               {
+                                   adddiv =  adddiv
+                                    +             "<span>"
+                                    +                  "<a href='" + nbanews[i].tag3url + "'target='_blank' style='text-decoration:none;'>" + nbanews[i].tag3 + "</a>"
+                                    +             "</span>";
+                               }
+                               if  (nbanews[i].tag4 != null && nbanews[i].tag4 != "")
+                               {
+                                   adddiv =  adddiv
+                                    +             "<span>"
+                                    +                  "<a href='" + nbanews[i].tag4url + "'target='_blank' style='text-decoration:none;'>" + nbanews[i].tag4 + "</a>"
+                                    +             "</span>";
+                               }
+                               if  (nbanews[i].tag5 != null && nbanews[i].tag5 != "")
+                               {
+                                   adddiv =  adddiv
+                                    +             "<span>"
+                                    +                  "<a href='" + nbanews[i].tag5url + "'target='_blank' style='text-decoration:none;'>" + nbanews[i].tag5 + "</a>"
+                                    +             "</span>";
+                               }
+                               adddiv =  adddiv
+                               +  "</span>"
+                               +  "<span>"
+                               +     "<a href='" + nbanews[i].comment_url + "'target='_blank' style='text-decoration:none;'>"
+                               +        "<span class='glyphicon glyphicon-comment'></span>"
+                               +     "</a>"
+                               +  "</span>"
+                               + "</p>"
+                            +  "</div>"
+                        +  "</div>";
+
+                addBody = addBody + adddiv;
               }
-             $("#hotmatchul").html(addBody);
+             $("#mainnews").html(addBody);
+             if (type != 'hot')
+             {
+                $("#hot").removeAttr("class");
+                $("#hota").css("color","black");
+                $("#hota").css("background-color","");
+                $("#hota").css("font-weight","");
+             }
+             if (type != 'nba')
+             {
+                $("#nba").removeAttr("class");
+                $("#nbaa").css("color","black");
+                $("#nbaa").css("background-color","");
+                $("#nbaa").css("font-weight","");
+             }
+             if (type != 'intsoc')
+             {
+                $("#intsoc").removeAttr("class");
+                $("#intsoca").css("color","black");
+                $("#intsoca").css("background-color","");
+                $("#intsoca").css("font-weight","");
+             }
+             if (type != 'chisoc')
+             {
+                $("#chisoc").removeAttr("class");
+                $("#chisoca").css("color","black");
+                $("#chisoca").css("background-color","");
+                $("#chisoca").css("font-weight","");
+             }
+             if (type != 'cba')
+             {
+                $("#cba").removeAttr("class");
+                $("#cbaa").css("color","black");
+                $("#cbaa").css("background-color","");
+                $("#cbaa").css("font-weight","");
+             }
+             if (type != 'sum')
+             {
+                $("#sum").removeAttr("class");
+                $("#suma").css("color","black");
+                $("#suma").css("background-color","");
+                $("#suma").css("font-weight","");
+             }
+             $("#" + type + "").attr("class","active");
+             $("#" + type + "a" + "").css('background-color','red');
+             $("#" + type + "a" + "").css('color','#fff');
+             $("#" + type + "a" + "").css('font-weight','bold');
           }
-          $("#hotmatchpage").html(currentpage);
         }
       });
+     }
+     else
+     {
+        $.ajax({
+            type: "GET",
+            url: "/api/hotmatchnews",
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+               hotmatchnews = data.hotmatchnews;
+               if (hotmatchnews.length > 0)
+               {
+                 var addBody = "";
+                 for(var i = 0; i < hotmatchnews.length; i++){
+                    var adddiv =  "<div>"
+                                     + "<h3 class='hotmattitlesum'>"
+                                     +    "<a target='_blank' href='" + hotmatchnews[i].title1url + "' class='hotmatchnewstitle'>" + hotmatchnews[i].title1 + "</a>"
+                                     +    "<a target='_blank' href='" + hotmatchnews[i].title2url + "' class='hotmatchnewstitle'>" + hotmatchnews[i].title2 + "</a>"
+                                     +    "<a target='_blank' href='" + hotmatchnews[i].title3url + "' class='hotmatchnewstitle'>" + hotmatchnews[i].title3 + "</a>"
+                                     +  "</h3>"
+                                     +   "<div style='width:560px;height:100px'>"
+                                     +      "<div style='float:left;width:120px;height:100px'>"
+                                     +         "<div>"
+                                     +            "<a target='_blank' href='" + hotmatchnews[i].imgurl + "'>"
+                                     +               "<img src='" + hotmatchnews[i].imgsrcurl + "'>"
+                                     +            "</a>"
+                                     +         "</div>"
+                                     +      "</div>"
+                                     +  "<ul style='float:left;width:440px;height:100px' >";
+                    if ( (hotmatchnews[i].line1 != null &&  hotmatchnews[i].line1 != "") || (hotmatchnews[i].line2 != null &&  hotmatchnews[i].line2 != "") || (hotmatchnews[i].line3 != null &&  hotmatchnews[i].line3 != "") )
+                    {
+                        adddiv  = adddiv +
+                           "<li class='hotmatchnewsli'>"
+                            +   "<a target='_blank' href='" + hotmatchnews[i].line1url + "' class='hotmatchnewsline'>" + hotmatchnews[i].line1 + "</a>"
+                            +   "<a target='_blank' href='" + hotmatchnews[i].line2url + "' class='hotmatchnewsline'>" + hotmatchnews[i].line2 + "</a>"
+                            +   "<a target='_blank' href='" + hotmatchnews[i].line3url + "' class='hotmatchnewsline'>" + hotmatchnews[i].line3 + "</a>"
+                         +   "</li>" ;
+                    }
+                    if ( (hotmatchnews[i].line4 != null &&  hotmatchnews[i].line4 != "") || (hotmatchnews[i].line5 != null &&  hotmatchnews[i].line5 != "") || (hotmatchnews[i].line6 != null &&  hotmatchnews[i].line6 != "") )
+                    {
+                          adddiv  = adddiv +
+                                    "<li class='hotmatchnewsli' style='margin-top:10px'>"
+                                   +   "<a target='_blank' href='" + hotmatchnews[i].line4url + "' class='hotmatchnewsline'>" + hotmatchnews[i].line4 + "</a>"
+                                   +   "<a target='_blank' href='" + hotmatchnews[i].line5url + "' class='hotmatchnewsline'>" + hotmatchnews[i].line5 + "</a>"
+                                   +   "<a target='_blank' href='" + hotmatchnews[i].line6url + "' class='hotmatchnewsline'>" + hotmatchnews[i].line6 + "</a>"
+                                   +   "</li>" ;
+                    }
+                    if ( (hotmatchnews[i].line7 != null &&  hotmatchnews[i].line7 != "") || (hotmatchnews[i].line8 != null &&  hotmatchnews[i].line8 != "") || (hotmatchnews[i].line9 != null &&  hotmatchnews[i].line9 != "") )
+                    {
+                          adddiv  = adddiv +
+                                    "<li class='hotmatchnewsli' style='margin-top:10px'>"
+                                   +   "<a target='_blank' href='" + hotmatchnews[i].line7url + "' class='hotmatchnewsline'>" + hotmatchnews[i].line7 + "</a>"
+                                   +   "<a target='_blank' href='" + hotmatchnews[i].line8url + "' class='hotmatchnewsline'>" + hotmatchnews[i].line8 + "</a>"
+                                   +   "<a target='_blank' href='" + hotmatchnews[i].line9url + "' class='hotmatchnewsline'>" + hotmatchnews[i].line9 + "</a>"
+                                   +   "</li>" ;
+                    }
+                   adddiv  = adddiv  +     "</ul>"
+                              +   "</div>"
+
+                              +  "</div>";
+
+                addBody = addBody + adddiv;
+              }
+             $("#mainnews").html(addBody);
+
+                $("#nba").removeAttr("class");
+                $("#nbaa").css("color","black");
+                $("#nbaa").css("background-color","");
+                $("#nbaa").css("font-weight","");
+
+                $("#intsoc").removeAttr("class");
+                $("#intsoca").css("color","black");
+                $("#intsoca").css("background-color","");
+                $("#intsoca").css("font-weight","");
+
+                $("#chisoc").removeAttr("class");
+                $("#chisoca").css("color","black");
+                $("#chisoca").css("background-color","");
+                $("#chisoca").css("font-weight","");
+
+                $("#cba").removeAttr("class");
+                $("#cbaa").css("color","black");
+                $("#cbaa").css("background-color","");
+                $("#cbaa").css("font-weight","");
+
+                $("#sum").removeAttr("class");
+                $("#suma").css("color","black");
+                $("#suma").css("background-color","");
+                $("#suma").css("font-weight","");
+
+             $("#hot").attr("class","active");
+             $("#hota").css('background-color','red');
+             $("#hota").css('color','#fff');
+             $("#hota").css('font-weight','bold');
+          }
+        }
+      });
+     }
 }
 </script>
 
@@ -388,16 +555,16 @@ function shiftnews(type)
        </div>
        <div style="margin-top:20px">
            <ul class="nav nav-tabs nav-justified">
-               <li class="active"><a id="firstmidtab" class="midtab" style="background-color:red;color:#fff;font-weight:bold" href="javascript:void(0)" onclick="shiftnews('hot')"><span>热门</span></a></li>
-               <li><a  class="midtab" href="javascript:void(0)" onclick="shiftnews('nba')"><span>NBA</span></a></li>
-               <li><a class="midtab" href="javascript:void(0)" onclick="shiftnews('intsoc')"><span>国际足球</span></a></li>
-               <li><a class="midtab" href="javascript:void(0)" onclick="shiftnews('chisoc')"><span>中国足球</span></a></li>
-               <li><a class="midtab" href="javascript:void(0)" onclick="shiftnews('cba')"><span>中国篮球</span></a></li>
-               <li><a class="midtab" href="javascript:void(0)" onclick="shiftnews('sum')"><span>综合体育</span></a></li>
+               <li id="hot" class="active"><a id="hota" class="midtab"  href="javascript:void(0)" onclick="shiftnews('hot')"><span>热门</span></a></li>
+               <li id="nba"><a id="nbaa" class="midtab" href="javascript:void(0)" onclick="shiftnews('nba')"><span>NBA</span></a></li>
+               <li id="intsoc"><a id="intsoca" class="midtab" href="javascript:void(0)" onclick="shiftnews('intsoc')"><span>国际足球</span></a></li>
+               <li id="chisoc"><a id="chisoca" class="midtab" href="javascript:void(0)" onclick="shiftnews('chisoc')"><span>中国足球</span></a></li>
+               <li id="cba"><a id="cbaa" class="midtab" href="javascript:void(0)" onclick="shiftnews('cba')"><span>中国篮球</span></a></li>
+               <li id="sum"><a id="suma" class="midtab" href="javascript:void(0)" onclick="shiftnews('sum')"><span>综合体育</span></a></li>
            </ul>
        </div>
        <div>
-           <div>
+           <div id="mainnews">
                {% for hotmatchnews in hotmatchnewss %}
                <div>
                    <h3 class="hotmattitlesum">
