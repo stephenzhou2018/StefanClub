@@ -11,6 +11,7 @@ from models import User,Blog,Comment,next_id,IndexCarouselItems,IndexNews,HotMat
 import asyncio,time,re,hashlib,json,logging
 from apis import APIError,APIValueError,APIPermissionError,APIResourceNotFoundError,Page
 from config import configs
+from datetime import datetime
 
 
 COOKIE_NAME = 'awesession'
@@ -316,7 +317,21 @@ async def api_hotmatches(*, page='1', swi_type='pre'):
 @get('/api/nbanews')
 async def api_nbanews(*, shift_type):
     nbanews = await NbaNews.findAll('newstype=?',[shift_type],orderBy='id desc',limit=(0, 25))
-
+    for nbanewsitem in nbanews:
+        newsitemtime = nbanewsitem["newstime"]
+        timestamp = datetime.timestamp(newsitemtime)
+        nowtime = time.time()
+        delta = int(nowtime - timestamp)
+        if delta < 60:
+            nbanewsitem["newstime"] = u'1分钟前'
+        if delta < 3600:
+            nbanewsitem["newstime"] = u'%s分钟前' % (delta // 60)
+        if delta < 86400:
+            nbanewsitem["newstime"] = u'%s小时前' % (delta // 3600)
+        if delta < 604800:
+            nbanewsitem["newstime"] = u'%s天前' % (delta // 86400)
+        else:
+            nbanewsitem["newstime"] = u'%s年%s月%s日' % (newsitemtime.year, newsitemtime.month, newsitemtime.day)
     return dict(nbanews=nbanews)
 
 

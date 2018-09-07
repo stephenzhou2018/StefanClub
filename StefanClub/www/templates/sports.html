@@ -98,6 +98,12 @@
 .hotmatchnewsli a:hover {
      color: red;
 }
+.nbanewslabela {
+     color:black;
+}
+.nbanewsspan {
+  margin-left:10px;
+}
 </style>
 <script>
 window.onload = function()
@@ -253,50 +259,48 @@ function shiftnews(type)
                                +       "</h3>"
                                +       "<p></p>"
                                +       "<p  style='width:425px;height:15px;position: absolute;left:0px;right:0px;top:0px;bottom:0px;margin:auto;margin-bottom: 5px;'>"
-                               +          "<span>";
-                               var timestr =  nbanews[i].newstime.toString();
-                               adddiv = adddiv + timestr;
-                               adddiv = adddiv
-                                + "</span>"
-                               +          "<span>";
+                               +          "<span style='opacity:0.7;'>"
+                               +              nbanews[i].newstime
+                               +          "</span>"
+                               +          "<span class='nbanewsspan'>";
                                if  (nbanews[i].tag1 != null && nbanews[i].tag1 != "")
                                {
                                    adddiv =  adddiv
                                     +             "<span>"
-                                    +                  "<a href='" + nbanews[i].tag1url + "'target='_blank' style='text-decoration:none;'>" + nbanews[i].tag1 + "</a>"
+                                    +                  "<a href='" + nbanews[i].tag1url + "'target='_blank' style='text-decoration:none;' class='nbanewslabela'>" + nbanews[i].tag1 + "</a>"
                                     +             "</span>";
                                }
                                if  (nbanews[i].tag2 != null && nbanews[i].tag2 != "")
                                {
                                    adddiv =  adddiv
-                                    +             "<span>"
-                                    +                  "<a href='" + nbanews[i].tag2url + "'target='_blank' style='text-decoration:none;'>" + nbanews[i].tag2 + "</a>"
+                                    +             "<span class='nbanewsspan'>"
+                                    +                  "<a href='" + nbanews[i].tag2url + "'target='_blank' style='text-decoration:none;' class='nbanewslabela'>" + nbanews[i].tag2 + "</a>"
                                     +             "</span>";
                                }
                                if  (nbanews[i].tag3 != null && nbanews[i].tag3 != "")
                                {
                                    adddiv =  adddiv
-                                    +             "<span>"
-                                    +                  "<a href='" + nbanews[i].tag3url + "'target='_blank' style='text-decoration:none;'>" + nbanews[i].tag3 + "</a>"
+                                    +             "<span class='nbanewsspan'>"
+                                    +                  "<a href='" + nbanews[i].tag3url + "'target='_blank' style='text-decoration:none;' class='nbanewslabela'>" + nbanews[i].tag3 + "</a>"
                                     +             "</span>";
                                }
                                if  (nbanews[i].tag4 != null && nbanews[i].tag4 != "")
                                {
                                    adddiv =  adddiv
-                                    +             "<span>"
-                                    +                  "<a href='" + nbanews[i].tag4url + "'target='_blank' style='text-decoration:none;'>" + nbanews[i].tag4 + "</a>"
+                                    +             "<span class='nbanewsspan'>"
+                                    +                  "<a href='" + nbanews[i].tag4url + "'target='_blank' style='text-decoration:none;' class='nbanewslabela'>" + nbanews[i].tag4 + "</a>"
                                     +             "</span>";
                                }
                                if  (nbanews[i].tag5 != null && nbanews[i].tag5 != "")
                                {
                                    adddiv =  adddiv
-                                    +             "<span>"
-                                    +                  "<a href='" + nbanews[i].tag5url + "'target='_blank' style='text-decoration:none;'>" + nbanews[i].tag5 + "</a>"
+                                    +             "<span class='nbanewsspan'>"
+                                    +                  "<a href='" + nbanews[i].tag5url + "'target='_blank' style='text-decoration:none;' class='nbanewslabela'>" + nbanews[i].tag5 + "</a>"
                                     +             "</span>";
                                }
                                adddiv =  adddiv
                                +  "</span>"
-                               +  "<span>"
+                               +  "<span style='float:right'>"
                                +     "<a href='" + nbanews[i].comment_url + "'target='_blank' style='text-decoration:none;'>"
                                +        "<span class='glyphicon glyphicon-comment'></span>"
                                +     "</a>"
