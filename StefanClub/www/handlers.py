@@ -120,7 +120,7 @@ async def sports():
         'sinacars': sinacars,
         'sinacars1': sinacars1[0],
         'hotmatchnewss': hotmatchnews,
-        'lefttopimg': lefttopimg,
+        'lefttopimg': lefttopimg[0],
         'lefttoplines': lefttoplines,
     }
 

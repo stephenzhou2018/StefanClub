@@ -624,17 +624,23 @@ function shiftnews(type)
     </div>
     <div class="uk-width-medium-3-10">
         <div>
-            <div style="width:120px;height:100px;position:relative;">
+            <div style="width:314.5px;height:180px;position:relative;">
                 <a href="{{lefttopimg.imgurl}}" target="_blank">
                     <img src="{{lefttopimg.imgsrcurl}}">
-                    <div style='position:absolute;width:10px;height:10px;z-index:2;left:0px;right:0px;top:0;bottom:0px;margin:auto;margin-bottom: 15px;margin-left: 15px;'>
+                    <div style='position:absolute;width:300px;height:10px;z-index:2;left:0px;right:0px;top:0;bottom:0px;margin:auto;margin-bottom: 15px;margin-left: 15px;'>
                         {% if lefttopimg.isvideo == 'TRUE' %}
                         <span class='glyphicon glyphicon-play-circle' style='color:white'></span>
                         {% endif %}
-                        <span>{{lefttopimg.title}}</span>
+                        <span style="color:white">{{lefttopimg.title}}</span>
                     </div>
-
                 </a>
+            </div>
+            <div style="width:314.5px; margin-top:14px;">
+                {% for lefttopline in lefttoplines %}
+                <p>
+                    <a target="_blank" href="{{lefttopline.titleurl}}" style="color:black;opacity:0.7;">{{lefttopline.title}}</a>
+                </p>
+                {% endfor %}
             </div>
         </div>
     </div>
