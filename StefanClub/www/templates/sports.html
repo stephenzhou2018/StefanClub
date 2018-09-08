@@ -246,9 +246,17 @@ function shiftnews(type)
                                if (nbanews[i].imgurl != null && nbanews[i].imgurl != "")
                                {
                                   adddiv = adddiv  +    "<div style='float:left;width:120px;height:100px;'>"
-                                         +      "<div style='width:120px;height:100px;'>"
+                                         +      "<div style='width:120px;height:100px;position:relative;'>"
                                          +          "<a href='" + nbanews[i].imgurl + "'target='_blank' style='text-decoration:none;'>"
-                                         +              "<img style='width:100%;height:100%;' src='" + nbanews[i].imgsrcurl + "'>"
+                                         +              "<img style='width:100%;height:100%;' src='" + nbanews[i].imgsrcurl + "'>";
+                                         if (nbanews[i].isvideo == 'TRUE')
+                                         {
+                                              adddiv = adddiv
+                                         +              "<div style='position:absolute;width:10px;height:10px;z-index:2;left:0px;right:0px;top:0;bottom:0px;margin:auto;margin-bottom: 15px;margin-left: 15px;'>"
+                                         +                   "<span class='glyphicon glyphicon-play-circle' style='color:white'></span>"
+                                         +              "</div>";
+                                         }
+                                         adddiv = adddiv
                                          +          "</a>"
                                          +      "</div>"
                                          +    "</div>";
@@ -615,7 +623,20 @@ function shiftnews(type)
        </div>
     </div>
     <div class="uk-width-medium-3-10">
+        <div>
+            <div style="width:120px;height:100px;position:relative;">
+                <a href="{{lefttopimg.imgurl}}" target="_blank">
+                    <img src="{{lefttopimg.imgsrcurl}}">
+                    <div style='position:absolute;width:10px;height:10px;z-index:2;left:0px;right:0px;top:0;bottom:0px;margin:auto;margin-bottom: 15px;margin-left: 15px;'>
+                        {% if lefttopimg.isvideo == 'TRUE' %}
+                        <span class='glyphicon glyphicon-play-circle' style='color:white'></span>
+                        {% endif %}
+                        <span>{{lefttopimg.title}}</span>
+                    </div>
 
+                </a>
+            </div>
+        </div>
     </div>
 
 {% endblock %}

@@ -49,6 +49,11 @@ class SinasportsSpider(scrapy.Spider):
         max_nbanews_num = 0
     curr_num_of_nba = max_nbanews_num + 1
 
+    max_lefttop_num = get_max_num('lefttop')
+    if max_lefttop_num is None:
+        max_lefttop_num = 0
+    curr_num_of_letop = max_lefttop_num + 1
+
     def start_requests(self):
         yield Request(self.nbanews_url, meta={"newstype":"NBA","request_url":self.nbanews_url}, callback=self.parse_nba_news)
         yield Request(self.intsoc_url, meta={"newstype":"INTSOC","request_url":self.intsoc_url}, callback=self.parse_nba_news)
@@ -105,9 +110,40 @@ class SinasportsSpider(scrapy.Spider):
     def parse_main(self, response):
         sinacarousel = SinaCarousel()
         hotmatchnews = HotMatchNews()
+        nbanews = NbaNews()
         soup = BeautifulSoup(response.text, 'lxml')
         post_nodes = soup.select("ul[class='slide-focus-d-cont'] li[class='clearfix thumbnail-b-gra']")
         post_nodes1 = soup.select("div[node-type='tytopwrap']")
+        lefttopimg_node = soup.select("div[data-sudaclick='blk_focusvideo'] div[class='thumbnail-b thumbnail-b-gra thumbnail-b-video']")[0]
+        post_nodes2 = soup.select("div[data-sudaclick='blk_focusvideo'] div[class='layout-mt-g news-list-e'] p")
+
+        lefttopsel = Selector(text=str(lefttopimg_node), type="html", )
+        lefttoptitle = lefttopsel.xpath('//h3/text()').extract()[0].strip()
+        lefttopurl = lefttopsel.xpath('//a//@href').extract()[0].strip()
+        lefttopimgsrcurl = lefttopsel.xpath('//img//@src').extract()[0].strip()
+        lefttopisvideo = lefttopurl[2:7]
+        if lefttopisvideo == 'video':
+            lefttopisvideo = 'TRUE'
+        else:
+            lefttopisvideo = 'FALSE'
+        lefttopfile_name = "lefttop_%s.jpg" % (self.curr_num_of_letop)
+        lefttopfile_path = os.path.join("D:\StefanClub\StefanClub\www\static\img\sinasports", lefttopfile_name)
+        urllib.request.urlretrieve(lefttopimgsrcurl, lefttopfile_path)
+        nbanews["number"] = self.curr_num_of_letop
+        self.curr_num_of_letop = self.curr_num_of_letop + 1
+        nbanews["imgsrcurl"] = "../static/img/sinasports/%s" % (lefttopfile_name)
+        nbanews["imgurl"] = lefttopurl
+        nbanews["isvideo"] = lefttopisvideo
+        nbanews["title"] = lefttoptitle
+        nbanews["titleurl"] = None
+        nbanews["newstime"] = None
+        nbanews["comment_url"] = None
+        for j in range(1,6):
+            nbanews["tag%s" % (j)] = None
+            nbanews["tag%surl" % (j)] = None
+        nbanews["newstype"] = 'lefttop'
+        yield  nbanews
+
         for post_node in post_nodes:
             sel = Selector(text=str(post_node), type="html", )
             title = sel.xpath('//p/text()').extract()[0].strip()
@@ -293,6 +329,25 @@ class SinasportsSpider(scrapy.Spider):
             hotmatchnews["line9url"] = line9url
 
             yield hotmatchnews
+
+        for post_node2 in post_nodes2:
+            sel2 = Selector(text=str(post_node2), type="html", )
+            title2 = sel2.xpath('//a/text()').extract()[0].strip()
+            titleurl2 = sel2.xpath('//a//@href').extract()[0].strip()
+            nbanews["number"] = None
+            nbanews["imgsrcurl"] = None
+            nbanews["imgurl"] = None
+            nbanews["isvideo"] = None
+            nbanews["title"] = title2
+            nbanews["titleurl"] = titleurl2
+            nbanews["newstime"] = None
+            nbanews["comment_url"] = None
+            for j in range(1,6):
+                nbanews["tag%s" % (j)] = None
+                nbanews["tag%surl" % (j)] = None
+            nbanews["newstype"] = 'lefttoplines'
+            yield  nbanews
+
 
     def parse_nba_news(self, response):
         nbanews = NbaNews()

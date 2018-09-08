@@ -278,8 +278,13 @@ def get_max_num(num_type,indexcar_type=None):
              '''
     elif num_type == 'nbanews':
         select_sql = '''
-            select max(number) from NbaNews
+            select max(number) from NbaNews where newstype <> 'lefttop' and newstype <> 'lefttoplines'
              '''
+    elif num_type == 'lefttop':
+        select_sql = '''
+            select max(number) from NbaNews where newstype = 'lefttop' 
+             '''
+
     else:
         pass
 

@@ -112,12 +112,16 @@ async def sports():
     sinacars = await SinaCarousel.findAll(orderBy='id desc', limit=(1,6))
     hotmatchnews = await HotMatchNews.findAll(orderBy='id desc', limit=(0,6))
     hotmatchnews.sort(key=lambda k: (k.get('id', 0)))
+    lefttopimg = await NbaNews.findAll('newstype=?',['lefttop'],orderBy='id desc', limit=(0,1))
+    lefttoplines = await NbaNews.findAll('newstype=?',['lefttoplines'],orderBy='id desc', limit=(0,5))
     return {
         '__template__': 'sports.html',
         'hotmatches': hotmatches,
         'sinacars': sinacars,
         'sinacars1': sinacars1[0],
         'hotmatchnewss': hotmatchnews,
+        'lefttopimg': lefttopimg,
+        'lefttoplines': lefttoplines,
     }
 
 
