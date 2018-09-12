@@ -112,4 +112,25 @@ class NbaNews(scrapy.Item):
     tag3url = scrapy.Field()
     tag4url = scrapy.Field()
     tag5url = scrapy.Field()
+    
+    
+class ZhihuHot(scrapy.Item):
+    feedsourcetag = scrapy.Field()
+    feedsourceurl = scrapy.Field()
+    userimgnumber = scrapy.Field()
+    userimgsrcurl = scrapy.Field()
+    userimgurl = scrapy.Field()
+    username = scrapy.Field()
+    userinfo = scrapy.Field()
+    newsimgnumber = scrapy.Field()
+    newsimgsrcurl = scrapy.Field()
+    newsimgurl = scrapy.Field()
+    isvideo = scrapy.Field()
+    title = scrapy.Field()
+    titleurl = scrapy.Field()
+    newscontent = scrapy.Field()
+    infavorqty  = scrapy.Field()
+    comment_url = scrapy.Field()
+    comment_title = scrapy.Field()
+    share_url = scrapy.Field()
 

@@ -171,3 +171,29 @@ create table NbaNews (
     key `idx_created_at` (`created_at`),
     primary key (`id`)
 ) engine=innodb default charset=utf8;
+
+
+create table ZhihuHot (
+    `id` int not null auto_increment,
+    `feedsourcetag` varchar(100),
+    `feedsourceurl` varchar(300),
+    `userimgnumber` int,
+    `userimgsrcurl` varchar(300),
+    `userimgurl` varchar(300),
+    `username` varchar(100),
+    `userinfo` varchar(300),
+    `newsimgnumber` int,
+    `newsimgsrcurl` varchar(300),
+    `newsimgurl` varchar(300),
+    `isvideo` varchar(5),
+    `title` varchar(300) ,
+    `titleurl` varchar(300) ,
+    `newscontent` varchar(1000) ,
+    `infavorqty`  varchar(20) ,
+    `comment_url` varchar(300) ,
+    `comment_title` varchar(300) ,
+    `share_url` varchar(300) ,
+    `created_at` TIMESTAMP not null,
+    key `idx_created_at` (`created_at`),
+    primary key (`id`)
+) engine=innodb default charset=utf8;

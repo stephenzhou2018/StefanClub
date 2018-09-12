@@ -116,10 +116,6 @@ class SinasportsSpider(scrapy.Spider):
     def parse_main(self, response):
         sinacarousel = SinaCarousel()
         hotmatchnews = HotMatchNews()
-        nbanews = NbaNews()
-        lefttop_nbanews = NbaNews()
-        leftsec_nbanews = NbaNews()
-        leftsectxt_nbanewslist = []
         soup = BeautifulSoup(response.text, 'lxml')
         post_nodes = soup.select("ul[class='slide-focus-d-cont'] li[class='clearfix thumbnail-b-gra']")
         post_nodes1 = soup.select("div[node-type='tytopwrap']")

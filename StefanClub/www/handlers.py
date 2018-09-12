@@ -114,6 +114,8 @@ async def sports():
     hotmatchnews.sort(key=lambda k: (k.get('id', 0)))
     lefttopimg = await NbaNews.findAll('newstype=?',['lefttop'],orderBy='id desc', limit=(0,1))
     lefttoplines = await NbaNews.findAll('newstype=?',['lefttoplines'],orderBy='id desc', limit=(0,5))
+    leftsecimg = await NbaNews.findAll('newstype=?',['leftsec'],orderBy='id desc', limit=(0,1))
+    leftseclines = await NbaNews.findAll('newstype=?',['leftsectxt'],orderBy='id desc', limit=(0,3))
     return {
         '__template__': 'sports.html',
         'hotmatches': hotmatches,
@@ -122,6 +124,15 @@ async def sports():
         'hotmatchnewss': hotmatchnews,
         'lefttopimg': lefttopimg[0],
         'lefttoplines': lefttoplines,
+        'leftsecimg': leftsecimg[0],
+        'leftseclines': leftseclines,
+    }
+
+
+@get('/zhihu')
+async def zhihu():
+    return {
+        '__template__': 'zhihu.html',
     }
 
 
