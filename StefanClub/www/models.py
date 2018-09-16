@@ -166,3 +166,30 @@ class NbaNews(Model):
     tag4url = StringField(ddl='varchar(300)')
     tag5url = StringField(ddl='varchar(300)')
     created_at = DateTimeField()
+    
+    
+class ZhihuHot(Model):
+    __table__ = 'ZhihuHot'
+
+    id = IntegerField(primary_key=True)
+    collapse_no = StringField(ddl='varchar(20)')
+    collapse_no_ref = StringField(ddl='varchar(20)')
+    feedsourcetag = StringField(ddl='varchar(100)')
+    feedsourceurl = StringField(ddl='varchar(300)')
+    userimgnumber = IntegerField()
+    userimgsrcurl = StringField(ddl='varchar(300)')
+    userimgurl = StringField(ddl='varchar(300)')
+    username = StringField(ddl='varchar(100)')
+    userinfo = StringField(ddl='varchar(300)')
+    newsimgnumber = IntegerField()
+    newsimgsrcurl = StringField(ddl='varchar(300)')
+    newsimgurl = StringField(ddl='varchar(300)')
+    isvideo = StringField(ddl='varchar(5)')
+    title = StringField(ddl='varchar(300)')
+    titleurl = StringField(ddl='varchar(300)')
+    newscontent = StringField(ddl='varchar(1000)')
+    infavorqty  = StringField(ddl='varchar(20)')
+    comment_url = StringField(ddl='varchar(300)')
+    comment_title = StringField(ddl='varchar(300)')
+    share_url = StringField(ddl='varchar(300)')
+    created_at = DateTimeField()

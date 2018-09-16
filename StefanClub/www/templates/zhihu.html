@@ -16,7 +16,78 @@
 {% block content %}
 
    <div class="uk-width-medium-7-10">
+      <div>
+         {% for zhihuhot in zhihuhots %}
+         <div>
+            <div>
+               <div>
+                  <div>
+                     热门内容, 来自:
+                     <span>
+                        <a href="{{zhihuhot.feedsourceurl}}" target="_blank">
+                           <div>
+                              <div id="Popover3-toggle">{{zhihuhot.feedsourcetag}}</div>
+                           </div>
+                        </a>
+                     </span>
+                  </div>
+                  <div>
+                     <span>
+                        <div>
+                           <div>
+                              <a target="_blank" href="{{zhihuhot.userimgurl}}">
+                                 <img style="width:20px;height:20px;" src="{{zhihuhot.userimgsrcurl}}">
+                              </a>
+                           </div>
+                        </div>
+                     </span>
+                     <div>
+                        <div>
+                           <span>
+                              <div>
+                                 <div>
+                                    <a target="_blank" href="{{zhihuhot.userimgurl}}">{{zhihuhot.username}}</a>
+                                 </div>
+                              </div>
+                           </span>
+                        </div>
+                        <div>
+                           <div>
+                              <div>{{zhihuhot.userinfo}}</div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               <div>
+                  <h2>
+                     <div>
+                        <a target="_blank" href="{{zhihuhot.titleurl}}">{{zhihuhot.title}}</a>
+                     </div>
+                  </h2>
+                  <div class="panel panel-default">
+                     <div class="panel-heading">
+                        <h4 class="panel-title">
+                           <a data-toggle="collapse" data-parent="#accordion" href="{{zhihuhot.collapse_no_ref}}" style="text-decoration:none;">
+                              <div>
+                                 <div>
+                                    <img src="{{zhihuhot.newsimgsrcurl}}">
+                                 </div>
+                              </div>
+                           </a>
+                        </h4>
+                     </div>
+                     <div id="{{zhihuhot.collapse_no}}" class="panel-collapse collapse">
+                        <div class="panel-body">
 
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         {% endfor %}
+      </div>
    </div>
    <div class="uk-width-medium-3-10">
 

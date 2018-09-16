@@ -7,7 +7,7 @@ __author__ = 'Stephen Zhou'
 import markdown2
 from aiohttp import web
 from coroweb import get,post
-from models import User,Blog,Comment,next_id,IndexCarouselItems,IndexNews,HotMatches,SinaCarousel,HotMatchNews,NbaNews
+from models import User,Blog,Comment,next_id,IndexCarouselItems,IndexNews,HotMatches,SinaCarousel,HotMatchNews,NbaNews,ZhihuHot
 import asyncio,time,re,hashlib,json,logging
 from apis import APIError,APIValueError,APIPermissionError,APIResourceNotFoundError,Page
 from config import configs
@@ -131,8 +131,10 @@ async def sports():
 
 @get('/zhihu')
 async def zhihu():
+    zhihuhots = await ZhihuHot.findAll(orderBy='id desc', limit=(0,30))
     return {
         '__template__': 'zhihu.html',
+        'zhihuhots': zhihuhots,
     }
 
 

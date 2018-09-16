@@ -6,7 +6,7 @@
 # See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 import pymysql
 import datetime
-from items import IndexCarouselItem,IndexNews,HotMatches,SinaCarousel,HotMatchNews,NbaNews
+from items import IndexCarouselItem,IndexNews,HotMatches,SinaCarousel,HotMatchNews,NbaNews,ZhihuHot
 from scrapy.exceptions import DropItem
 from redis import Redis
 import pandas as pd
@@ -84,9 +84,21 @@ class MysqlPipeline(object):
             item["comment_url"],item["tag1"], item["tag2"],item["tag3"], item["tag4"],item["tag5"], item["tag1url"],item["tag2url"],
             item["tag3url"], item["tag4url"],item["tag5url"],datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
 
+        elif isinstance(item, ZhihuHot):
+            insert_sql = '''
+            insert into ZhihuHot(feedsourcetag,feedsourceurl,userimgnumber,userimgsrcurl,userimgurl,username,userinfo,
+            newsimgnumber,newsimgsrcurl,newsimgurl,isvideo,title,titleurl,newscontent,infavorqty,comment_url,comment_title,
+            share_url,created_at) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            '''
+            self.cursor.execute(insert_sql, (
+            item["feedsourcetag"],item["feedsourceurl"], item["userimgnumber"], item["userimgsrcurl"], item["userimgurl"], item["username"],item["userinfo"],item["newsimgnumber"],
+            item["newsimgsrcurl"],item["newsimgurl"], item["isvideo"],item["title"], item["titleurl"],item["newscontent"], item["infavorqty"],item["comment_url"],
+            item["comment_title"], item["share_url"],datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
+
         else:
             pass
         self.conn.commit()
+        return item
 
 
 class DuplicatesPipeline(object):
@@ -97,6 +109,7 @@ class DuplicatesPipeline(object):
         self.sinacar_seen = set()
         self.hotmatchnews_seen = set()
         self.nbanews_seen = set()
+        self.zhihuhot_seen = set()
 
     def process_item(self, item, spider):
         if isinstance(item, HotMatches):
@@ -141,6 +154,13 @@ class DuplicatesPipeline(object):
                 self.nbanews_seen.add(item['title'])
                 return item
 
+        elif isinstance(item, ZhihuHot):
+            if item['title'] in self.zhihuhot_seen:
+                raise DropItem("(Scrapy)Duplicate item found: %s" % item)
+            else:
+                self.zhihuhot_seen.add(item['title'])
+                return item
+
         else:
             return item
 
@@ -153,6 +173,7 @@ redis_data_dict2 = "k_newsurls"
 redis_data_dict3 = "k_sinacarurls"
 redis_data_dict4 = "k_hotmatnews_imgurls"
 redis_data_dict5 = "k_nbanews_titles"
+redis_data_dict6 = "k_zhihuhot_titles"
 
 
 
@@ -198,6 +219,13 @@ class RedisPipeline(object):
             for nba_title in df['title'].get_values():
                 redis_db.hset(redis_data_dict5, nba_title, 0)
 
+        if redis_db.hlen(redis_data_dict6) == 0:
+            sql = "SELECT title FROM ZhihuHot;"
+            df = pd.read_sql(sql, self.connect)
+            for zhihuhot_title in df['title'].get_values():
+                redis_db.hset(redis_data_dict6, zhihuhot_title, 0)
+
+
     def process_item(self, item, spider):
         if isinstance(item, HotMatches):
             if redis_db.hexists (redis_data_dict, item['livecast_id']):
@@ -235,6 +263,12 @@ class RedisPipeline(object):
             else:
                 return item
 
+        elif isinstance(item, ZhihuHot):
+            if redis_db.hexists (redis_data_dict6, item['title']):
+                raise DropItem("(Redis)Duplicate item found: %s" % item)
+            else:
+                return item
+
         else:
             return item
 
@@ -248,12 +282,19 @@ class MysqlUpdatePipeline(object):
         self.cursor = self.conn.cursor()
 
     def process_item(self,item,spider):
-        update_sql = '''
-           update IndexNews set close_target_id = concat(left(close_target_id, 8),concat(id)) , close_target_id_ref = concat(left(close_target_id_ref, 9),concat(id));
-         '''
-        
-        self.cursor.execute(update_sql)
-        self.conn.commit()
+        if isinstance(item, IndexNews):
+            update_sql = '''
+               update IndexNews set close_target_id = concat(left(close_target_id, 8),concat(id)) , close_target_id_ref = concat(left(close_target_id_ref, 9),concat(id));
+             '''
+        elif isinstance(item, ZhihuHot):
+            update_sql = '''
+               update ZhihuHot set collapse_no = concat('collapse',concat(id)) , collapse_no_ref = concat('#collapse',concat(id));
+             '''
+        else:
+            update_sql = None
+        if update_sql is not None:
+            self.cursor.execute(update_sql)
+            self.conn.commit()
 
 
 def get_max_num(num_type,indexcar_type=None):
@@ -288,6 +329,14 @@ def get_max_num(num_type,indexcar_type=None):
     elif num_type == 'leftsec':
         select_sql = '''
             select max(number) from NbaNews where newstype = 'leftsec' 
+             '''
+    elif num_type == 'zhihuhotuser':
+        select_sql = '''
+            select max(userimgnumber) from zhihuhot 
+             '''
+    elif num_type == 'zhihuhotnews':
+        select_sql = '''
+            select max(newsimgnumber) from zhihuhot 
              '''
     else:
         pass

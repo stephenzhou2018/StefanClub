@@ -175,6 +175,8 @@ create table NbaNews (
 
 create table ZhihuHot (
     `id` int not null auto_increment,
+    `collapse_no` varchar(20),
+    `collapse_no_ref` varchar(20),
     `feedsourcetag` varchar(100),
     `feedsourceurl` varchar(300),
     `userimgnumber` int,
