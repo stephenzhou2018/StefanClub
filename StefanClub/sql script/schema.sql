@@ -175,6 +175,7 @@ create table NbaNews (
 
 create table ZhihuHot (
     `id` int not null auto_increment,
+    `hotid` varchar(30) not null,
     `collapse_no` varchar(20),
     `collapse_no_ref` varchar(20),
     `feedsourcetag` varchar(100),
@@ -195,6 +196,23 @@ create table ZhihuHot (
     `comment_url` varchar(300) ,
     `comment_title` varchar(300) ,
     `share_url` varchar(300) ,
+    `created_at` TIMESTAMP not null,
+    key `idx_created_at` (`created_at`),
+    primary key (`id`)
+) engine=innodb default charset=utf8;
+
+create table ZhihuHot_Comment (
+    `id` int not null auto_increment,
+    `hotid` varchar(30) not null,
+    `userimgnumber` int,
+    `userimgsrcurl` varchar(300),
+    `userimgurl` varchar(300),
+    `username` varchar(100),
+    `replytouser` varchar(100),
+    `replytouserurl` varchar(300),
+    `replytime` varchar(50),
+    `content` varchar(1000) ,
+    `infavorqty`  varchar(20) ,
     `created_at` TIMESTAMP not null,
     key `idx_created_at` (`created_at`),
     primary key (`id`)

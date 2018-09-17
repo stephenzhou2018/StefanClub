@@ -115,6 +115,7 @@ class NbaNews(scrapy.Item):
     
     
 class ZhihuHot(scrapy.Item):
+    hotid = scrapy.Field()
     feedsourcetag = scrapy.Field()
     feedsourceurl = scrapy.Field()
     userimgnumber = scrapy.Field()

@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 from scrapy import Request,Selector
 from selenium import webdriver
 from pipelines import get_max_num
+from function import get_zhihu_hotid
 #from pyvirtualdisplay import Display
 
 
@@ -66,7 +67,6 @@ class ZhihuSpider(scrapy.Spider):
         for post_node in post_nodes:
             sel = Selector(text=str(post_node), type="html", )
             feedsourceurl = sel.xpath('//a[@class="TopicLink"]//@href').extract()[0].strip()
-            feedsourceurl = feedsourceurl[2:]
             feedsourcetags = sel.xpath('//div[@aria-haspopup="true"]/text()')
             if len(feedsourcetags) > 0:
                 feedsourcetag = sel.xpath('//div[@aria-haspopup="true"]/text()').extract()[0].strip()
@@ -76,7 +76,6 @@ class ZhihuSpider(scrapy.Spider):
             userimgurls = sel.xpath('//a[@class="UserLink-link"]//@href')
             if len(userimgurls) > 0:
                 userimgurl = sel.xpath('//a[@class="UserLink-link"]//@href').extract()[0].strip()
-                userimgurl = userimgurl[2:]
             else:
                 userimgurl = None
             usernames1 = sel.xpath('//a[@class="UserLink-link"]/text()')
@@ -128,6 +127,10 @@ class ZhihuSpider(scrapy.Spider):
             else:
                 title = 'Empty title,It will be dropped by redis control except the first one'
                 titleurl = None
+            if titleurl is not None:
+                if titleurl[1:9] == 'question':
+                    titleurl = '//www.zhihu.com' + titleurl
+            hotid = get_zhihu_hotid(titleurl)
             newscontent = sel.xpath('//span[@class="RichText ztext CopyrightRichText-richText"]/text()').extract()[0].strip()
             infavorqty1 = sel.xpath('//button[@class="Button VoteButton VoteButton--up"]/text()').extract()[0].strip()
             infavorqty2 = sel.xpath('//button[@class="Button VoteButton VoteButton--up"]/text()').extract()[1].strip()
@@ -152,6 +155,7 @@ class ZhihuSpider(scrapy.Spider):
             zhihuhot["isvideo"] = isvideo
             zhihuhot["title"] = title
             zhihuhot["titleurl"] = titleurl
+            zhihuhot["hotid"] = hotid
             zhihuhot["newscontent"] = newscontent
             zhihuhot["infavorqty"] = infavorqty
             zhihuhot["comment_url"] = None

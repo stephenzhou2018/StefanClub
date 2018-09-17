@@ -86,12 +86,12 @@ class MysqlPipeline(object):
 
         elif isinstance(item, ZhihuHot):
             insert_sql = '''
-            insert into ZhihuHot(feedsourcetag,feedsourceurl,userimgnumber,userimgsrcurl,userimgurl,username,userinfo,
+            insert into ZhihuHot(hotid,feedsourcetag,feedsourceurl,userimgnumber,userimgsrcurl,userimgurl,username,userinfo,
             newsimgnumber,newsimgsrcurl,newsimgurl,isvideo,title,titleurl,newscontent,infavorqty,comment_url,comment_title,
-            share_url,created_at) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            share_url,created_at) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             '''
             self.cursor.execute(insert_sql, (
-            item["feedsourcetag"],item["feedsourceurl"], item["userimgnumber"], item["userimgsrcurl"], item["userimgurl"], item["username"],item["userinfo"],item["newsimgnumber"],
+            item["hotid"],item["feedsourcetag"],item["feedsourceurl"], item["userimgnumber"], item["userimgsrcurl"], item["userimgurl"], item["username"],item["userinfo"],item["newsimgnumber"],
             item["newsimgsrcurl"],item["newsimgurl"], item["isvideo"],item["title"], item["titleurl"],item["newscontent"], item["infavorqty"],item["comment_url"],
             item["comment_title"], item["share_url"],datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
 
@@ -155,10 +155,10 @@ class DuplicatesPipeline(object):
                 return item
 
         elif isinstance(item, ZhihuHot):
-            if item['title'] in self.zhihuhot_seen:
+            if item['hotid'] in self.zhihuhot_seen:
                 raise DropItem("(Scrapy)Duplicate item found: %s" % item)
             else:
-                self.zhihuhot_seen.add(item['title'])
+                self.zhihuhot_seen.add(item['hotid'])
                 return item
 
         else:
@@ -173,7 +173,7 @@ redis_data_dict2 = "k_newsurls"
 redis_data_dict3 = "k_sinacarurls"
 redis_data_dict4 = "k_hotmatnews_imgurls"
 redis_data_dict5 = "k_nbanews_titles"
-redis_data_dict6 = "k_zhihuhot_titles"
+redis_data_dict6 = "k_zhihuhot_hotids"
 
 
 
@@ -220,10 +220,10 @@ class RedisPipeline(object):
                 redis_db.hset(redis_data_dict5, nba_title, 0)
 
         if redis_db.hlen(redis_data_dict6) == 0:
-            sql = "SELECT title FROM ZhihuHot;"
+            sql = "SELECT hotid FROM ZhihuHot;"
             df = pd.read_sql(sql, self.connect)
-            for zhihuhot_title in df['title'].get_values():
-                redis_db.hset(redis_data_dict6, zhihuhot_title, 0)
+            for zhihuhot_hotid in df['hotid'].get_values():
+                redis_db.hset(redis_data_dict6, zhihuhot_hotid, 0)
 
 
     def process_item(self, item, spider):
@@ -264,7 +264,7 @@ class RedisPipeline(object):
                 return item
 
         elif isinstance(item, ZhihuHot):
-            if redis_db.hexists (redis_data_dict6, item['title']):
+            if redis_db.hexists (redis_data_dict6, item['hotid']):
                 raise DropItem("(Redis)Duplicate item found: %s" % item)
             else:
                 return item

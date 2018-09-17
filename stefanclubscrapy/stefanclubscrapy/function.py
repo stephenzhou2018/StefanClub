@@ -118,3 +118,13 @@ def parse_leftsectxt(leftsecond_node):
             nbanewslist[i] = copy.deepcopy(nbanews)
         return nbanewslist
     return None
+
+
+def get_zhihu_hotid(titleurl):
+    titleurl_list = list(titleurl)
+    max_index = -1
+    for i in range(len(titleurl_list)):
+        if titleurl_list[i] == '/':
+            max_index = i
+    hotid = titleurl[max_index + 1:]
+    return hotid
