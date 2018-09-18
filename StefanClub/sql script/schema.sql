@@ -203,6 +203,7 @@ create table ZhihuHot (
 
 create table ZhihuHot_Comment (
     `id` int not null auto_increment,
+    `commentid` varchar(30) not null,
     `hotid` varchar(30) not null,
     `userimgnumber` int,
     `userimgsrcurl` varchar(300),

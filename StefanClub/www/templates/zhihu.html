@@ -10,9 +10,26 @@
    opacity:0.7;
    margin-left:20px;
 }
+.bottomcomment {
+   text-decoration:none;
+   color:black;
+   opacity:0.7;
+   margin-left:20px;
+}
 </style>
 <script>
+window.onload = function()
+{
+     var commentas = document.getElementsByClassName("bottomcomment");
+     for(var i = 0; i < commentas.length; i++)
+     {
+	  commentas[i].onclick = function()
+	  {
+	       var commenttitle = this.text ;
 
+	  }
+      }
+}
 </script>
 
 
@@ -115,10 +132,10 @@
                   <span>
                      <button type="button" style="border:none;color:DodgerBlue;background-color:PowderBlue;"><span class="glyphicon glyphicon-arrow-up"></span>    {{zhihuhot.infavorqty}}</button>
                      <button type="button" style="border:none;color:DodgerBlue;background-color:PowderBlue;"><span class="glyphicon glyphicon-arrow-down"></span></button>
-                     <a class="bottoma"><span class="glyphicon glyphicon-comment"></span>    {{zhihuhot.comment_title}}</a>
-                     <a class="bottoma"><span class="glyphicon glyphicon-share-alt"></span>    分享</a>
-                     <a class="bottoma"><span class="glyphicon glyphicon-star-empty"></span>    收藏</a>
-                     <a class="bottoma"><span class="glyphicon glyphicon-heart-empty"></span>    感谢</a>
+                     <a class="bottomcomment"><span class="glyphicon glyphicon-comment"></span> {{zhihuhot.comment_title}}</a>
+                     <a class="bottoma"><span class="glyphicon glyphicon-share-alt"></span> 分享</a>
+                     <a class="bottoma"><span class="glyphicon glyphicon-star-empty"></span> 收藏</a>
+                     <a class="bottoma"><span class="glyphicon glyphicon-heart-empty"></span> 感谢</a>
                      <a class="bottoma">...</a>
                   </span>
                </div>

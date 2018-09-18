@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-import scrapy,os,urllib
-from items import ZhihuHot
+import scrapy,os,urllib,json,datetime
+from items import ZhihuHot,ZhihuHotComment
 from bs4 import BeautifulSoup
 from scrapy import Request,Selector
 from selenium import webdriver
 from pipelines import get_max_num
-from function import get_zhihu_hotid
+from function import get_zhihu_hotid,get_comment_qty
 #from pyvirtualdisplay import Display
 
 
@@ -14,6 +14,8 @@ class ZhihuSpider(scrapy.Spider):
     allowed_domains = ['www.zhihu.com']
     start_urls = ['https://www.zhihu.com']
 
+    zhuanlan_comment_url = 'https://www.zhihu.com/api/v4/articles/{hotid}/comments?include=data%5B*%5D.author%2Ccollapsed%2Creply_to_author%2Cdisliked%2Ccontent%2Cvoting%2Cvote_count%2Cis_parent_author%2Cis_author%2Calgorithm_right&order=normal&limit=20&offset={offset}&status=open'
+    answer_comment_url = 'https://www.zhihu.com/api/v4/answers/{hotid}/comments?include=data%5B*%5D.author%2Ccollapsed%2Creply_to_author%2Cdisliked%2Ccontent%2Cvoting%2Cvote_count%2Cis_parent_author%2Cis_author%2Calgorithm_right&order=normal&limit=20&offset={offset}&status=open'
     headers = {
         'User-Agent':"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36",
 
@@ -27,6 +29,11 @@ class ZhihuSpider(scrapy.Spider):
     if max_newsimg_num is None:
         max_newsimg_num = 0
     curr_num_of_neim = max_newsimg_num + 1
+
+    max_comuserimg_num = get_max_num('zhihuhotcomments')
+    if max_comuserimg_num is None:
+        max_comuserimg_num = 0
+    curr_num_of_comuser = max_comuserimg_num + 1
 
     def start_requests(self):
         #display = Display(visible=0, size=(800, 600))
@@ -58,10 +65,11 @@ class ZhihuSpider(scrapy.Spider):
         cookie_dict['q_c1'] = '68adb565ac5f49b78fe08440a8927c2d|1536993067000|1536993067000'
         cookie_dict['tgw_l7_route'] = '56f3b730f2eb8b75242a8095a22206f8'
        '''
-        yield Request(url=self.start_urls[0], dont_filter=True, cookies=cookie_dict, callback=self.parse_main)
+        yield Request(url=self.start_urls[0], dont_filter=True, meta={"cookies": cookie_dict}, cookies=cookie_dict, callback=self.parse_main)
 
     def parse_main(self, response):
         zhihuhot = ZhihuHot()
+        cookie_dict = response.meta.get("cookies", "")
         soup = BeautifulSoup(response.text, 'lxml')
         post_nodes = soup.select("div[class='Card TopstoryItem']")
         for post_node in post_nodes:
@@ -127,10 +135,16 @@ class ZhihuSpider(scrapy.Spider):
             else:
                 title = 'Empty title,It will be dropped by redis control except the first one'
                 titleurl = None
+            hottype = None
             if titleurl is not None:
                 if titleurl[1:9] == 'question':
                     titleurl = '//www.zhihu.com' + titleurl
-            hotid = get_zhihu_hotid(titleurl)
+                    hottype = 'question'
+                if titleurl[2:10] == 'zhuanlan':
+                    hottype = 'zhuanlan'
+            hotid = None
+            if titleurl is not None:
+                hotid = get_zhihu_hotid(titleurl)
             newscontent = sel.xpath('//span[@class="RichText ztext CopyrightRichText-richText"]/text()').extract()[0].strip()
             infavorqty1 = sel.xpath('//button[@class="Button VoteButton VoteButton--up"]/text()').extract()[0].strip()
             infavorqty2 = sel.xpath('//button[@class="Button VoteButton VoteButton--up"]/text()').extract()[1].strip()
@@ -139,6 +153,8 @@ class ZhihuSpider(scrapy.Spider):
             infavorqty_list.insert(2, " ")
             infavorqty = "".join(infavorqty_list)
             comment_title = sel.xpath('//button[@class="Button ContentItem-action Button--plain Button--withIcon Button--withLabel"]/text()').extract()[0].strip()
+            comment_qty = get_comment_qty(comment_title)
+            comment_page = comment_qty // 20 + (1 if comment_qty % 20 > 0 else 0)
             file_name = "zhihuhotuser_%s.jpg" % self.curr_num_of_usim
             file_path = os.path.join("D:\StefanClub\StefanClub\www\static\img\zhihu", file_name)
             urllib.request.urlretrieve(userimgsrcurl, file_path)
@@ -162,4 +178,59 @@ class ZhihuSpider(scrapy.Spider):
             zhihuhot["comment_title"] = comment_title
             zhihuhot["share_url"] = None
 
-            yield zhihuhot
+            if hotid is not None:
+                yield zhihuhot
+                if hottype == 'question':
+                    for i in range(comment_page):
+                        yield Request(url=self.answer_comment_url.format(hotid=hotid, offset=i * 20), meta={"hotid": hotid}, cookies=cookie_dict, callback=self.parse_zhihuhot_comment)
+                elif hottype == 'zhuanlan':
+                    for i in range(comment_page):
+                        yield Request(url=self.zhuanlan_comment_url.format(hotid=hotid, offset=i * 20), meta={"hotid": hotid}, cookies=cookie_dict, callback=self.parse_zhihuhot_comment)
+
+
+    def parse_zhihuhot_comment(self,response):
+        hotid = response.meta.get("hotid", "")
+        resultjson = json.loads(response.body)
+        comments = resultjson['data']
+        comment_item  = ZhihuHotComment()
+        for comment in comments:
+            commentid = comment['id']
+            author = comment['author']
+            author_member = author['member']
+            userimgsrcurl = author_member['avatar_url']
+            url_token = author_member['url_token']
+            userimgurl = '//www.zhihu.com/people/' + url_token
+            username = author_member['name']
+            replytime = comment['created_time']
+            replytime = datetime.datetime.fromtimestamp(replytime)
+            content = comment['content']
+            infavorqty = comment['vote_count']
+            replytouser = None
+            replytouserurl = None
+            if "reply_to_author" in comment.keys():
+                reply_to_author = comment['reply_to_author']
+                if reply_to_author is not None:
+                    reply_to_author_member = reply_to_author['member']
+                    replytouser = reply_to_author_member['name']
+                    replytouser_urltoken = reply_to_author_member['url_token']
+                    replytouserurl = '//www.zhihu.com/people/' + replytouser_urltoken
+            file_name = "zhihuhotcomuser_%s.jpg" % self.curr_num_of_comuser
+            file_path = os.path.join("D:\StefanClub\StefanClub\www\static\img\zhihu", file_name)
+            urllib.request.urlretrieve(userimgsrcurl, file_path)
+            comment_item["userimgsrcurl"] = "../static/img/zhihu/%s" % file_name
+            comment_item["userimgnumber"] = self.curr_num_of_comuser
+            self.curr_num_of_comuser = self.curr_num_of_comuser + 1
+
+            comment_item["commentid"] = commentid
+            comment_item["hotid"] = hotid
+            comment_item["userimgurl"] = userimgurl
+            comment_item["username"] = username
+            comment_item["replytouser"] = replytouser
+            comment_item["replytouserurl"] = replytouserurl
+            comment_item["replytime"] = replytime
+            comment_item["content"] = content
+            comment_item["infavorqty"] = infavorqty
+
+            yield comment_item
+
+

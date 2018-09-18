@@ -6,7 +6,7 @@
 # See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 import pymysql
 import datetime
-from items import IndexCarouselItem,IndexNews,HotMatches,SinaCarousel,HotMatchNews,NbaNews,ZhihuHot
+from items import IndexCarouselItem,IndexNews,HotMatches,SinaCarousel,HotMatchNews,NbaNews,ZhihuHot,ZhihuHotComment
 from scrapy.exceptions import DropItem
 from redis import Redis
 import pandas as pd
@@ -95,6 +95,15 @@ class MysqlPipeline(object):
             item["newsimgsrcurl"],item["newsimgurl"], item["isvideo"],item["title"], item["titleurl"],item["newscontent"], item["infavorqty"],item["comment_url"],
             item["comment_title"], item["share_url"],datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
 
+        elif isinstance(item, ZhihuHotComment):
+            insert_sql = '''
+            insert into ZhihuHot_Comment(commentid,hotid,userimgnumber,userimgsrcurl,userimgurl,username,replytouser,replytouserurl,replytime,
+            content,infavorqty,created_at) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            '''
+            self.cursor.execute(insert_sql, (
+            item["commentid"],item["hotid"],item["userimgnumber"],item["userimgsrcurl"], item["userimgurl"], item["username"], item["replytouser"], item["replytouserurl"],item["replytime"],item["content"],
+            item["infavorqty"],datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
+
         else:
             pass
         self.conn.commit()
@@ -110,6 +119,7 @@ class DuplicatesPipeline(object):
         self.hotmatchnews_seen = set()
         self.nbanews_seen = set()
         self.zhihuhot_seen = set()
+        self.zhihuhotcom_seen = set()
 
     def process_item(self, item, spider):
         if isinstance(item, HotMatches):
@@ -161,6 +171,13 @@ class DuplicatesPipeline(object):
                 self.zhihuhot_seen.add(item['hotid'])
                 return item
 
+        elif isinstance(item, ZhihuHotComment):
+            if item['commentid'] in self.zhihuhotcom_seen:
+                raise DropItem("(Scrapy)Duplicate item found: %s" % item)
+            else:
+                self.zhihuhotcom_seen.add(item['commentid'])
+                return item
+
         else:
             return item
 
@@ -174,6 +191,7 @@ redis_data_dict3 = "k_sinacarurls"
 redis_data_dict4 = "k_hotmatnews_imgurls"
 redis_data_dict5 = "k_nbanews_titles"
 redis_data_dict6 = "k_zhihuhot_hotids"
+redis_data_dict7 = "k_zhihuhotcom_ids"
 
 
 
@@ -225,6 +243,11 @@ class RedisPipeline(object):
             for zhihuhot_hotid in df['hotid'].get_values():
                 redis_db.hset(redis_data_dict6, zhihuhot_hotid, 0)
 
+        if redis_db.hlen(redis_data_dict7) == 0:
+            sql = "SELECT commentid FROM ZhihuHot_Comment;"
+            df = pd.read_sql(sql, self.connect)
+            for zhihuhotcom_id in df['commentid'].get_values():
+                redis_db.hset(redis_data_dict7, zhihuhotcom_id, 0)
 
     def process_item(self, item, spider):
         if isinstance(item, HotMatches):
@@ -265,6 +288,12 @@ class RedisPipeline(object):
 
         elif isinstance(item, ZhihuHot):
             if redis_db.hexists (redis_data_dict6, item['hotid']):
+                raise DropItem("(Redis)Duplicate item found: %s" % item)
+            else:
+                return item
+
+        elif isinstance(item, ZhihuHotComment):
+            if redis_db.hexists (redis_data_dict7, item['commentid']):
                 raise DropItem("(Redis)Duplicate item found: %s" % item)
             else:
                 return item
@@ -332,11 +361,15 @@ def get_max_num(num_type,indexcar_type=None):
              '''
     elif num_type == 'zhihuhotuser':
         select_sql = '''
-            select max(userimgnumber) from zhihuhot 
+            select max(userimgnumber) from ZhihuHot 
              '''
     elif num_type == 'zhihuhotnews':
         select_sql = '''
-            select max(newsimgnumber) from zhihuhot 
+            select max(newsimgnumber) from ZhihuHot 
+             '''
+    elif num_type == 'zhihuhotcomments':
+        select_sql = '''
+            select max(userimgnumber) from ZhihuHot_Comment 
              '''
     else:
         pass

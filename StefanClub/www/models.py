@@ -193,3 +193,21 @@ class ZhihuHot(Model):
     comment_title = StringField(ddl='varchar(300)')
     share_url = StringField(ddl='varchar(300)')
     created_at = DateTimeField()
+
+
+class ZhihuHotComment(Model):
+    __table__ = 'ZhihuHot_Comment'
+
+    id = IntegerField(primary_key=True)
+    commentid = StringField(ddl='varchar(30)')
+    hotid = StringField(ddl='varchar(30)')
+    userimgnumber = IntegerField()
+    userimgsrcurl = StringField(ddl='varchar(300)')
+    userimgurl = StringField(ddl='varchar(300)')
+    username = StringField(ddl='varchar(100)')
+    replytouser = StringField(ddl='varchar(100)')
+    replytouserurl = StringField(ddl='varchar(300)')
+    replytime = StringField(ddl='varchar(50)')
+    content = StringField(ddl='varchar(1000)')
+    infavorqty  = StringField(ddl='varchar(20)')
+    created_at = DateTimeField()

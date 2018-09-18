@@ -135,3 +135,17 @@ class ZhihuHot(scrapy.Item):
     comment_title = scrapy.Field()
     share_url = scrapy.Field()
 
+
+class ZhihuHotComment(scrapy.Item):
+    commentid = scrapy.Field()
+    hotid = scrapy.Field()
+    userimgnumber = scrapy.Field()
+    userimgsrcurl = scrapy.Field()
+    userimgurl = scrapy.Field()
+    username = scrapy.Field()
+    replytouser = scrapy.Field()
+    replytouserurl = scrapy.Field()
+    replytime = scrapy.Field()
+    content = scrapy.Field()
+    infavorqty  = scrapy.Field()
+

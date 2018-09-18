@@ -128,3 +128,14 @@ def get_zhihu_hotid(titleurl):
             max_index = i
     hotid = titleurl[max_index + 1:]
     return hotid
+
+
+def get_comment_qty(comment_title):
+    comment_title_list = list(comment_title)
+    max_index = -1
+    for i in range(len(comment_title_list)):
+        if comment_title_list[i] == '条':
+            max_index = i
+    comment_qty = comment_title[0:max_index]
+    comment_qty = int(comment_qty)
+    return comment_qty
