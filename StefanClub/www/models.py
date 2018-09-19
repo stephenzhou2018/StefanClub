@@ -172,6 +172,7 @@ class ZhihuHot(Model):
     __table__ = 'ZhihuHot'
 
     id = IntegerField(primary_key=True)
+    hotid = StringField(ddl='varchar(30)')
     collapse_no = StringField(ddl='varchar(20)')
     collapse_no_ref = StringField(ddl='varchar(20)')
     feedsourcetag = StringField(ddl='varchar(100)')

@@ -361,42 +361,48 @@ async def api_hotmatchnews():
 
 
 @get('/api/zhihuhotcomments')
-async def api_zhihuhotcomments(*, hotid, page=1, swi_type='None'):
-    if swi_type == 'None' and page==1:
+async def api_zhihuhotcomments(*, hotid, page='1', swi_type='None'):
+    if swi_type == 'None' and page == '1':
         hotcomments = await ZhihuHotComment.findAll('hotid=?', [hotid], orderBy='id desc', limit=(0, 20))
-    item_count = await HotMatches.findNumber('count(id)')
-    page_count = item_count // 5 + (1 if item_count % 5 > 0 else 0)
-    lastpage = 'FALSE'
-    firstpage = 'FALSE'
-    currentpage = int(page)
-    if swi_type == 'pre':
-        currentpage = currentpage - 1
-    else:
-        currentpage = currentpage + 1
-    if currentpage == page_count:
-        lastpage = 'TRUE'
-    if currentpage == 1:
         firstpage = 'TRUE'
-    matches = await HotMatches.findAll(orderBy='id desc',limit=(5*(currentpage - 1), 5))
-    strcurrentpage = str(currentpage)
-    return dict(matches=matches,lastpage=lastpage,firstpage=firstpage,currentpage=strcurrentpage)
-
-    for nbanewsitem in nbanews:
-        newsitemtime = nbanewsitem["newstime"]
-        timestamp = datetime.timestamp(newsitemtime)
+        lastpage = 'FALSE'
+        strcurrentpage = '1'
+    else:
+        item_count = await ZhihuHotComment.findNumber('count(id)', 'hotid=?', [hotid])
+        page_count = item_count // 20 + (1 if item_count % 20 > 0 else 0)
+        lastpage = 'FALSE'
+        firstpage = 'FALSE'
+        currentpage = int(page)
+        if swi_type == 'pre':
+            currentpage = currentpage - 1
+        else:
+            currentpage = currentpage + 1
+        if currentpage == page_count:
+            lastpage = 'TRUE'
+        if currentpage == 1:
+            firstpage = 'TRUE'
+        hotcomments = await ZhihuHotComment.findAll('hotid=?', [hotid], orderBy='id desc',limit=(20*(currentpage - 1), 5))
+        strcurrentpage = str(currentpage)
+    for hotcomment in hotcomments:
+        replytime = hotcomment["replytime"]
+        replytime = datetime.strptime(replytime, "%Y-%m-%d %H:%M:%S")
+        timestamp = datetime.timestamp(replytime)
         nowtime = time.time()
         delta = int(nowtime - timestamp)
         if delta < 60:
-            nbanewsitem["newstime"] = u'1分钟前'
+            hotcomment["replytime"] = u'1分钟前'
         if delta < 3600:
-            nbanewsitem["newstime"] = u'%s分钟前' % (delta // 60)
+            hotcomment["replytime"] = u'%s分钟前' % (delta // 60)
         if delta < 86400:
-            nbanewsitem["newstime"] = u'%s小时前' % (delta // 3600)
+            hotcomment["replytime"] = u'%s小时前' % (delta // 3600)
         if delta < 604800:
-            nbanewsitem["newstime"] = u'%s天前' % (delta // 86400)
+            hotcomment["replytime"] = u'%s天前' % (delta // 86400)
         else:
-            nbanewsitem["newstime"] = u'%s年%s月%s日' % (newsitemtime.year, newsitemtime.month, newsitemtime.day)
-    return dict(nbanews=nbanews)
+            hotcomment["replytime"] = u'%s年%s月%s日' % (replytime.year, replytime.month, replytime.day)
+    return dict(hotcomments=hotcomments,lastpage=lastpage,firstpage=firstpage,currentpage=strcurrentpage)
+
+
+
 
 
 @post('/api/blogs/{id}/comments')

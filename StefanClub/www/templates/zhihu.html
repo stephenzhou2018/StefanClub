@@ -16,6 +16,7 @@
    opacity:0.7;
    margin-left:20px;
 }
+
 </style>
 <script>
 window.onload = function()
@@ -26,7 +27,141 @@ window.onload = function()
 	  commentas[i].onclick = function()
 	  {
 	       var commenttitle = this.text ;
+	       commenttitle = commenttitle.replace(/\s*/g,"");
+	       var hotid = this.id;
+	       var target_divid =  hotid + 'div';
+	       if (commenttitle == '收起评论')
+	       {
+	         $("#" + target_divid + "").html('');
+	         var oriaid = hotid + 'a';
+	         oricommenttitle = $("#" + oriaid + "").text();
+	         var changecomment = "<span class='glyphicon glyphicon-comment'></span>" + oricommenttitle;
+             $("#" + hotid + "").html(changecomment);
+	       }
+	       else
+	       {
+	         LoadOrRefreshComment(hotid,'1','None',commenttitle);
+	       }
 
+	  }
+      }
+}
+
+function LoadOrRefreshComment(hotid,page,type,commenttitle)
+{
+    var target_divid =  hotid + 'div';
+    $.ajax({
+        type: "GET",
+        url: "/api/zhihuhotcomments?hotid="+hotid+"&page="+page+"&swi_type="+type,
+        dataType: "json",
+        contentType: "application/json; charset=utf-8",
+        success: function (data) {
+          currentpage = data.currentpage;
+          hotcomments = data.hotcomments;
+          if (page == '1' && type == 'None')
+          {
+             if (hotcomments.length > 0)
+             {
+                var addBody = "<div style='width:560px;'>"
+                            +   "<div style='width:560px;'>"
+                            +     "<div style='width:560px;height:10px;'>"
+                            +       "<h5 style='font-weight:bold;'>" + commenttitle + "</h5>"
+                            +     "</div>"
+                            +     "<div style='width:560px;margin-top:20px;'>"
+                            +       "<div  style='width:100%;'>";
+                for(var i = 0; i < hotcomments.length; i++){
+                   var adddiv = "<div style='width:100%;margin-top:15px;'>"
+                              +   "<div style='width:100%;height:20px;'>"
+                              +       "<span style='float:left;'>"
+                              +         "<div>"
+                              +           "<div>"
+                              +             "<a target='_blank' href='" + hotcomments[i].userimgurl + "'>"
+                              +                "<img style='width:20px;height:20px;' src='" + hotcomments[i].userimgsrcurl + "'>"
+                              +             "</a>"
+                              +           "</div>"
+                              +          "</div>"
+                              +        "</span>"
+                              +        "<span style='float:left;margin-left:15px;'>"
+                              +          "<a target='_blank' href='" + hotcomments[i].userimgurl + "'>"  + hotcomments[i].username + "</a>"
+                              +        "</span>";
+                   if (hotcomments[i].replytouser != null && hotcomments[i].replytouser != "")
+                   {
+                     adddiv = adddiv + "<span style='float:left;margin-left:15px;'>"
+                                     +   "<span>回复</span>"
+                                     +   "<span style='margin-left:15px;'>"
+                                     +     "<a target='_blank' href='" + hotcomments[i].replytouserurl + "'>"  + hotcomments[i].replytouser + "</a>"
+                                     +   "</span>"
+                                     + "</span>";
+                   }
+                   adddiv = adddiv  +        "<span style='float:right;'>" + hotcomments[i].replytime + "</span>"
+                                    +      "</div>"
+                                    + "<div style='width:100%;margin-top:15px;'>" + hotcomments[i].content + "</div>"
+                                    + "<div style='height:20px;width:100%;margin-top:15px;'>"
+                                    +   "<a>"
+                                    +     "<span class='glyphicon glyphicon-thumbs-up'></span>";
+                   if (hotcomments[i].infavorqty != '0')
+                   {
+                     adddiv = adddiv  + "&nbsp;" + hotcomments[i].infavorqty;
+                   }
+                   adddiv = adddiv  + "</a>" + "</div>" + "</div>";
+                   addBody = addBody + adddiv;
+                 }
+                 addBody = addBody + "</div>"
+                                   + "<div style='margin-top:20px;'>"
+                                   +   "<a id='" + hotid + "pre" + "' class='commentswipage' href='javascript:void(0)' style='margin-left:210px;pointer-events: none;opacity: 0.5;'>上一页</a>"
+                                   +   "<a style='display:none' id='" + hotid + "curr" + "'>" + currentpage + "</a>"
+                                   +   "<a id='" + hotid + "next" + "' class='commentswipage' href='javascript:void(0)' style='margin-left:60px;'>下一页</a>"
+                                   + "</div>"
+                                   + "</div>" + "</div>" + "</div>";
+                $("#" + target_divid + "").html(addBody);
+                var changecomment = "<span class='glyphicon glyphicon-comment'></span>&nbsp;收起评论";
+                $("#" + hotid + "").html(changecomment);
+                AddEvent();
+             }
+          }
+          else
+          {
+             lastpage = data.lastpage;
+             firstpage = data.firstpage;
+             if (lastpage == 'TRUE')
+             {
+                $("#posthotmatch").attr("disabled","disabled");
+             }
+             else
+             {
+                $("#posthotmatch").removeAttr("disabled");
+             }
+             if (firstpage == 'TRUE')
+             {
+                $("#prehotmatch").attr("disabled","disabled");
+             }
+             else
+             {
+                $("#prehotmatch").removeAttr("disabled");
+             }
+             if (matches.length > 0)
+             {
+                var addBody = "";
+                for(var i = 0; i < matches.length; i++){
+                   var addli = a ;
+                   addBody = addBody + addli;
+                 }
+                $("#hotmatchul").html(addBody);
+             }
+             $("#hotmatchpage").html(currentpage);
+          }
+        }
+      });
+}
+
+function AddEvent(){
+     var swipages = document.getElementsByClassName("commentswipage");
+     for(var i = 0; i < swipages.length; i++)
+     {
+	  swipages[i].onclick = function()
+	  {
+	  	   var swipageid = this.id;
+           LoadOrRefreshComment(hotid,page,type,commenttitle)
 	  }
       }
 }
@@ -132,12 +267,16 @@ window.onload = function()
                   <span>
                      <button type="button" style="border:none;color:DodgerBlue;background-color:PowderBlue;"><span class="glyphicon glyphicon-arrow-up"></span>    {{zhihuhot.infavorqty}}</button>
                      <button type="button" style="border:none;color:DodgerBlue;background-color:PowderBlue;"><span class="glyphicon glyphicon-arrow-down"></span></button>
-                     <a class="bottomcomment"><span class="glyphicon glyphicon-comment"></span> {{zhihuhot.comment_title}}</a>
+                     <a id="{{zhihuhot.hotid}}" class="bottomcomment"><span class="glyphicon glyphicon-comment"></span> {{zhihuhot.comment_title}}</a>
                      <a class="bottoma"><span class="glyphicon glyphicon-share-alt"></span> 分享</a>
                      <a class="bottoma"><span class="glyphicon glyphicon-star-empty"></span> 收藏</a>
                      <a class="bottoma"><span class="glyphicon glyphicon-heart-empty"></span> 感谢</a>
                      <a class="bottoma">...</a>
+                     <a id="{{zhihuhot.hotid}}a" style="visibility:hidden;">{{zhihuhot.comment_title}}</a>
                   </span>
+               </div>
+               <div id="{{zhihuhot.hotid}}div" style="width:560px;">
+
                </div>
             </div>
          </div>
