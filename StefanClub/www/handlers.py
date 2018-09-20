@@ -381,7 +381,7 @@ async def api_zhihuhotcomments(*, hotid, page='1', swi_type='None'):
             lastpage = 'TRUE'
         if currentpage == 1:
             firstpage = 'TRUE'
-        hotcomments = await ZhihuHotComment.findAll('hotid=?', [hotid], orderBy='id desc',limit=(20*(currentpage - 1), 5))
+        hotcomments = await ZhihuHotComment.findAll('hotid=?', [hotid], orderBy='id desc',limit=(20*(currentpage - 1), 20))
         strcurrentpage = str(currentpage)
     for hotcomment in hotcomments:
         replytime = hotcomment["replytime"]
