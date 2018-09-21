@@ -1,4 +1,4 @@
-from items import NbaNews
+from items import NbaNews,TaobaoProducts
 from scrapy import Selector
 import os,urllib,copy
 from pipelines import get_max_num
@@ -118,6 +118,44 @@ def parse_leftsectxt(leftsecond_node):
             nbanewslist[i] = copy.deepcopy(nbanews)
         return nbanewslist
     return None
+
+
+def parse_taobao_products(auction,keyword):
+    taobao_product = TaobaoProducts()
+    taobao_product["keyword"] = keyword
+    taobao_product["product_id"] = auction['nid']
+    imgsrcurl = auction['pic_url']
+    taobao_product["imgsrcurl"] = imgsrcurl
+    taobao_product["keyword"] = keyword
+    taobao_product["keyword"] = keyword
+    taobao_product["keyword"] = keyword
+    taobao_product["keyword"] = keyword
+    taobao_product["keyword"] = keyword
+    taobao_product["keyword"] = keyword
+    taobao_product["keyword"] = keyword
+    taobao_product["keyword"] = keyword
+    taobao_product["keyword"] = keyword
+    taobao_product["keyword"] = keyword
+    taobao_product["keyword"] = keyword
+    taobao_product["keyword"] = keyword
+    taobao_product["keyword"] = keyword
+    taobao_product["keyword"] = keyword
+    taobao_product["keyword"] = keyword
+    taobao_product["keyword"] = keyword
+    taobao_product["keyword"] = keyword
+    taobao_product["keyword"] = keyword
+    taobao_product["keyword"] = keyword
+    taobao_product["keyword"] = keyword
+    taobao_product["keyword"] = keyword
+    taobao_product["keyword"] = keyword
+    taobao_product["keyword"] = keyword
+    taobao_product["keyword"] = keyword
+    taobao_product["keyword"] = keyword
+    taobao_product["keyword"] = keyword
+    taobao_product["keyword"] = keyword
+    taobao_product["keyword"] = keyword
+    taobao_product["keyword"] = keyword
+    return taobao_product
 
 
 def get_zhihu_hotid(titleurl):

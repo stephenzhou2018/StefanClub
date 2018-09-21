@@ -187,7 +187,6 @@ class ZhihuSpider(scrapy.Spider):
                     for i in range(comment_page):
                         yield Request(url=self.zhuanlan_comment_url.format(hotid=hotid, offset=i * 20), meta={"hotid": hotid}, cookies=cookie_dict, callback=self.parse_zhihuhot_comment)
 
-
     def parse_zhihuhot_comment(self,response):
         hotid = response.meta.get("hotid", "")
         resultjson = json.loads(response.body)
