@@ -120,41 +120,56 @@ def parse_leftsectxt(leftsecond_node):
     return None
 
 
-def parse_taobao_products(auction,keyword):
+def parse_taobao_products(auction,keyword,curr_num_of_img):
     taobao_product = TaobaoProducts()
     taobao_product["keyword"] = keyword
     taobao_product["product_id"] = auction['nid']
     imgsrcurl = auction['pic_url']
-    taobao_product["imgsrcurl"] = imgsrcurl
-    taobao_product["keyword"] = keyword
-    taobao_product["keyword"] = keyword
-    taobao_product["keyword"] = keyword
-    taobao_product["keyword"] = keyword
-    taobao_product["keyword"] = keyword
-    taobao_product["keyword"] = keyword
-    taobao_product["keyword"] = keyword
-    taobao_product["keyword"] = keyword
-    taobao_product["keyword"] = keyword
-    taobao_product["keyword"] = keyword
-    taobao_product["keyword"] = keyword
-    taobao_product["keyword"] = keyword
-    taobao_product["keyword"] = keyword
-    taobao_product["keyword"] = keyword
-    taobao_product["keyword"] = keyword
-    taobao_product["keyword"] = keyword
-    taobao_product["keyword"] = keyword
-    taobao_product["keyword"] = keyword
-    taobao_product["keyword"] = keyword
-    taobao_product["keyword"] = keyword
-    taobao_product["keyword"] = keyword
-    taobao_product["keyword"] = keyword
-    taobao_product["keyword"] = keyword
-    taobao_product["keyword"] = keyword
-    taobao_product["keyword"] = keyword
-    taobao_product["keyword"] = keyword
-    taobao_product["keyword"] = keyword
-    taobao_product["keyword"] = keyword
-    taobao_product["keyword"] = keyword
+    imgsrcurl = get_utfurl_from_unicode(imgsrcurl)
+    file_name = "taobaoproduct_%s.jpg" % curr_num_of_img
+    file_path = os.path.join("D:\StefanClub\StefanClub\www\static\img\taobao", file_name)
+    urllib.request.urlretrieve(imgsrcurl, file_path)
+    taobao_product["imgsrcurl"] = "../static/img/taobao/%s" % file_name
+    taobao_product["imgnumber"] = curr_num_of_img
+    detail_url = auction['detail_url']
+    detail_url = get_utfurl_from_unicode(detail_url)
+    taobao_product["imgurl"] = detail_url
+    i2itags = auction['i2iTags']
+    samestyle = i2itags['samestyle']
+    samestyleurl = samestyle['url']
+    samestyleurl = get_utfurl_from_unicode(samestyleurl)
+    taobao_product["samestyleurl"] = samestyleurl
+    similar = i2itags['similar']
+    similarurl = similar['url']
+    similarurl = get_utfurl_from_unicode(similarurl)
+    taobao_product["similarurl"] = similarurl
+    taobao_product["product_price"] = auction['view_price']
+    taobao_product["payednum"] = auction['view_sales']
+    title = auction['title']
+    title = get_correct_title(title)
+    taobao_product["title"] = title
+    taobao_product["keyword"] = auction['nid']
+    taobao_product["keyword"] = auction['nid']
+    taobao_product["keyword"] = auction['nid']
+    taobao_product["keyword"] = auction['nid']
+    taobao_product["keyword"] = auction['nid']
+    taobao_product["keyword"] = auction['nid']
+    taobao_product["keyword"] = auction['nid']
+    taobao_product["keyword"] = auction['nid']
+    taobao_product["keyword"] = auction['nid']
+    taobao_product["keyword"] = auction['nid']
+    taobao_product["keyword"] = auction['nid']
+    taobao_product["keyword"] = auction['nid']
+    taobao_product["keyword"] = auction['nid']
+    taobao_product["keyword"] = auction['nid']
+    taobao_product["keyword"] = auction['nid']
+    taobao_product["keyword"] = auction['nid']
+    taobao_product["keyword"] = auction['nid']
+    taobao_product["keyword"] = auction['nid']
+    taobao_product["keyword"] = auction['nid']
+    taobao_product["keyword"] = auction['nid']
+    taobao_product["keyword"] = auction['nid']
+    taobao_product["keyword"] = auction['nid']
     return taobao_product
 
 
@@ -177,3 +192,23 @@ def get_comment_qty(comment_title):
     comment_qty = comment_title[0:max_index]
     comment_qty = int(comment_qty)
     return comment_qty
+
+
+def get_utfurl_from_unicode(url):
+    url = url.encode('utf-8')
+    url = str(url)
+    url = url[2:]
+    return url
+
+
+def get_correct_title(ori_title):
+    ori_title_list = list(ori_title)
+    first_chi = -1
+    for i in range(len(ori_title_list)):
+        if u'\u4e00' <= ori_title_list[i] <= u'\u9fff':
+            first_chi = i
+            break
+    eng_title = ori_title[:first_chi]
+    chi_title = ori_title[first_chi-1:]
+    correct_title = eng_title + chi_title
+    return correct_title
