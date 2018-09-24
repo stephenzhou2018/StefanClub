@@ -6,7 +6,7 @@
 # See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 import pymysql
 import datetime
-from items import IndexCarouselItem,IndexNews,HotMatches,SinaCarousel,HotMatchNews,NbaNews,ZhihuHot,ZhihuHotComment
+from items import IndexCarouselItem,IndexNews,HotMatches,SinaCarousel,HotMatchNews,NbaNews,ZhihuHot,ZhihuHotComment,TaobaoProducts
 from scrapy.exceptions import DropItem
 from redis import Redis
 import pandas as pd
@@ -104,6 +104,26 @@ class MysqlPipeline(object):
             item["commentid"],item["hotid"],item["userimgnumber"],item["userimgsrcurl"], item["userimgurl"], item["username"], item["replytouser"], item["replytouserurl"],item["replytime"],item["content"],
             item["infavorqty"],datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
 
+        elif isinstance(item, TaobaoProducts):
+            insert_sql = '''
+            insert into TaobaoProducts(keyword,product_id,imgsrcurl,imgurl,imgnumber,samestyleurl,similarurl,product_price,payednum,
+            title,titleurl,shopname,shopurl,shopaddress,shoplevelzuanqty,shoplevelguanqty,shoplevelxinqty,shopleveljingguanqty,istmall,
+            iconkey1,icontitle1,iconurl1,iconkey2,icontitle2,iconurl2,iconkey3,icontitle3,iconurl3,iconkey4,icontitle4,iconurl4,iconkey5,
+            icontitle5,iconurl5,subiconclass1,subicontitle1,subiconcontent1,subiconclass2,subicontitle2,subiconcontent2,subiconclass3,
+            subicontitle3,subiconcontent3,subiconclass4,subicontitle4,subiconcontent4,subiconclass5,subicontitle5,subiconcontent5,shoptotalrate,
+            shopdescscore,shopdescscorediff,shopdesccompare,shopdeliveryscore,shopdeliveryscorediff,shopdeliverycompare,shopservicescore,
+            shopservicescorediff,shopservicecompare,created_at) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
+            %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            '''
+            self.cursor.execute(insert_sql, (
+            item["keyword"],item["product_id"],item["imgsrcurl"],item["imgurl"], item["imgnumber"], item["samestyleurl"], item["similarurl"], item["product_price"],item["payednum"],item["title"],
+            item["titleurl"], item["shopname"], item["shopurl"], item["shopaddress"], item["shoplevelzuanqty"],item["shoplevelguanqty"], item["shoplevelxinqty"], item["shopleveljingguanqty"],
+            item["istmall"], item["iconkey1"],item["icontitle1"], item["iconurl1"], item["iconkey2"],item["icontitle2"], item["iconurl2"], item["iconkey3"],item["icontitle3"], item["iconurl3"],
+            item["iconkey4"], item["icontitle4"], item["iconurl4"], item["iconkey5"],item["icontitle5"], item["iconurl5"], item["subiconclass1"], item["subicontitle1"], item["subiconcontent1"],
+            item["subiconclass2"], item["subicontitle2"], item["subiconcontent2"], item["subiconclass3"], item["subicontitle3"], item["subiconcontent3"], item["subiconclass4"], item["subicontitle4"],
+            item["subiconcontent4"],item["subiconclass5"], item["subicontitle5"], item["subiconcontent5"],item["shoptotalrate"], item["shopdescscore"], item["shopdescscorediff"], item["shopdesccompare"],
+            item["shopdeliveryscore"],item["shopdeliveryscorediff"],item["shopdeliverycompare"],item["shopservicescore"],item["shopservicescorediff"],item["shopservicecompare"],datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
+
         else:
             pass
         self.conn.commit()
@@ -120,6 +140,7 @@ class DuplicatesPipeline(object):
         self.nbanews_seen = set()
         self.zhihuhot_seen = set()
         self.zhihuhotcom_seen = set()
+        self.taobaoproid_seen = set()
 
     def process_item(self, item, spider):
         if isinstance(item, HotMatches):
@@ -178,6 +199,13 @@ class DuplicatesPipeline(object):
                 self.zhihuhotcom_seen.add(item['commentid'])
                 return item
 
+        elif isinstance(item, TaobaoProducts):
+            if item['product_id'] in self.taobaoproid_seen:
+                raise DropItem("(Scrapy)Duplicate item found: %s" % item)
+            else:
+                self.taobaoproid_seen.add(item['product_id'])
+                return item
+
         else:
             return item
 
@@ -192,6 +220,7 @@ redis_data_dict4 = "k_hotmatnews_imgurls"
 redis_data_dict5 = "k_nbanews_titles"
 redis_data_dict6 = "k_zhihuhot_hotids"
 redis_data_dict7 = "k_zhihuhotcom_ids"
+redis_data_dict8 = "k_taobaoproduct_ids"
 
 
 
@@ -249,6 +278,12 @@ class RedisPipeline(object):
             for zhihuhotcom_id in df['commentid'].get_values():
                 redis_db.hset(redis_data_dict7, zhihuhotcom_id, 0)
 
+        if redis_db.hlen(redis_data_dict8) == 0:
+            sql = "SELECT product_id FROM TaobaoProducts;"
+            df = pd.read_sql(sql, self.connect)
+            for tbproduct_id in df['product_id'].get_values():
+                redis_db.hset(redis_data_dict8, tbproduct_id, 0)
+
     def process_item(self, item, spider):
         if isinstance(item, HotMatches):
             if redis_db.hexists (redis_data_dict, item['livecast_id']):
@@ -294,6 +329,12 @@ class RedisPipeline(object):
 
         elif isinstance(item, ZhihuHotComment):
             if redis_db.hexists (redis_data_dict7, item['commentid']):
+                raise DropItem("(Redis)Duplicate item found: %s" % item)
+            else:
+                return item
+
+        elif isinstance(item, TaobaoProducts):
+            if redis_db.hexists (redis_data_dict8, item['product_id']):
                 raise DropItem("(Redis)Duplicate item found: %s" % item)
             else:
                 return item

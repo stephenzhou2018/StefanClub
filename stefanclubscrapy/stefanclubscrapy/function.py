@@ -126,6 +126,7 @@ def parse_taobao_products(auction,keyword,curr_num_of_img):
     taobao_product["product_id"] = auction['nid']
     imgsrcurl = auction['pic_url']
     imgsrcurl = get_utfurl_from_unicode(imgsrcurl)
+    imgsrcurl = 'https:' + imgsrcurl
     file_name = "taobaoproduct_%s.jpg" % curr_num_of_img
     file_path = os.path.join("D:\StefanClub\StefanClub\www\static\img\taobao", file_name)
     urllib.request.urlretrieve(imgsrcurl, file_path)
@@ -148,28 +149,97 @@ def parse_taobao_products(auction,keyword,curr_num_of_img):
     title = auction['title']
     title = get_correct_title(title)
     taobao_product["title"] = title
-    taobao_product["keyword"] = auction['nid']
-    taobao_product["keyword"] = auction['nid']
-    taobao_product["keyword"] = auction['nid']
-    taobao_product["keyword"] = auction['nid']
-    taobao_product["keyword"] = auction['nid']
-    taobao_product["keyword"] = auction['nid']
-    taobao_product["keyword"] = auction['nid']
-    taobao_product["keyword"] = auction['nid']
-    taobao_product["keyword"] = auction['nid']
-    taobao_product["keyword"] = auction['nid']
-    taobao_product["keyword"] = auction['nid']
-    taobao_product["keyword"] = auction['nid']
-    taobao_product["keyword"] = auction['nid']
-    taobao_product["keyword"] = auction['nid']
-    taobao_product["keyword"] = auction['nid']
-    taobao_product["keyword"] = auction['nid']
-    taobao_product["keyword"] = auction['nid']
-    taobao_product["keyword"] = auction['nid']
-    taobao_product["keyword"] = auction['nid']
-    taobao_product["keyword"] = auction['nid']
-    taobao_product["keyword"] = auction['nid']
-    taobao_product["keyword"] = auction['nid']
+    taobao_product["titleurl"] = detail_url
+    taobao_product["shopname"] = auction['nick']
+    shopLink = auction['shopLink']
+    shopLink = get_utfurl_from_unicode(shopLink)
+    taobao_product["shopurl"] = shopLink
+    taobao_product["shopaddress"] = auction['item_loc']
+    shopcard = auction['shopcard']
+    levelclasses = shopcard['levelClasses']
+    shopleveljingguanqty = 0
+    shoplevelzuanqty = 0
+    shoplevelguanqty = 0
+    shoplevelxinqty = 0
+    for levelclass in levelclasses:
+        if levelclass['levelClass'] == 'icon-supple-level-jinguan':
+            shopleveljingguanqty += 1
+        elif levelclass['levelClass'] == 'icon-supple-level-guan':
+            shoplevelguanqty += 1
+        elif levelclass['levelClass'] == 'icon-supple-level-xin':
+            shoplevelxinqty += 1
+        elif levelclass['levelClass'] == 'icon-supple-level-zuan':
+            shoplevelzuanqty += 1
+        else:
+            pass
+    taobao_product["shoplevelzuanqty"] = shoplevelzuanqty
+    taobao_product["shopleveljingguanqty"] = shopleveljingguanqty
+    taobao_product["shoplevelguanqty"] = shoplevelguanqty
+    taobao_product["shoplevelxinqty"] = shoplevelxinqty
+    taobao_product["istmall"] = shopcard['isTmall']
+    icons = auction['icon']
+    for j in range(5):
+        taobao_product["iconkey%s" % (j + 1)] = None
+        taobao_product["icontitle%s" % (j + 1)] = None
+        taobao_product["iconurl%s" % (j + 1)] = None
+        taobao_product["subiconclass%s" % (j + 1)] = None
+        taobao_product["subicontitle%s" % (j + 1)] = None
+        taobao_product["subiconcontent%s" % (j + 1)] = None
+    i = 1
+    for icon in icons:
+        taobao_product["iconkey%s" % i] = icon['icon_key']
+        taobao_product["icontitle%s" % i] = icon['title']
+        if "url" in icon.keys():
+            taobao_product["iconurl%s" % i] = icon['url']
+        if "iconPopupComplex" in icon.keys():
+            iconpopupcomplex = icon['iconPopupComplex']
+            taobao_product["subicontitle%s" % i] = iconpopupcomplex['popup_title']
+            if "subIcons" in iconpopupcomplex.keys():
+                subicons = iconpopupcomplex['subIcons']
+                if len(subicons) > 0:
+                    subicon = subicons[0]
+                    taobao_product["subiconclass%s" % i] = subicon['dom_class']
+                    taobao_product["subiconcontent%s" % i] = subicon['icon_content']
+        if "iconPopupNormal" in icon.keys():
+            iconpopupnormal = icon['iconPopupNormal']
+            taobao_product["subiconclass%s" % i] = iconpopupnormal['dom_class']
+        i += 1
+    shoptotalrate = shopcard['totalRate']
+    shoptotalrate = get_show_rate(shoptotalrate)
+    taobao_product["shoptotalrate"] = shoptotalrate
+    descriptions = shopcard['description']
+    deliveries = shopcard['delivery']
+    services = shopcard['service']
+    taobao_product["shopdescscore"] = descriptions[0] / 100
+    taobao_product["shopdescscorediff"] = descriptions[2] / 10000
+    shopdesccompare = descriptions[1]
+    if shopdesccompare > 0:
+        shopdesccompare = 'higher'
+    elif shopdesccompare < 0:
+        shopdesccompare = 'lower'
+    else:
+        shopdesccompare = 'equal'
+    taobao_product["shopdesccompare"] = shopdesccompare
+    taobao_product["shopdeliveryscore"] = deliveries[0] / 100
+    taobao_product["shopdeliveryscorediff"] = deliveries[2] / 10000
+    shopdeliverycompare = deliveries[1]
+    if shopdeliverycompare > 0:
+        shopdeliverycompare = 'higher'
+    elif shopdeliverycompare < 0:
+        shopdeliverycompare = 'lower'
+    else:
+        shopdeliverycompare = 'equal'
+    taobao_product["shopdeliverycompare"] = shopdeliverycompare
+    taobao_product["shopservicescore"] = services[0] / 100
+    taobao_product["shopservicescorediff"] = services[2] / 10000
+    shopservicecompare = services[1]
+    if shopservicecompare > 0:
+        shopservicecompare = 'higher'
+    elif shopservicecompare < 0:
+        shopservicecompare = 'lower'
+    else:
+        shopservicecompare = 'equal'
+    taobao_product["shopservicecompare"] = shopservicecompare
     return taobao_product
 
 
@@ -212,3 +282,18 @@ def get_correct_title(ori_title):
     chi_title = ori_title[first_chi-1:]
     correct_title = eng_title + chi_title
     return correct_title
+
+
+def get_show_rate(ori_rate):
+    ori_rate = str(ori_rate)
+    ori_rate_list = list(ori_rate)
+    ori_rate_len = len(ori_rate_list)
+    if ori_rate_len == 4:
+        ori_rate_list.insert(2, ".")
+    elif ori_rate_len == 5:
+        ori_rate_list.insert(3, ".")
+    else:
+        pass
+    show_rate = "".join(ori_rate_list)
+    show_rate = show_rate + '%'
+    return show_rate
