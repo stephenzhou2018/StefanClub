@@ -224,6 +224,7 @@ create table TaobaoProducts (
     `id` int not null auto_increment,
     `keyword` varchar(30) not null,
     `product_id` varchar(100),
+    `product_type` varchar(100),
     `imgsrcurl` varchar(300),
     `imgurl` varchar(300),
     `imgnumber` int,

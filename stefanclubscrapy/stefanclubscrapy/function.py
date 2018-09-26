@@ -127,22 +127,26 @@ def parse_taobao_products(auction,keyword,curr_num_of_img):
     imgsrcurl = auction['pic_url']
     imgsrcurl = get_utfurl_from_unicode(imgsrcurl)
     imgsrcurl = 'https:' + imgsrcurl
+    imgsrcurl = imgsrcurl[:-1]
     file_name = "taobaoproduct_%s.jpg" % curr_num_of_img
-    file_path = os.path.join("D:\StefanClub\StefanClub\www\static\img\taobao", file_name)
-    urllib.request.urlretrieve(imgsrcurl, file_path)
+    file_path = os.path.join("D:\StefanClub\StefanClub\www\static\img\\taobao", file_name)
+    auto_download(imgsrcurl,file_path)
     taobao_product["imgsrcurl"] = "../static/img/taobao/%s" % file_name
     taobao_product["imgnumber"] = curr_num_of_img
     detail_url = auction['detail_url']
     detail_url = get_utfurl_from_unicode(detail_url)
     taobao_product["imgurl"] = detail_url
-    i2itags = auction['i2iTags']
-    samestyle = i2itags['samestyle']
-    samestyleurl = samestyle['url']
-    samestyleurl = get_utfurl_from_unicode(samestyleurl)
+    samestyleurl = None
+    similarurl = None
+    if "i2iTags" in auction.keys():
+        i2itags = auction['i2iTags']
+        samestyle = i2itags['samestyle']
+        samestyleurl = samestyle['url']
+        samestyleurl = get_utfurl_from_unicode(samestyleurl)
+        similar = i2itags['similar']
+        similarurl = similar['url']
+        similarurl = get_utfurl_from_unicode(similarurl)
     taobao_product["samestyleurl"] = samestyleurl
-    similar = i2itags['similar']
-    similarurl = similar['url']
-    similarurl = get_utfurl_from_unicode(similarurl)
     taobao_product["similarurl"] = similarurl
     taobao_product["product_price"] = auction['view_price']
     taobao_product["payednum"] = auction['view_sales']
@@ -204,8 +208,10 @@ def parse_taobao_products(auction,keyword,curr_num_of_img):
             iconpopupnormal = icon['iconPopupNormal']
             taobao_product["subiconclass%s" % i] = iconpopupnormal['dom_class']
         i += 1
-    shoptotalrate = shopcard['totalRate']
-    shoptotalrate = get_show_rate(shoptotalrate)
+    shoptotalrate = None
+    if 'totalRate' in shopcard.keys():
+        shoptotalrate = shopcard['totalRate']
+        shoptotalrate = get_show_rate(shoptotalrate)
     taobao_product["shoptotalrate"] = shoptotalrate
     descriptions = shopcard['description']
     deliveries = shopcard['delivery']
@@ -297,3 +303,11 @@ def get_show_rate(ori_rate):
     show_rate = "".join(ori_rate_list)
     show_rate = show_rate + '%'
     return show_rate
+
+
+def auto_download(imgsrcurl,file_path):
+    try:
+        urllib.request.urlretrieve(imgsrcurl, file_path)
+    except urllib.ContentTooShortError:
+        print ('Network conditions is not good.Reloading.')
+        auto_download(imgsrcurl,file_path)
