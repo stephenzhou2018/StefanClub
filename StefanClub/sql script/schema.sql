@@ -282,6 +282,9 @@ create table TaobaoProducts (
     `shopservicescore` varchar(20),
     `shopservicescorediff` varchar(20) ,
     `shopservicecompare` varchar(20) ,
+    `product_price_float` float ,
+    `product_sales_qty` int ,
+    `shop_ave_score` float ,
     `created_at` TIMESTAMP not null,
     key `idx_created_at` (`created_at`),
     primary key (`id`)

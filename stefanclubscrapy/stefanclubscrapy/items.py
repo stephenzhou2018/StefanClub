@@ -210,3 +210,6 @@ class TaobaoProducts(scrapy.Item):
     shopservicescore = scrapy.Field()
     shopservicescorediff = scrapy.Field()
     shopservicecompare = scrapy.Field()
+    product_price_float = scrapy.Field()
+    product_sales_qty = scrapy.Field()
+    shop_ave_score = scrapy.Field()

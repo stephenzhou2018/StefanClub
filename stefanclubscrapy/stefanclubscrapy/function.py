@@ -143,13 +143,32 @@ def parse_taobao_products(auction,keyword,curr_num_of_img):
         samestyle = i2itags['samestyle']
         samestyleurl = samestyle['url']
         samestyleurl = get_utfurl_from_unicode(samestyleurl)
+        if samestyleurl == "'":
+            samestyleurl = None
+        if samestyleurl is not None:
+            if samestyleurl[:22] == '/search?type=samestyle':
+                samestyleurl = 'https://s.taobao.com' + samestyleurl
         similar = i2itags['similar']
         similarurl = similar['url']
         similarurl = get_utfurl_from_unicode(similarurl)
+        if similarurl is not None:
+            if similarurl[:20] == '/search?type=similar':
+                similarurl = 'https://s.taobao.com' + similarurl
     taobao_product["samestyleurl"] = samestyleurl
     taobao_product["similarurl"] = similarurl
-    taobao_product["product_price"] = auction['view_price']
-    taobao_product["payednum"] = auction['view_sales']
+    product_price = auction['view_price']
+    product_price_float = float(product_price)
+    taobao_product["product_price_float"] = product_price_float
+    taobao_product["product_price"] = product_price
+    payednum = None
+    product_sales_qty = 0
+    if 'view_sales' in auction.keys():
+        payednum = auction['view_sales']
+    if payednum is not None:
+        product_sales_qty = payednum[:-3]
+        product_sales_qty = int(product_sales_qty)
+    taobao_product["product_sales_qty"] = product_sales_qty
+    taobao_product["payednum"] = payednum
     title = auction['title']
     title = get_correct_title(title)
     taobao_product["title"] = title
@@ -159,28 +178,101 @@ def parse_taobao_products(auction,keyword,curr_num_of_img):
     shopLink = get_utfurl_from_unicode(shopLink)
     taobao_product["shopurl"] = shopLink
     taobao_product["shopaddress"] = auction['item_loc']
-    shopcard = auction['shopcard']
-    levelclasses = shopcard['levelClasses']
-    shopleveljingguanqty = 0
-    shoplevelzuanqty = 0
-    shoplevelguanqty = 0
-    shoplevelxinqty = 0
-    for levelclass in levelclasses:
-        if levelclass['levelClass'] == 'icon-supple-level-jinguan':
-            shopleveljingguanqty += 1
-        elif levelclass['levelClass'] == 'icon-supple-level-guan':
-            shoplevelguanqty += 1
-        elif levelclass['levelClass'] == 'icon-supple-level-xin':
-            shoplevelxinqty += 1
-        elif levelclass['levelClass'] == 'icon-supple-level-zuan':
-            shoplevelzuanqty += 1
-        else:
-            pass
-    taobao_product["shoplevelzuanqty"] = shoplevelzuanqty
-    taobao_product["shopleveljingguanqty"] = shopleveljingguanqty
-    taobao_product["shoplevelguanqty"] = shoplevelguanqty
-    taobao_product["shoplevelxinqty"] = shoplevelxinqty
-    taobao_product["istmall"] = shopcard['isTmall']
+    taobao_product["shoplevelzuanqty"] = None
+    taobao_product["shopleveljingguanqty"] = None
+    taobao_product["shoplevelguanqty"] = None
+    taobao_product["shoplevelxinqty"] = None
+    taobao_product["istmall"] = None
+    taobao_product["shoptotalrate"] = None
+    taobao_product["shopdescscore"] = None
+    taobao_product["shopdescscorediff"] = None
+    taobao_product["shopdesccompare"] = None
+    taobao_product["shopdeliveryscore"] = None
+    taobao_product["shopdeliveryscorediff"] = None
+    taobao_product["shopdeliverycompare"] = None
+    taobao_product["shopservicescore"] = None
+    taobao_product["shopservicescorediff"] = None
+    taobao_product["shopservicecompare"] = None
+    taobao_product["shop_ave_score"] = 0
+    shopdescscore = -1
+    shopdeliveryscore = -1
+    shopservicescore = -1
+    if 'shopcard' in auction.keys():
+        shopcard = auction['shopcard']
+        levelclasses = shopcard['levelClasses']
+        shopleveljingguanqty = 0
+        shoplevelzuanqty = 0
+        shoplevelguanqty = 0
+        shoplevelxinqty = 0
+        for levelclass in levelclasses:
+            if levelclass['levelClass'] == 'icon-supple-level-jinguan':
+                shopleveljingguanqty += 1
+            elif levelclass['levelClass'] == 'icon-supple-level-guan':
+                shoplevelguanqty += 1
+            elif levelclass['levelClass'] == 'icon-supple-level-xin':
+                shoplevelxinqty += 1
+            elif levelclass['levelClass'] == 'icon-supple-level-zuan':
+                shoplevelzuanqty += 1
+            else:
+                pass
+        taobao_product["shoplevelzuanqty"] = shoplevelzuanqty
+        taobao_product["shopleveljingguanqty"] = shopleveljingguanqty
+        taobao_product["shoplevelguanqty"] = shoplevelguanqty
+        taobao_product["shoplevelxinqty"] = shoplevelxinqty
+        taobao_product["istmall"] = shopcard['isTmall']
+        shoptotalrate = None
+        if 'totalRate' in shopcard.keys():
+            shoptotalrate = shopcard['totalRate']
+            shoptotalrate = get_show_rate(shoptotalrate)
+        taobao_product["shoptotalrate"] = shoptotalrate
+        descriptions = shopcard['description']
+        deliveries = shopcard['delivery']
+        services = shopcard['service']
+        if len(descriptions) > 0:
+            shopdescscore = descriptions[0] / 100
+            taobao_product["shopdescscore"] = shopdescscore
+            shopdescscorediff = descriptions[2] / 100
+            shopdescscorediff = str(shopdescscorediff) + '%'
+            taobao_product["shopdescscorediff"] = shopdescscorediff
+            shopdesccompare = descriptions[1]
+            if shopdesccompare > 0:
+                shopdesccompare = 'higher'
+            elif shopdesccompare < 0:
+                shopdesccompare = 'lower'
+            else:
+                shopdesccompare = 'equal'
+            taobao_product["shopdesccompare"] = shopdesccompare
+        if len(deliveries) > 0:
+            shopdeliveryscore = deliveries[0] / 100
+            taobao_product["shopdeliveryscore"] = shopdeliveryscore
+            shopdeliveryscorediff = deliveries[2] / 100
+            shopdeliveryscorediff = str(shopdeliveryscorediff) + '%'
+            taobao_product["shopdeliveryscorediff"] = shopdeliveryscorediff
+            shopdeliverycompare = deliveries[1]
+            if shopdeliverycompare > 0:
+                shopdeliverycompare = 'higher'
+            elif shopdeliverycompare < 0:
+                shopdeliverycompare = 'lower'
+            else:
+                shopdeliverycompare = 'equal'
+            taobao_product["shopdeliverycompare"] = shopdeliverycompare
+        if len(services) > 0:
+            shopservicescore = services[0] / 100
+            taobao_product["shopservicescore"] = shopservicescore
+            shopservicescorediff = services[2] / 100
+            shopservicescorediff = str(shopservicescorediff) + '%'
+            taobao_product["shopservicescorediff"] = shopservicescorediff
+            shopservicecompare = services[1]
+            if shopservicecompare > 0:
+                shopservicecompare = 'higher'
+            elif shopservicecompare < 0:
+                shopservicecompare = 'lower'
+            else:
+                shopservicecompare = 'equal'
+            taobao_product["shopservicecompare"] = shopservicecompare
+    if shopdescscore != -1 and shopdeliveryscore != -1 and shopservicescore != -1:
+        taobao_product["shop_ave_score"] = (shopdescscore + shopdeliveryscore + shopservicescore) / 3
+
     icons = auction['icon']
     for j in range(5):
         taobao_product["iconkey%s" % (j + 1)] = None
@@ -208,44 +300,6 @@ def parse_taobao_products(auction,keyword,curr_num_of_img):
             iconpopupnormal = icon['iconPopupNormal']
             taobao_product["subiconclass%s" % i] = iconpopupnormal['dom_class']
         i += 1
-    shoptotalrate = None
-    if 'totalRate' in shopcard.keys():
-        shoptotalrate = shopcard['totalRate']
-        shoptotalrate = get_show_rate(shoptotalrate)
-    taobao_product["shoptotalrate"] = shoptotalrate
-    descriptions = shopcard['description']
-    deliveries = shopcard['delivery']
-    services = shopcard['service']
-    taobao_product["shopdescscore"] = descriptions[0] / 100
-    taobao_product["shopdescscorediff"] = descriptions[2] / 10000
-    shopdesccompare = descriptions[1]
-    if shopdesccompare > 0:
-        shopdesccompare = 'higher'
-    elif shopdesccompare < 0:
-        shopdesccompare = 'lower'
-    else:
-        shopdesccompare = 'equal'
-    taobao_product["shopdesccompare"] = shopdesccompare
-    taobao_product["shopdeliveryscore"] = deliveries[0] / 100
-    taobao_product["shopdeliveryscorediff"] = deliveries[2] / 10000
-    shopdeliverycompare = deliveries[1]
-    if shopdeliverycompare > 0:
-        shopdeliverycompare = 'higher'
-    elif shopdeliverycompare < 0:
-        shopdeliverycompare = 'lower'
-    else:
-        shopdeliverycompare = 'equal'
-    taobao_product["shopdeliverycompare"] = shopdeliverycompare
-    taobao_product["shopservicescore"] = services[0] / 100
-    taobao_product["shopservicescorediff"] = services[2] / 10000
-    shopservicecompare = services[1]
-    if shopservicecompare > 0:
-        shopservicecompare = 'higher'
-    elif shopservicecompare < 0:
-        shopservicecompare = 'lower'
-    else:
-        shopservicecompare = 'equal'
-    taobao_product["shopservicecompare"] = shopservicecompare
     return taobao_product
 
 

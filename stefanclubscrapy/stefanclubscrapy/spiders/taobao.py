@@ -10,7 +10,8 @@ class TaobaoSpider(scrapy.Spider):
     name = 'taobao'
     allowed_domains = ['www.taobao.com']
     start_urls = ['http://www.taobao.com/']
-    keywords = ['UNIQLO', 'SUPERME']
+    #keywords = ['UNIQLO', 'SUPERME', 'NIKE', 'ADIDAS', 'APPLE', 'HUAWEI']
+    keywords = ['UNIQLO', 'SUPERME', 'NIKE', 'ADIDAS']
     last_twelve_url = 'https://s.taobao.com/api?_ksTS=1537784279315_208&callback=jsonp209&ajax=true&m=customized&stats_click=search_radio_all:1&q={keyword}&s=36&imgfile=&initiative_id=staobaoz_20180924&bcoffset=0&js=1&ie=utf8&rn=91a38a1dc028b177e8b2f5d17a1f1e05'
     next_page_url = 'https://s.taobao.com/search?data-key=s&data-value={datavalue}&ajax=true&_ksTS=1537791664734_887&callback=jsonp888&q={keyword}&imgfile=&js=1&stats_click=search_radio_all%3A1&initiative_id=staobaoz_20180920&ie=utf8&bcoffset=4&p4ppushleft=1%2C48'
 

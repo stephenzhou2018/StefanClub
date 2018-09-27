@@ -1,0 +1,269 @@
+{% extends '__base__.html' %}
+
+{% block title %}淘宝{% endblock %}
+
+{% block beforehead %}
+<style type="text/css" xmlns:backgroudimg="http://www.w3.org/1999/xhtml">
+.inp:focus {
+outline:none;
+    border: 2px solid OrangeRed;
+}
+.chooseitem {
+  color:black;
+  opacity:0.7;
+  float:left;
+}
+.chooseitema {
+  color:black;
+  margin-left:30px;
+}
+.chooseitemdiv {
+ margin-top:10px;
+ height:20px;
+}
+.orderbya {
+  color:black;
+  opacity:0.7;
+}
+.chooseprice {
+  float:left;
+  margin-left:5px;
+}
+.priceinput {
+  width:120px;
+  height:30px;
+}
+.productdiv {
+  float:left;
+  width:255.5px;
+  height:490px;
+  margin-left:7.5px;
+  margin-top:15px;
+  border:solid;
+  border-width: 1px;
+  border-color:LightSteelBlue;
+}
+.samesimia {
+  color:white;
+}
+.samesimia:hover{
+   color:white;
+}
+.samesimidiv {
+  position:absolute;
+  width:255.5px;
+  height:35px;
+  z-index:2;
+  left:0px;
+  right:0px;
+  top:0;
+  bottom:0px;
+  margin:auto;
+  margin-bottom: 0px;
+  background-color:OrangeRed;
+}
+
+
+</style>
+<script>
+window.onload = function()
+{
+  $("#alla").css('background-color','OrangeRed');
+  $("#alla").css('color','#fff');
+  $("#alla").css('font-weight','bold');
+  $("#tmalla").css('color','black');
+  $("#salesqtya").css('color','OrangeRed');
+  $(".samesimidiv").hide();
+
+}
+
+$(document).ready(function(){
+  $(".choosetab").hover(function(){
+    $(this).css("color","#fff");
+    $(this).css("background-color","OrangeRed");
+    $(this).css("font-weight","bold");
+    },function(){
+    var thisliid = this.id;
+    thisliid = thisliid.substring(0,thisliid.length-1);
+    if ($("#" + thisliid + "").attr('class') != 'active')
+    {
+       $(this).css("color","black");
+       $(this).css("background-color","");
+       $(this).css("font-weight","");
+    }
+  });
+  $(".orderbya").hover(function(){
+    $(this).css("color","OrangeRed");
+    },function(){
+    var thisliid = this.id;
+    thisliid = thisliid.substring(0,thisliid.length-1);
+    if ($("#" + thisliid + "").attr('class') != 'active')
+    {
+       $(this).css("color","black");
+    }
+  });
+  $(".productimgdiv").hover(function(){
+    var imgdivid = this.id;
+    var id = imgdivid.substring(0,imgdivid.length-6);
+    var imgsubdivid = id + 'imgsubdiv';
+    $("#" + imgsubdivid + "").show();
+    $("#" + imgsubdivid + "").css("opacity",0.7);
+    },function(){
+    var imgdivid = this.id;
+    var id = imgdivid.substring(0,imgdivid.length-6);
+    var imgsubdivid = id + 'imgsubdiv';
+    $("#" + imgsubdivid + "").hide();
+  });
+});
+</script>
+
+
+{% endblock %}
+
+{% block content %}
+
+<div>
+    <div style="width:1060px;height:60px;">
+        <div style="float:left;width:110px;height:60px;">
+            <img style="width:100%;height:100%;" src="../static/img/common/taobao.png">
+        </div>
+        <div style="float:right;width:600px;height:60px;">
+            <div style="width:100%;height:100%;">
+                <input class="inp" type="text" style="float:left;width:520px;height:40px;margin-top:10px;border:2px solid OrangeRed;" placeholder="请输入shoes/clothes/electronic搜索...">
+                <button style="float:left;width:80px;height:40px;margin-top:10px;background-color:OrangeRed;color:white;font-size:120%;font-weight:bold;border:none;">搜 索</button>
+            </div>
+        </div>
+    </div>
+    <div style="width:1060px;margin-top:40px;">
+        <ul id="myTab" class="nav nav-tabs">
+            <li id="all" class="active">
+                <a id="alla" href="#allpro" data-toggle="tab" class="choosetab">所有宝贝</a>
+            </li>
+            <li id="tmall">
+                <a id="tmalla" href="#tmallpro" data-toggle="tab"  class="choosetab">天猫</a>
+            </li>
+        </ul>
+        <div id="myTabContent" class="tab-content">
+            <div class="tab-pane fade in active" id="allpro">
+                <div style="width:1060px;margin-top:10px;">
+                    <div style="height:30px;">
+                        <div style="float:left;opacity:0.7;">所有分类></div>
+                        <div style="float:right;">
+                            <a style="text-decoration:none;color:black;opacity:0.7;">
+                                收起筛选 <span class="glyphicon glyphicon-chevron-up"></span>
+                            </a>
+                        </div>
+                    </div>
+                    <div style="margin-top:10px;">
+                        <div class="chooseitemdiv">
+                            <div class="chooseitem">品牌:</div>
+                            <div>
+                                <a class="chooseitema" style="text-decoration:none;">华为</a>
+                                <a class="chooseitema" style="text-decoration:none;">苹果</a>
+                            </div>
+                        </div>
+                        <div class="chooseitemdiv">
+                            <div class="chooseitem">网络类型:</div>
+                            <div>
+                                <a class="chooseitema" style="text-decoration:none;">全网通</a>
+                                <a class="chooseitema" style="text-decoration:none;">联通</a>
+                                <a class="chooseitema" style="text-decoration:none;">移动</a>
+                                <a class="chooseitema" style="text-decoration:none;">中国电信</a>
+                            </div>
+                        </div>
+                        <div class="chooseitemdiv">
+                            <div class="chooseitem">最想要的功能:</div>
+                            <div>
+                                <a class="chooseitema" style="text-decoration:none;">双卡双待</a>
+                                <a class="chooseitema" style="text-decoration:none;">人脸识别</a>
+                                <a class="chooseitema" style="text-decoration:none;">全面屏</a>
+                                <a class="chooseitema" style="text-decoration:none;">无锁</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top:20px;">
+                    <div>
+                        <ul class="nav nav-tabs">
+                            <li id="salesqty" class="active"><a id="salesqtya" class="orderbya" href="#">销量</a></li>
+                            <li id="shopscore"><a id="shopscorea" class="orderbya" href="#">综合店铺评分</a></li>
+                            <li id="price"><a id="pricea" class="orderbya" href="#">价格</a></li>
+                        </ul>
+                    </div>
+                    <div style="margin-top:20px;height:30px;">
+                        <div style="float:left;">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" id="inlineCheckbox1" value="option1"> 包邮
+                            </label>
+                            <label class="checkbox-inline">
+                                <input type="checkbox" id="inlineCheckbox2" value="option2"> 公益宝贝
+                            </label>
+                            <label class="checkbox-inline">
+                                <input type="checkbox" id="inlineCheckbox3" value="option3"> 天猫
+                            </label>
+                        </div>
+                        <div style="float:right;">
+                            <div class="chooseprice">
+                                <input type="text" class="priceinput" placeholder="最低价格">
+                            </div>
+                            <div class="chooseprice" style="margin-top:5px;">---</div>
+                            <div class="chooseprice">
+                                <input type="text" class="priceinput" placeholder="最高价格">
+                            </div>
+                            <div class="chooseprice">
+                                <button style="background-color:OrangeRed;border:none;color:white;height:30px;width:50px;">确定</button>
+                            </div>
+                            <div class="chooseprice" style="margin-top:5px;">
+                                发货地区:
+                            </div>
+                            <div style="float:right;margin-left:10px;">
+                                <select style="width:60px;height:30px;">
+                                    <option>上海</option>
+                                    <option>北京</option>
+                                    <option>广州</option>
+                                    <option>浙江</option>
+                                    <option>金华</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="width:1060px;margin-top:20px;height:auto;">
+                    {% for product in products %}
+                    <div class="productdiv">
+                        <div>
+                            <div>
+                                <div  id ="{{product.id}}imgdiv" class="productimgdiv" style="width:255.5px;height:255.5px;position:relative;">
+                                    <a target="_blank" href="{{product.imgurl}}">
+                                        <img src="{{product.imgsrcurl}}">
+                                        <div class="samesimidiv" id="{{product.id}}imgsubdiv">
+                                            <div style="margin-top:7.5px;float:left;margin-left:50px;">
+                                                {% if product.samestyleurl %}
+                                                <a target="_blank" href="{{product.samestyleurl}}" class="samesimia" style="text-decoration:none;">找同款</a>
+                                                {% else %}
+                                                <a target="_blank" href="{{product.samestyleurl}}" class="samesimia" style="text-decoration:none;pointer-events:none;opacity:0.7;" >找同款</a>
+                                                {% endif %}
+                                            </div>
+                                            <div style="margin-top:7.5px;float:left;margin-left:65px;">
+                                                {% if product.similarurl %}
+                                                <a target="_blank" href="{{product.similarurl}}" class="samesimia" style="text-decoration:none;">找相似</a>
+                                                {% else %}
+                                                <a target="_blank" href="{{product.similarurl}}" class="samesimia" style="text-decoration:none;pointer-events:none;opacity:0.7;">找相似</a>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="tab-pane fade" id="tmallpro">
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

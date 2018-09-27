@@ -112,7 +112,8 @@ class MysqlPipeline(object):
             icontitle5,iconurl5,subiconclass1,subicontitle1,subiconcontent1,subiconclass2,subicontitle2,subiconcontent2,subiconclass3,
             subicontitle3,subiconcontent3,subiconclass4,subicontitle4,subiconcontent4,subiconclass5,subicontitle5,subiconcontent5,shoptotalrate,
             shopdescscore,shopdescscorediff,shopdesccompare,shopdeliveryscore,shopdeliveryscorediff,shopdeliverycompare,shopservicescore,
-            shopservicescorediff,shopservicecompare,created_at) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
+            shopservicescorediff,shopservicecompare,product_price_float,product_sales_qty,shop_ave_score,created_at) VALUES (%s,%s,%s,%s,
+            %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
             %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             '''
             self.cursor.execute(insert_sql, (
@@ -122,7 +123,8 @@ class MysqlPipeline(object):
             item["iconkey4"], item["icontitle4"], item["iconurl4"], item["iconkey5"],item["icontitle5"], item["iconurl5"], item["subiconclass1"], item["subicontitle1"], item["subiconcontent1"],
             item["subiconclass2"], item["subicontitle2"], item["subiconcontent2"], item["subiconclass3"], item["subicontitle3"], item["subiconcontent3"], item["subiconclass4"], item["subicontitle4"],
             item["subiconcontent4"],item["subiconclass5"], item["subicontitle5"], item["subiconcontent5"],item["shoptotalrate"], item["shopdescscore"], item["shopdescscorediff"], item["shopdesccompare"],
-            item["shopdeliveryscore"],item["shopdeliveryscorediff"],item["shopdeliverycompare"],item["shopservicescore"],item["shopservicescorediff"],item["shopservicecompare"],datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
+            item["shopdeliveryscore"],item["shopdeliveryscorediff"],item["shopdeliverycompare"],item["shopservicescore"],item["shopservicescorediff"],item["shopservicecompare"],
+            item["product_price_float"], item["product_sales_qty"], item["shop_ave_score"],datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
 
         else:
             pass

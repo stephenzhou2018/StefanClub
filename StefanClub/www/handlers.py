@@ -7,7 +7,7 @@ __author__ = 'Stephen Zhou'
 import markdown2
 from aiohttp import web
 from coroweb import get,post
-from models import User,Blog,Comment,next_id,IndexCarouselItems,IndexNews,HotMatches,SinaCarousel,HotMatchNews,NbaNews,ZhihuHot,ZhihuHotComment
+from models import User,Blog,Comment,next_id,IndexCarouselItems,IndexNews,HotMatches,SinaCarousel,HotMatchNews,NbaNews,ZhihuHot,ZhihuHotComment,TaobaoProducts
 import asyncio,time,re,hashlib,json,logging
 from apis import APIError,APIValueError,APIPermissionError,APIResourceNotFoundError,Page
 from config import configs
@@ -135,6 +135,15 @@ async def zhihu():
     return {
         '__template__': 'zhihu.html',
         'zhihuhots': zhihuhots,
+    }
+
+
+@get('/taobao')
+async def taobao():
+    products = await TaobaoProducts.findAll(orderBy='id', limit=(0,48))
+    return {
+        '__template__': 'taobao.html',
+        'products': products,
     }
 
 
