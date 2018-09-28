@@ -135,6 +135,9 @@ def parse_taobao_products(auction,keyword,curr_num_of_img):
     taobao_product["imgnumber"] = curr_num_of_img
     detail_url = auction['detail_url']
     detail_url = get_utfurl_from_unicode(detail_url)
+    if detail_url is not None:
+        if detail_url[len(detail_url) - 1:] == "'":
+            detail_url = detail_url[:-1]
     taobao_product["imgurl"] = detail_url
     samestyleurl = None
     similarurl = None
@@ -148,12 +151,18 @@ def parse_taobao_products(auction,keyword,curr_num_of_img):
         if samestyleurl is not None:
             if samestyleurl[:22] == '/search?type=samestyle':
                 samestyleurl = 'https://s.taobao.com' + samestyleurl
+            if samestyleurl[len(samestyleurl) - 1:] == "'":
+                samestyleurl = samestyleurl[:-1]
         similar = i2itags['similar']
         similarurl = similar['url']
         similarurl = get_utfurl_from_unicode(similarurl)
+        if similarurl == "'":
+            similarurl = None
         if similarurl is not None:
             if similarurl[:20] == '/search?type=similar':
                 similarurl = 'https://s.taobao.com' + similarurl
+            if similarurl[len(similarurl) - 1:] == "'":
+                similarurl = similarurl[:-1]
     taobao_product["samestyleurl"] = samestyleurl
     taobao_product["similarurl"] = similarurl
     product_price = auction['view_price']
@@ -169,13 +178,19 @@ def parse_taobao_products(auction,keyword,curr_num_of_img):
         product_sales_qty = int(product_sales_qty)
     taobao_product["product_sales_qty"] = product_sales_qty
     taobao_product["payednum"] = payednum
-    title = auction['title']
-    title = get_correct_title(title)
-    taobao_product["title"] = title
+    orititle = auction['raw_title']
+    title1,title2,new_title,titlehaskey = get_correct_title(orititle,keyword)
+    taobao_product["title"] = new_title
+    taobao_product["title1"] = title1
+    taobao_product["title2"] = title2
+    taobao_product["titlehaskey"] = titlehaskey
     taobao_product["titleurl"] = detail_url
     taobao_product["shopname"] = auction['nick']
     shopLink = auction['shopLink']
     shopLink = get_utfurl_from_unicode(shopLink)
+    if shopLink is not None:
+        if shopLink[len(shopLink) - 1:] == "'":
+            shopLink = shopLink[:-1]
     taobao_product["shopurl"] = shopLink
     taobao_product["shopaddress"] = auction['item_loc']
     taobao_product["shoplevelzuanqty"] = None
@@ -331,17 +346,24 @@ def get_utfurl_from_unicode(url):
     return url
 
 
-def get_correct_title(ori_title):
+def get_correct_title(ori_title,keyword):
     ori_title_list = list(ori_title)
-    first_chi = -1
-    for i in range(len(ori_title_list)):
-        if u'\u4e00' <= ori_title_list[i] <= u'\u9fff':
-            first_chi = i
-            break
-    eng_title = ori_title[:first_chi]
-    chi_title = ori_title[first_chi-1:]
-    correct_title = eng_title + chi_title
-    return correct_title
+    new_title = ''.join(ori_title_list)  # transfer the unicode to utf-8
+    title1 = None
+    title2 = None
+    titlehaskey = 'FALSE'
+    low_new_title = new_title.lower()
+    low_key = keyword.lower()
+    if low_key in low_new_title:
+        titlehaskey = 'TRUE'
+        keyword_index = low_new_title.index(low_key)
+        keyword_len = len(keyword)
+        title1 = new_title[:keyword_index]
+        title2 = new_title[keyword_index + keyword_len:]
+    return title1,title2,new_title,titlehaskey
+
+
+
 
 
 def get_show_rate(ori_rate):

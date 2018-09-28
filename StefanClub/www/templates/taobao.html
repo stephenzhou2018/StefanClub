@@ -62,8 +62,66 @@ outline:none;
   margin-bottom: 0px;
   background-color:OrangeRed;
 }
-
-
+.profirstrow {
+  float:left;
+  margin-left:5px;
+}
+.protitlea {
+  color:black;
+}
+.protitlea:hover{
+   color:OrangeRed;
+}
+.shopinfo{position:relative;float:left;}
+.shopimg{float:left;margin-left:5px;}
+.shopname{float:left;margin-left:5px;}
+.shopcard{display:none;width:300px;height:175px;position:absolute;top:20px;left:20px;cursor:default;border:solid 1px #D0D0D0;opacity:1;z-index:2000;background-color:white;}
+.shopinfo:hover .shopcard{display:block;}
+.shopicon {
+  width:20px;
+  height:20px;
+}
+.kindfirsticon {
+  margin-top:5px;
+  margin-left:5px;
+  float:left;
+}
+.kindresticons {
+  margin-top:5px;
+  margin-left:1px;
+  float:left;
+}
+.shopscorediv {
+  margin-left:5px;
+  margin-top:10px;
+}
+.shophighertext {
+  margin-left:5px;
+  background-color:OrangeRed;
+  color:white;
+}
+.shophigherdiff {
+  margin-left:5px;
+  color:OrangeRed;
+}
+.shoplowertext {
+  margin-left:5px;
+  background-color:#00CCCC;
+  color:white;
+}
+.shoplowerdiff {
+  margin-left:5px;
+  color:#00CCCC;
+}
+.shopequaltext {
+  margin-left:5px;
+  background-color:#FFFF00;
+  color:white;
+}
+.shopequaldiff {
+  margin-left:5px;
+  color:#FFFF00;
+}
 </style>
 <script>
 window.onload = function()
@@ -114,6 +172,11 @@ $(document).ready(function(){
     var imgsubdivid = id + 'imgsubdiv';
     $("#" + imgsubdivid + "").hide();
   });
+  $(".shopnamea").hover(function(){
+    $(this).css("color","OrangeRed");
+    },function(){
+    $(this).css("color","black");
+  });
 });
 </script>
 
@@ -129,7 +192,7 @@ $(document).ready(function(){
         </div>
         <div style="float:right;width:600px;height:60px;">
             <div style="width:100%;height:100%;">
-                <input class="inp" type="text" style="float:left;width:520px;height:40px;margin-top:10px;border:2px solid OrangeRed;" placeholder="请输入shoes/clothes/electronic搜索...">
+                <input class="inp" type="text" style="float:left;width:520px;height:40px;margin-top:10px;border:2px solid OrangeRed;" placeholder="请输入shoes/clothes/electronic/UNIQLO/SUPERME/NIKE/ADIDAS/APPLE/HUAWEI搜索...">
                 <button style="float:left;width:80px;height:40px;margin-top:10px;background-color:OrangeRed;color:white;font-size:120%;font-weight:bold;border:none;">搜 索</button>
             </div>
         </div>
@@ -231,28 +294,159 @@ $(document).ready(function(){
                 <div style="width:1060px;margin-top:20px;height:auto;">
                     {% for product in products %}
                     <div class="productdiv">
-                        <div>
-                            <div>
-                                <div  id ="{{product.id}}imgdiv" class="productimgdiv" style="width:255.5px;height:255.5px;position:relative;">
-                                    <a target="_blank" href="{{product.imgurl}}">
-                                        <img src="{{product.imgsrcurl}}">
-                                        <div class="samesimidiv" id="{{product.id}}imgsubdiv">
-                                            <div style="margin-top:7.5px;float:left;margin-left:50px;">
-                                                {% if product.samestyleurl %}
-                                                <a target="_blank" href="{{product.samestyleurl}}" class="samesimia" style="text-decoration:none;">找同款</a>
-                                                {% else %}
-                                                <a target="_blank" href="{{product.samestyleurl}}" class="samesimia" style="text-decoration:none;pointer-events:none;opacity:0.7;" >找同款</a>
+                        <div  id ="{{product.id}}imgdiv" class="productimgdiv" style="width:255.5px;height:255.5px;position:relative;">
+                            <a target="_blank" href="{{product.imgurl}}">
+                                <img style="width:255.5px;height:255.5px;" src="{{product.imgsrcurl}}">
+                                <div class="samesimidiv" id="{{product.id}}imgsubdiv">
+                                    <div style="margin-top:7.5px;float:left;margin-left:50px;">
+                                        {% if product.samestyleurl %}
+                                        <a target="_blank" href="{{product.samestyleurl}}" class="samesimia" style="text-decoration:none;">找同款</a>
+                                        {% else %}
+                                        <a target="_blank" href="{{product.samestyleurl}}" class="samesimia" style="text-decoration:none;pointer-events:none;opacity:0.7;" >找同款</a>
+                                        {% endif %}
+                                    </div>
+                                    <div style="margin-top:7.5px;float:left;margin-left:65px;">
+                                        {% if product.similarurl %}
+                                        <a target="_blank" href="{{product.similarurl}}" class="samesimia" style="text-decoration:none;">找相似</a>
+                                        {% else %}
+                                        <a target="_blank" href="{{product.similarurl}}" class="samesimia" style="text-decoration:none;pointer-events:none;opacity:0.7;">找相似</a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <div style="margin-top:15px;">
+                            <div style="height:20px;">
+                                <div class="profirstrow">
+                                    <span style="color:OrangeRed;font-weight:bold;font-size:120%;">￥{{product.product_price}}</span>
+                                </div>
+                                {% if '包邮' in product.title %}
+                                <div class="profirstrow">
+                                    <img style="width:35px;height:20px;" src="../static/img/common/deliveryfree.png">
+                                </div>
+                                {% endif %}
+                                {% if product.payednum %}
+                                <div style="float:right;margin-right:5px;">
+                                    <span style="color:black;opacity:0.7;">{{product.payednum}}</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div style="margin-top:10px;margin-left:5px;">
+                                {% if product.titlehaskey == 'FALSE' %}
+                                <a class="protitlea" target="_blank" href="{{product.titleurl}}">{{product.title}}</a>
+                                {% else %}
+                                <a class="protitlea" target="_blank" href="{{product.titleurl}}"><span>{{product.title1}}</span><span style="color:OrangeRed;">{{product.keyword}}</span><span>{{product.title2}}</span></a>
+                                {% endif %}
+                            </div>
+                            <div style="margin-top:10px;">
+                                <div class="shopinfo">
+                                    <div class="shopimgname">
+                                        <div class="shopimg">
+                                            <img style="width:17.5px;height:17.5px;" src="../static/img/common/shopicon.png">
+                                        </div>
+                                        <div class="shopname">
+                                            <a target="_blank" class="shopnamea" style="color:black;opacity:0.7;" href="{{product.shopurl}}">{{product.shopname}}</a>
+                                        </div>
+                                    </div>
+                                    <div class="shopcard">
+                                        {% if product.istmall == '1' %}
+                                        <div style="margin-top:5px;margin-left:5px;height:20px;">
+                                            <img style="width:80px;height:20px;" src="../static/img/common/tmall.png">
+                                        </div>
+                                        {% endif %}
+                                        <div style="height:20px;">
+                                            {% if product.shopleveljingguanqty > 0 %}
+                                            <div class="kindfirsticon">
+                                                <img class="shopicon" src="../static/img/common/jinguan.png">
+                                            </div>
+                                            {% for i in range(product.shopleveljingguanqty - 1) %}
+                                            <div class="kindresticons">
+                                                <img class="shopicon" src="../static/img/common/jinguan.png">
+                                            </div>
+                                            {% endfor %}
+                                            {% endif %}
+                                            {% if product.shoplevelguanqty > 0 %}
+                                            <div class="kindfirsticon">
+                                                <img class="shopicon" src="../static/img/common/guan.png">
+                                            </div>
+                                            {% for i in range(product.shoplevelguanqty - 1) %}
+                                            <div class="kindresticons">
+                                                <img class="shopicon" src="../static/img/common/guan.png">
+                                            </div>
+                                            {% endfor %}
+                                            {% endif %}
+                                            {% if product.shoplevelzuanqty > 0 %}
+                                            <div class="kindfirsticon">
+                                                <img class="shopicon" src="../static/img/common/zuan.png">
+                                            </div>
+                                            {% for i in range(product.shoplevelzuanqty - 1) %}
+                                            <div class="kindresticons">
+                                                <img class="shopicon" src="../static/img/common/zuan.png">
+                                            </div>
+                                            {% endfor %}
+                                            {% endif %}
+                                            {% if product.shoplevelxinqty > 0 %}
+                                            <div class="kindfirsticon">
+                                                <img class="shopicon" src="../static/img/common/xin.png">
+                                            </div>
+                                            {% for i in range(product.shoplevelxinqty - 1) %}
+                                            <div class="kindresticons">
+                                                <img class="shopicon" src="../static/img/common/xin.png">
+                                            </div>
+                                            {% endfor %}
+                                            {% endif %}
+                                            {% if product.shoptotalrate %}
+                                            <div class="kindresticons" style="margin-left:10px;">
+                                                <span style="color:black;font-size:90%;">好评率：{{product.shoptotalrate}}</span>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <div style="margin-top:10px;opacity:0.7;height:10px;">---------------------------------------------------------------</div>
+                                        <div style="margin-top:20px;">
+                                            <div style="margin-left:5px;">
+                                                <span>如实描述：{{product.shopdescscore}}</span>
+                                                {% if product.shopdesccompare == 'higher' %}
+                                                <span class="shophighertext">比同行均值高</span>
+                                                <span class="shophigherdiff">{{product.shopdescscorediff}}</span>
+                                                {% elif product.shopdesccompare == 'lower' %}
+                                                <span class="shoplowertext">比同行均值低</span>
+                                                <span class="shoplowerdiff">{{product.shopdescscorediff}}</span>
+                                                {% elif product.shopdesccompare == 'equal' %}
+                                                <span class="shopequaltext">与同行均值相等</span>
+                                                <span class="shopequaldiff">{{product.shopdescscorediff}}</span>
                                                 {% endif %}
                                             </div>
-                                            <div style="margin-top:7.5px;float:left;margin-left:65px;">
-                                                {% if product.similarurl %}
-                                                <a target="_blank" href="{{product.similarurl}}" class="samesimia" style="text-decoration:none;">找相似</a>
-                                                {% else %}
-                                                <a target="_blank" href="{{product.similarurl}}" class="samesimia" style="text-decoration:none;pointer-events:none;opacity:0.7;">找相似</a>
+                                            <div class="shopscorediv">
+                                                <span>服务态度：{{product.shopservicescore}}</span>
+                                                {% if product.shopservicecompare == 'higher' %}
+                                                <span class="shophighertext">比同行均值高</span>
+                                                <span class="shophigherdiff">{{product.shopservicescorediff}}</span>
+                                                {% elif product.shopservicecompare == 'lower' %}
+                                                <span class="shoplowertext">比同行均值低</span>
+                                                <span class="shoplowerdiff">{{product.shopservicescorediff}}</span>
+                                                {% elif product.shopservicecompare == 'equal' %}
+                                                <span class="shopequaltext">与同行均值相等</span>
+                                                <span class="shopequaldiff">{{product.shopservicescorediff}}</span>
+                                                {% endif %}
+                                            </div>
+                                            <div class="shopscorediv">
+                                                <span>物流服务：{{product.shopdeliveryscore}}</span>
+                                                {% if product.shopdeliverycompare == 'higher' %}
+                                                <span class="shophighertext">比同行均值高</span>
+                                                <span class="shophigherdiff">{{product.shopdeliveryscorediff}}</span>
+                                                {% elif product.shopdeliverycompare == 'lower' %}
+                                                <span class="shoplowertext">比同行均值低</span>
+                                                <span class="shoplowerdiff">{{product.shopdeliveryscorediff}}</span>
+                                                {% elif product.shopdeliverycompare == 'equal' %}
+                                                <span class="shopequaltext">与同行均值相等</span>
+                                                <span class="shopequaldiff">{{product.shopdeliveryscorediff}}</span>
                                                 {% endif %}
                                             </div>
                                         </div>
-                                    </a>
+                                    </div>
+                                </div>
+                                <div style="float:right;margin-right:10px;">
+                                    <span style="color:black;opacity:0.7;">{{product.shopaddress}}</span>
                                 </div>
                             </div>
                         </div>
