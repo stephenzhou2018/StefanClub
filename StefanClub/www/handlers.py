@@ -141,9 +141,35 @@ async def zhihu():
 @get('/taobao')
 async def taobao():
     products = await TaobaoProducts.findAll(orderBy='id', limit=(0,48))
+    shift_type = 'all'
+    keyword = 'UNIQLO'
     return {
         '__template__': 'taobao.html',
         'products': products,
+        'shift_type': shift_type,
+        'keyword': keyword,
+    }
+
+
+@get('/taobao/all')
+async def taobao_all():
+    products = await TaobaoProducts.findAll(orderBy='id', limit=(0,48))
+    shift_type = 'all'
+    return {
+        '__template__': 'taobao.html',
+        'products': products,
+        'shift_type': shift_type,
+    }
+
+
+@get('/taobao/tmall')
+async def taobao_tmall():
+    products = await TaobaoProducts.findAll('istmall=?',['1'],orderBy='id', limit=(0,48))
+    shift_type = 'tmall'
+    return {
+        '__template__': 'taobao.html',
+        'products': products,
+        'shift_type': shift_type,
     }
 
 
@@ -411,7 +437,23 @@ async def api_zhihuhotcomments(*, hotid, page='1', swi_type='None'):
     return dict(hotcomments=hotcomments,lastpage=lastpage,firstpage=firstpage,currentpage=strcurrentpage)
 
 
+@get('/api/search/products')
+async def api_search_products(*, search_item):
+    error_msg = None
+    products = []
+    if search_item == 'UNIQLO' or search_item == 'SUPERME' or search_item == 'NIKE' or search_item == 'ADIDAS' or search_item == 'APPLE' or search_item == 'HUAWEI':
+        keytype_products = await TaobaoProducts.findAll('keyword=?', [search_item], orderBy='id',limit=(0, 48))
+        products = products + keytype_products
+    elif search_item == 'shoes' or search_item == 'clothes' or search_item == 'electronic':
+        for i in range(6):
+            products1 = await TaobaoProducts.findAll('product_type=?', [search_item], orderBy='id', limit=(i*4, 4))
+            products = products + products1
+            products2 = await TaobaoProducts.findAll('product_type=?', [search_item], orderBy='id desc', limit=(i*4, 4))
+            products = products + products2
+    else:
+        error_msg = 'Please input limited search conditions'
 
+    return dict(products=products, error_msg=error_msg)
 
 
 @post('/api/blogs/{id}/comments')

@@ -36,7 +36,7 @@ outline:none;
 .productdiv {
   float:left;
   width:255.5px;
-  height:490px;
+  height:430px;
   margin-left:7.5px;
   margin-top:15px;
   border:solid;
@@ -122,6 +122,27 @@ outline:none;
   margin-left:5px;
   color:#FFFF00;
 }
+.iconsize {
+  width:25px;
+  height:25px;
+}
+.biggericonsize {
+  width:35px;
+  height:35px;
+}
+.subicontext {
+  margin-top:10px;
+  margin-left:5px;
+  color:black;
+  opacity:0.7;
+}
+.subiconcontent {
+  margin-left:5px;
+  float:left;
+}
+.icondiv{position:relative;float:left;}
+.subicondiv{display:none;width:255.5px;height:auto;position:absolute;top:20px;left:20px;cursor:default;border:solid 1px #D0D0D0;opacity:1;z-index:2000;background-color:white;}
+.icondiv:hover .subicondiv{display:block;}
 </style>
 <script>
 window.onload = function()
@@ -132,7 +153,31 @@ window.onload = function()
   $("#tmalla").css('color','black');
   $("#salesqtya").css('color','OrangeRed');
   $(".samesimidiv").hide();
-
+  var shift_type = {{shift_type}}.id;
+  if (shift_type == 'all')
+  {
+     $("#tmall").removeAttr("class");
+     $("#tmalla").css("color","black");
+     $("#tmalla").css("background-color","");
+     $("#tmalla").css("font-weight","");
+     $("#all").attr("class","active");
+     $("#alla").css("color","#fff");
+     $("#alla").css("background-color","OrangeRed");
+     $("#alla").css("font-weight","bold");
+  }
+  else
+  {
+     $("#all").removeAttr("class");
+     $("#alla").css("color","black");
+     $("#alla").css("background-color","");
+     $("#alla").css("font-weight","");
+     $("#tmall").attr("class","active");
+     $("#tmalla").css("color","#fff");
+     $("#tmalla").css("background-color","OrangeRed");
+     $("#tmalla").css("font-weight","bold");
+  }
+  var keyword = '{{keyword}}';
+  $("#keywordspan").html(keyword);
 }
 
 $(document).ready(function(){
@@ -177,7 +222,21 @@ $(document).ready(function(){
     },function(){
     $(this).css("color","black");
   });
+  $(".productdiv").hover(function(){
+    $(this).css("border-color","OrangeRed");
+    },function(){
+    $(this).css("border-color","LightSteelBlue");
+  });
+  $(window).on('keypress', function(e) {
+    if (e.keyCode === 13) $('#searchbutton').trigger('click')
+   })
 });
+
+function shifttmall(type)
+{
+    return location.assign('/taobao/' + type);
+}
+
 </script>
 
 
@@ -190,20 +249,21 @@ $(document).ready(function(){
         <div style="float:left;width:110px;height:60px;">
             <img style="width:100%;height:100%;" src="../static/img/common/taobao.png">
         </div>
+        <div style="display:none;" class="keyworddiv"><span id="keywordspan"></span></div>
         <div style="float:right;width:600px;height:60px;">
             <div style="width:100%;height:100%;">
-                <input class="inp" type="text" style="float:left;width:520px;height:40px;margin-top:10px;border:2px solid OrangeRed;" placeholder="请输入shoes/clothes/electronic/UNIQLO/SUPERME/NIKE/ADIDAS/APPLE/HUAWEI搜索...">
-                <button style="float:left;width:80px;height:40px;margin-top:10px;background-color:OrangeRed;color:white;font-size:120%;font-weight:bold;border:none;">搜 索</button>
+                <input id="searchinput" class="inp" type="text" style="float:left;width:520px;height:40px;margin-top:10px;border:2px solid OrangeRed;" placeholder="请输入shoes/clothes/electronic/UNIQLO/SUPERME/NIKE/ADIDAS/APPLE/HUAWEI搜索...">
+                <button id="searchbutton" onclick="search()" style="float:left;width:80px;height:40px;margin-top:10px;background-color:OrangeRed;color:white;font-size:120%;font-weight:bold;border:none;">搜 索</button>
             </div>
         </div>
     </div>
     <div style="width:1060px;margin-top:40px;">
         <ul id="myTab" class="nav nav-tabs">
             <li id="all" class="active">
-                <a id="alla" href="#allpro" data-toggle="tab" class="choosetab">所有宝贝</a>
+                <a id="alla" class="choosetab" onclick="shifttmall('all')">所有宝贝</a>
             </li>
             <li id="tmall">
-                <a id="tmalla" href="#tmallpro" data-toggle="tab"  class="choosetab">天猫</a>
+                <a id="tmalla" class="choosetab" onclick="shifttmall('tmall')">天猫</a>
             </li>
         </ul>
         <div id="myTabContent" class="tab-content">
@@ -217,7 +277,7 @@ $(document).ready(function(){
                             </a>
                         </div>
                     </div>
-                    <div style="margin-top:10px;">
+                    <div style="margin-top:10px;" id="filterdiv">
                         <div class="chooseitemdiv">
                             <div class="chooseitem">品牌:</div>
                             <div>
@@ -291,7 +351,7 @@ $(document).ready(function(){
                         </div>
                     </div>
                 </div>
-                <div style="width:1060px;margin-top:20px;height:auto;">
+                <div style="width:1060px;margin-top:20px;height:auto;" id="productlistdiv">
                     {% for product in products %}
                     <div class="productdiv">
                         <div  id ="{{product.id}}imgdiv" class="productimgdiv" style="width:255.5px;height:255.5px;position:relative;">
@@ -338,7 +398,7 @@ $(document).ready(function(){
                                 <a class="protitlea" target="_blank" href="{{product.titleurl}}"><span>{{product.title1}}</span><span style="color:OrangeRed;">{{product.keyword}}</span><span>{{product.title2}}</span></a>
                                 {% endif %}
                             </div>
-                            <div style="margin-top:10px;">
+                            <div style="margin-top:10px;height:30px;">
                                 <div class="shopinfo">
                                     <div class="shopimgname">
                                         <div class="shopimg">
@@ -449,12 +509,182 @@ $(document).ready(function(){
                                     <span style="color:black;opacity:0.7;">{{product.shopaddress}}</span>
                                 </div>
                             </div>
+                            <div style="margin-top:10px;">
+                                <div style="margin-left:5px;float:left;">
+                                    {% if product.iconkey1 %}
+                                    <div class="icondiv">
+                                        <div>
+                                            {% if product.iconurl1 %}
+                                            <a target="_blank" href="{{product.iconurl1}}">
+                                            {% else %}
+                                            <a style="pointer-events:none;" target="_blank" href="{{product.iconurl1}}">
+                                            {% endif %}
+                                                <img class="iconsize" src="../static/img/common/{{product.iconkey1}}.png">
+                                            </a>
+                                        </div>
+                                        <div class="subicondiv">
+                                            {% if product.subiconclass1 %}
+                                            {% if product.subicontitle1 %}
+                                            <div style="margin-left:5px;margin-top:10px;">
+                                                <div><span class="subicontext">{{product.subicontitle1}}</span></div>
+                                                <div style="margin-top:10px;margin-left:5px;">
+                                                    <div class="subiconcontent"><img class="iconsize" src="../static/img/common/{{product.subiconclass1}}.png"></div>
+                                                    <div class="subiconcontent"><span class="subicontext">{{product.subiconcontent1}}</span></div>
+                                                </div>
+                                            </div>
+                                            {% else %}
+                                            <div  style="margin-left:5px;margin-top:10px;">
+                                                <div><img class="biggericonsize" src="../static/img/common/{{product.subiconclass1}}.png"></div>
+                                                <div><span class="subicontext">{{product.icontitle1}}</span></div>
+                                            </div>
+                                            {% endif %}
+                                            {% else %}
+                                            <span class="subicontext">{{product.icontitle1}}</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% if product.iconkey2 %}
+                                    <div class="icondiv">
+                                        <div>
+                                            {% if product.iconurl2 %}
+                                            <a target="_blank" href="{{product.iconurl2}}">
+                                            {% else %}
+                                            <a style="pointer-events:none;" target="_blank" href="{{product.iconurl2}}">
+                                            {% endif %}
+                                                <img class="iconsize" src="../static/img/common/{{product.iconkey2}}.png">
+                                            </a>
+                                        </div>
+                                        <div class="subicondiv">
+                                            {% if product.subiconclass2 %}
+                                            {% if product.subicontitle2 %}
+                                            <div style="margin-left:5px;margin-top:10px;">
+                                                <div><span class="subicontext">{{product.subicontitle2}}</span></div>
+                                                <div style="margin-top:10px;margin-left:5px;">
+                                                    <div class="subiconcontent"><img class="iconsize" src="../static/img/common/{{product.subiconclass2}}.png"></div>
+                                                    <div class="subiconcontent"><span class="subicontext">{{product.subiconcontent2}}</span></div>
+                                                </div>
+                                            </div>
+                                            {% else %}
+                                            <div  style="margin-left:5px;margin-top:10px;">
+                                                <div><img class="biggericonsize" src="../static/img/common/{{product.subiconclass2}}.png"></div>
+                                                <div><span class="subicontext">{{product.icontitle2}}</span></div>
+                                            </div>
+                                            {% endif %}
+                                            {% else %}
+                                            <span class="subicontext">{{product.icontitle2}}</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% if product.iconkey3 %}
+                                    <div class="icondiv">
+                                        <div>
+                                            {% if product.iconurl3 %}
+                                            <a target="_blank" href="{{product.iconurl3}}">
+                                            {% else %}
+                                            <a style="pointer-events:none;" target="_blank" href="{{product.iconurl3}}">
+                                            {% endif %}
+                                                <img class="iconsize" src="../static/img/common/{{product.iconkey3}}.png">
+                                            </a>
+                                        </div>
+                                        <div class="subicondiv">
+                                            {% if product.subiconclass3 %}
+                                            {% if product.subicontitle3 %}
+                                            <div style="margin-left:5px;margin-top:10px;">
+                                                <div><span class="subicontext">{{product.subicontitle3}}</span></div>
+                                                <div style="margin-top:10px;margin-left:5px;">
+                                                    <div class="subiconcontent"><img class="iconsize" src="../static/img/common/{{product.subiconclass3}}.png"></div>
+                                                    <div class="subiconcontent"><span class="subicontext">{{product.subiconcontent3}}</span></div>
+                                                </div>
+                                            </div>
+                                            {% else %}
+                                            <div  style="margin-left:5px;margin-top:10px;">
+                                                <div><img class="biggericonsize" src="../static/img/common/{{product.subiconclass3}}.png"></div>
+                                                <div><span class="subicontext">{{product.icontitle3}}</span></div>
+                                            </div>
+                                            {% endif %}
+                                            {% else %}
+                                            <span class="subicontext">{{product.icontitle3}}</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% if product.iconkey4%}
+                                    <div class="icondiv">
+                                        <div>
+                                            {% if product.iconurl4 %}
+                                            <a target="_blank" href="{{product.iconurl4}}">
+                                            {% else %}
+                                            <a style="pointer-events:none;" target="_blank" href="{{product.iconurl4}}">
+                                            {% endif %}
+                                                <img class="iconsize" src="../static/img/common/{{product.iconkey4}}.png">
+                                            </a>
+                                        </div>
+                                        <div class="subicondiv">
+                                            {% if product.subiconclass4 %}
+                                            {% if product.subicontitle4 %}
+                                            <div style="margin-left:5px;margin-top:10px;">
+                                                <div><span class="subicontext">{{product.subicontitle4}}</span></div>
+                                                <div style="margin-top:10px;margin-left:5px;">
+                                                    <div class="subiconcontent"><img class="iconsize" src="../static/img/common/{{product.subiconclass4}}.png"></div>
+                                                    <div class="subiconcontent"><span class="subicontext">{{product.subiconcontent4}}</span></div>
+                                                </div>
+                                            </div>
+                                            {% else %}
+                                            <div  style="margin-left:5px;margin-top:10px;">
+                                                <div><img class="biggericonsize" src="../static/img/common/{{product.subiconclass4}}.png"></div>
+                                                <div><span class="subicontext">{{product.icontitle4}}</span></div>
+                                            </div>
+                                            {% endif %}
+                                            {% else %}
+                                            <span class="subicontext">{{product.icontitle4}}</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% if product.iconkey5 %}
+                                    <div class="icondiv">
+                                        <div>
+                                            {% if product.iconurl5 %}
+                                            <a target="_blank" href="{{product.iconurl5}}">
+                                            {% else %}
+                                            <a style="pointer-events:none;" target="_blank" href="{{product.iconurl5}}">
+                                            {% endif %}
+                                                <img class="iconsize" src="../static/img/common/{{product.iconkey5}}.png">
+                                            </a>
+                                        </div>
+                                        <div class="subicondiv">
+                                            {% if product.subiconclass5 %}
+                                            {% if product.subicontitle5 %}
+                                            <div style="margin-left:5px;margin-top:10px;">
+                                                <div><span class="subicontext">{{product.subicontitle5}}</span></div>
+                                                <div style="margin-top:10px;margin-left:5px;">
+                                                    <div class="subiconcontent"><img class="iconsize" src="../static/img/common/{{product.subiconclass5}}.png"></div>
+                                                    <div class="subiconcontent"><span class="subicontext">{{product.subiconcontent5}}</span></div>
+                                                </div>
+                                            </div>
+                                            {% else %}
+                                            <div  style="margin-left:5px;margin-top:10px;">
+                                                <div><img class="biggericonsize" src="../static/img/common/{{product.subiconclass5}}.png"></div>
+                                                <div><span class="subicontext">{{product.icontitle5}}</span></div>
+                                            </div>
+                                            {% endif %}
+                                            {% else %}
+                                            <span class="subicontext">{{product.icontitle5}}</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div style="margin-right:5px;float:right;">
+                                    <a><img class="iconsize" src="../static/img/common/wangwang.png"></a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     {% endfor %}
                 </div>
-            </div>
-            <div class="tab-pane fade" id="tmallpro">
             </div>
         </div>
     </div>
