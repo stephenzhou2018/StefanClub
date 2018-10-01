@@ -36,7 +36,7 @@ outline:none;
 .productdiv {
   float:left;
   width:255.5px;
-  height:430px;
+  height:455px;
   margin-left:7.5px;
   margin-top:15px;
   border:solid;
@@ -178,6 +178,7 @@ window.onload = function()
   }
   var keyword = '{{keyword}}';
   $("#keywordspan").html(keyword);
+  set_filterdiv(keyword);
 }
 
 $(document).ready(function(){
@@ -232,9 +233,11 @@ $(document).ready(function(){
    })
 });
 
-function shifttmall(type)
+function shifttmall(shift_type)
 {
-    return location.assign('/taobao/' + type);
+    var keyword = $('#keywordspan').html();
+    window.location.href = '/taobao?keyword=' + keyword + '&shift_type=' + shift_type;
+
 }
 
 </script>
@@ -278,31 +281,6 @@ function shifttmall(type)
                         </div>
                     </div>
                     <div style="margin-top:10px;" id="filterdiv">
-                        <div class="chooseitemdiv">
-                            <div class="chooseitem">品牌:</div>
-                            <div>
-                                <a class="chooseitema" style="text-decoration:none;">华为</a>
-                                <a class="chooseitema" style="text-decoration:none;">苹果</a>
-                            </div>
-                        </div>
-                        <div class="chooseitemdiv">
-                            <div class="chooseitem">网络类型:</div>
-                            <div>
-                                <a class="chooseitema" style="text-decoration:none;">全网通</a>
-                                <a class="chooseitema" style="text-decoration:none;">联通</a>
-                                <a class="chooseitema" style="text-decoration:none;">移动</a>
-                                <a class="chooseitema" style="text-decoration:none;">中国电信</a>
-                            </div>
-                        </div>
-                        <div class="chooseitemdiv">
-                            <div class="chooseitem">最想要的功能:</div>
-                            <div>
-                                <a class="chooseitema" style="text-decoration:none;">双卡双待</a>
-                                <a class="chooseitema" style="text-decoration:none;">人脸识别</a>
-                                <a class="chooseitema" style="text-decoration:none;">全面屏</a>
-                                <a class="chooseitema" style="text-decoration:none;">无锁</a>
-                            </div>
-                        </div>
                     </div>
                 </div>
                 <div style="margin-top:20px;">

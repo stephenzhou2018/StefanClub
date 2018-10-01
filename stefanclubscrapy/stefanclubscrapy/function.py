@@ -193,11 +193,11 @@ def parse_taobao_products(auction,keyword,curr_num_of_img):
             shopLink = shopLink[:-1]
     taobao_product["shopurl"] = shopLink
     taobao_product["shopaddress"] = auction['item_loc']
-    taobao_product["shoplevelzuanqty"] = None
-    taobao_product["shopleveljingguanqty"] = None
-    taobao_product["shoplevelguanqty"] = None
-    taobao_product["shoplevelxinqty"] = None
-    taobao_product["istmall"] = None
+    taobao_product["shoplevelzuanqty"] = 0
+    taobao_product["shopleveljingguanqty"] = 0
+    taobao_product["shoplevelguanqty"] = 0
+    taobao_product["shoplevelxinqty"] = 0
+    taobao_product["istmall"] = '0'
     taobao_product["shoptotalrate"] = None
     taobao_product["shopdescscore"] = None
     taobao_product["shopdescscorediff"] = None

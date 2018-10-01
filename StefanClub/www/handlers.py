@@ -139,38 +139,174 @@ async def zhihu():
 
 
 @get('/taobao')
-async def taobao():
-    products = await TaobaoProducts.findAll(orderBy='id', limit=(0,48))
-    shift_type = 'all'
-    keyword = 'UNIQLO'
-    return {
-        '__template__': 'taobao.html',
-        'products': products,
-        'shift_type': shift_type,
-        'keyword': keyword,
-    }
+async def taobao(*,keyword=None,shift_type=None):
+    if keyword is None and shift_type is None:
+        products = []
+        for i in range(4):
+            products1 = await TaobaoProducts.findAll('keyword=?',['UNIQLO'], orderBy='id', limit=(2*i,2))
+            products2 = await TaobaoProducts.findAll('keyword=?', ['APPLE'], orderBy='id', limit=(2 * i, 2))
+            products3 = await TaobaoProducts.findAll('keyword=?', ['NIKE'], orderBy='id', limit=(2 * i, 2))
+            products4 = await TaobaoProducts.findAll('keyword=?', ['SUPERME'], orderBy='id', limit=(2 * i, 2))
+            products5 = await TaobaoProducts.findAll('keyword=?', ['HUAWEI'], orderBy='id', limit=(2 * i, 2))
+            products6 = await TaobaoProducts.findAll('keyword=?',['ADIDAS'], orderBy='id', limit=(2*i,2))
+            products = products + products1 + products2 + products3 + products4 + products5 + products6
+        shift_type = 'all'
+        keyword = 'all'
+        return {
+            '__template__': 'taobao.html',
+            'products': products,
+            'shift_type': shift_type,
+            'keyword': keyword,
+         }
+    else:
+        if shift_type == 'tmall':
+            if keyword == 'all':
+                products = []
+                for i in range(4):
+                    products1 = await TaobaoProducts.findAll('keyword=? and istmall=?', ['UNIQLO', '1'], orderBy='id',
+                                                             limit=(2 * i, 2))
+                    products2 = await TaobaoProducts.findAll('keyword=? and istmall=?', ['APPLE', '1'], orderBy='id',
+                                                             limit=(2 * i, 2))
+                    products3 = await TaobaoProducts.findAll('keyword=? and istmall=?', ['NIKE', '1'], orderBy='id',
+                                                             limit=(2 * i, 2))
+                    products4 = await TaobaoProducts.findAll('keyword=? and istmall=?', ['SUPERME', '1'], orderBy='id',
+                                                             limit=(2 * i, 2))
+                    products5 = await TaobaoProducts.findAll('keyword=? and istmall=?', ['HUAWEI', '1'], orderBy='id',
+                                                             limit=(2 * i, 2))
+                    products6 = await TaobaoProducts.findAll('keyword=? and istmall=?', ['ADIDAS', '1'], orderBy='id',
+                                                             limit=(2 * i, 2))
+                    products = products + products1 + products2 + products3 + products4 + products5 + products6
+                return {
+                    '__template__': 'taobao.html',
+                    'products': products,
+                    'shift_type': shift_type,
+                    'keyword': keyword,
+                }
+            else:
+                products = []
+                if keyword == 'UNIQLO' or keyword == 'SUPERME' or keyword == 'NIKE' or keyword == 'ADIDAS' or keyword == 'APPLE' or keyword == 'HUAWEI':
+                    keytype_products = await TaobaoProducts.findAll('keyword=? and istmall=?', [keyword, '1'],
+                                                                    orderBy='id', limit=(0, 48))
+                    products = products + keytype_products
+                else:
+                    for i in range(6):
+                        products1 = await TaobaoProducts.findAll('product_type=? and istmall=?', [keyword, '1'],
+                                                                 orderBy='id',
+                                                                 limit=(i * 4, 4))
+                        products = products + products1
+                        products2 = await TaobaoProducts.findAll('product_type=? and istmall=?', [keyword, '1'],
+                                                                 orderBy='id desc',
+                                                                 limit=(i * 4, 4))
+                        products = products + products2
+                return {
+                    '__template__': 'taobao.html',
+                    'products': products,
+                    'shift_type': shift_type,
+                    'keyword': keyword,
+                }
+        else:    # if shift_type == 'all':
+            if keyword == 'all':
+                products = []
+                for i in range(4):
+                    products1 = await TaobaoProducts.findAll('keyword=?', ['UNIQLO'], orderBy='id', limit=(2 * i, 2))
+                    products2 = await TaobaoProducts.findAll('keyword=?', ['APPLE'], orderBy='id', limit=(2 * i, 2))
+                    products3 = await TaobaoProducts.findAll('keyword=?', ['NIKE'], orderBy='id', limit=(2 * i, 2))
+                    products4 = await TaobaoProducts.findAll('keyword=?', ['SUPERME'], orderBy='id', limit=(2 * i, 2))
+                    products5 = await TaobaoProducts.findAll('keyword=?', ['HUAWEI'], orderBy='id', limit=(2 * i, 2))
+                    products6 = await TaobaoProducts.findAll('keyword=?', ['ADIDAS'], orderBy='id', limit=(2 * i, 2))
+                    products = products + products1 + products2 + products3 + products4 + products5 + products6
+                return {
+                    '__template__': 'taobao.html',
+                    'products': products,
+                    'shift_type': shift_type,
+                    'keyword': keyword,
+                }
+            else:
+                products = []
+                if keyword == 'UNIQLO' or keyword == 'SUPERME' or keyword == 'NIKE' or keyword == 'ADIDAS' or keyword == 'APPLE' or keyword == 'HUAWEI':
+                    keytype_products = await TaobaoProducts.findAll('keyword=?', [keyword], orderBy='id', limit=(0, 48))
+                    products = products + keytype_products
+                else:
+                    for i in range(6):
+                        products1 = await TaobaoProducts.findAll('product_type=?', [keyword], orderBy='id',
+                                                                 limit=(i * 4, 4))
+                        products = products + products1
+                        products2 = await TaobaoProducts.findAll('product_type=?', [keyword], orderBy='id desc',
+                                                                 limit=(i * 4, 4))
+                        products = products + products2
+                return {
+                    '__template__': 'taobao.html',
+                    'products': products,
+                    'shift_type': shift_type,
+                    'keyword': keyword,
+                }
 
 
-@get('/taobao/all')
-async def taobao_all():
-    products = await TaobaoProducts.findAll(orderBy='id', limit=(0,48))
-    shift_type = 'all'
-    return {
-        '__template__': 'taobao.html',
-        'products': products,
-        'shift_type': shift_type,
-    }
+@get('/taobao/all/{keyword}')
+async def taobao_all(keyword):
+    if keyword == 'all':
+        return taobao()
+    else:
+        products = []
+        if keyword == 'UNIQLO' or keyword == 'SUPERME' or keyword == 'NIKE' or keyword == 'ADIDAS' or keyword == 'APPLE' or keyword == 'HUAWEI':
+            keytype_products = await TaobaoProducts.findAll('keyword=?', [keyword], orderBy='id', limit=(0, 48))
+            products = products + keytype_products
+        else:
+            for i in range(6):
+                products1 = await TaobaoProducts.findAll('product_type=?', [keyword], orderBy='id',
+                                                         limit=(i * 4, 4))
+                products = products + products1
+                products2 = await TaobaoProducts.findAll('product_type=?', [keyword], orderBy='id desc',
+                                                         limit=(i * 4, 4))
+                products = products + products2
+        shift_type = 'all'
+        return {
+            '__template__': 'taobao.html',
+            'products': products,
+            'shift_type': shift_type,
+            'keyword': keyword,
+        }
 
 
-@get('/taobao/tmall')
-async def taobao_tmall():
-    products = await TaobaoProducts.findAll('istmall=?',['1'],orderBy='id', limit=(0,48))
-    shift_type = 'tmall'
-    return {
-        '__template__': 'taobao.html',
-        'products': products,
-        'shift_type': shift_type,
-    }
+@get('/taobao/tmall/{keyword}')
+async def taobao_tmall(keyword):
+    if keyword == 'all':
+        products = []
+        for i in range(4):
+            products1 = await TaobaoProducts.findAll('keyword=? and istmall=?', ['UNIQLO', '1'], orderBy='id', limit=(2 * i, 2))
+            products2 = await TaobaoProducts.findAll('keyword=? and istmall=?', ['APPLE', '1'], orderBy='id', limit=(2 * i, 2))
+            products3 = await TaobaoProducts.findAll('keyword=? and istmall=?', ['NIKE', '1'], orderBy='id', limit=(2 * i, 2))
+            products4 = await TaobaoProducts.findAll('keyword=? and istmall=?', ['SUPERME', '1'], orderBy='id', limit=(2 * i, 2))
+            products5 = await TaobaoProducts.findAll('keyword=? and istmall=?', ['HUAWEI', '1'], orderBy='id', limit=(2 * i, 2))
+            products6 = await TaobaoProducts.findAll('keyword=? and istmall=?', ['ADIDAS', '1'], orderBy='id', limit=(2 * i, 2))
+            products = products + products1 + products2 + products3 + products4 + products5 + products6
+        shift_type = 'tmall'
+        return {
+            '__template__': 'taobao.html',
+            'products': products,
+            'shift_type': shift_type,
+            'keyword': keyword,
+        }
+    else:
+        products = []
+        if keyword == 'UNIQLO' or keyword == 'SUPERME' or keyword == 'NIKE' or keyword == 'ADIDAS' or keyword == 'APPLE' or keyword == 'HUAWEI':
+            keytype_products = await TaobaoProducts.findAll('keyword=? and istmall=?', [keyword, '1'], orderBy='id', limit=(0, 48))
+            products = products + keytype_products
+        else:
+            for i in range(6):
+                products1 = await TaobaoProducts.findAll('product_type=? and istmall=?', [keyword, '1'], orderBy='id',
+                                                         limit=(i * 4, 4))
+                products = products + products1
+                products2 = await TaobaoProducts.findAll('product_type=? and istmall=?', [keyword, '1'], orderBy='id desc',
+                                                         limit=(i * 4, 4))
+                products = products + products2
+        shift_type = 'tmall'
+        return {
+            '__template__': 'taobao.html',
+            'products': products,
+            'shift_type': shift_type,
+            'keyword': keyword,
+        }
 
 
 @get('/blogs')

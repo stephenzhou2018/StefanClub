@@ -1,6 +1,7 @@
 function search()
 {
    var search_item = $("#searchinput").val();
+   var existed_search = $("#keywordspan").html();
    $.ajax({
        type: "GET",
        url: "/api/search/products?search_item="+search_item,
@@ -14,6 +15,122 @@ function search()
           }
           else
           {
+             if(search_item != existed_search)
+             {
+                if (search_item == 'UNIQLO' || search_item == 'SUPERME' || search_item == 'clothes')
+                {
+                  var addfilter =  "<div class='chooseitemdiv'>"
+                                 +   "<div class='chooseitem'>" + "品牌:" + "</div>"
+                                 +    "<div>";
+                  if(search_item == 'UNIQLO')
+                  {
+                      var addfilter =  addfilter  +  "<a class='chooseitema' style='text-decoration:none;'>" + "UNIQLO" + "</a>";
+                  }
+                  else if(search_item == 'SUPERME')
+                  {
+                      var addfilter =  addfilter  +  "<a class='chooseitema' style='text-decoration:none;'>" + "SUPERME" + "</a>";
+                   }
+                  else
+                  {
+                     var addfilter =  addfilter  +  "<a class='chooseitema' style='text-decoration:none;'>" + "UNIQLO" + "</a>"
+                                                 +  "<a class='chooseitema' style='text-decoration:none;'>" + "SUPERME" + "</a>";
+                  }
+                  var addfilter =  addfilter  +  "</div>"
+                                 +  "</div>"
+                     +   "<div class='chooseitemdiv'>"
+                     +       "<div class='chooseitem'>" + "类别:" + "</div>"
+                     +  "<div>"
+                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "男装" + "</a>"
+                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "女装" + "</a>"
+                     +       "</div>"
+                      +       "</div>"
+                     +   "<div class='chooseitemdiv'>"
+                     +       "<div class='chooseitem'>" + "款式" + "</div>"
+                     +       "<div>"
+                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "衬衫" + "</a>"
+                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "长裤" + "</a>"
+                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "T恤" + "</a>"
+                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "牛仔裤" + "</a>"
+                     +       "</div>"
+                      +       "</div>";
+                }
+                if (search_item == 'NIKE' || search_item == 'ADIDAS' || search_item == 'shoes')
+                {
+                  var addfilter =  "<div class='chooseitemdiv'>"
+                                 +   "<div class='chooseitem'>" + "品牌:" + "</div>"
+                                 +    "<div>";
+                  if(search_item == 'NIKE')
+                  {
+                      var addfilter =  addfilter  +  "<a class='chooseitema' style='text-decoration:none;'>" + "NIKE" + "</a>";
+                  }
+                  else if(search_item == 'ADIDAS')
+                  {
+                      var addfilter =  addfilter  +  "<a class='chooseitema' style='text-decoration:none;'>" + "ADIDAS" + "</a>";
+                   }
+                  else
+                  {
+                     var addfilter =  addfilter  +  "<a class='chooseitema' style='text-decoration:none;'>" + "NIKE" + "</a>"
+                                                 +  "<a class='chooseitema' style='text-decoration:none;'>" + "ADIDAS" + "</a>";
+                  }
+                  var addfilter =  addfilter  +  "</div>"
+                                 +  "</div>"
+                     +   "<div class='chooseitemdiv'>"
+                     +       "<div class='chooseitem'>" + "类别:" + "</div>"
+                     +  "<div>"
+                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "外套" + "</a>"
+                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "鞋子" + "</a>"
+                     +       "</div>"
+                      +       "</div>"
+                     +   "<div class='chooseitemdiv'>"
+                     +       "<div class='chooseitem'>" + "鞋子款式" + "</div>"
+                     +       "<div>"
+                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "跑鞋" + "</a>"
+                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "板鞋" + "</a>"
+                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "球鞋" + "</a>"
+                     +       "</div>"
+                      +       "</div>";
+                }
+                if (search_item == 'APPLE' || search_item == 'HUAWEI' || search_item == 'electronic')
+                {
+                  var addfilter =  "<div class='chooseitemdiv'>"
+                                 +   "<div class='chooseitem'>" + "品牌:" + "</div>"
+                                 +    "<div>";
+                  if(search_item == 'APPLE')
+                  {
+                      var addfilter =  addfilter  +  "<a class='chooseitema' style='text-decoration:none;'>" + "苹果" + "</a>";
+                  }
+                  else if(search_item == 'HUAWEI')
+                  {
+                      var addfilter =  addfilter  +  "<a class='chooseitema' style='text-decoration:none;'>" + "华为" + "</a>";
+                   }
+                  else
+                  {
+                     var addfilter =  addfilter  +  "<a class='chooseitema' style='text-decoration:none;'>" + "苹果" + "</a>"
+                                                 +  "<a class='chooseitema' style='text-decoration:none;'>" + "华为" + "</a>";
+                  }
+                  var addfilter =  addfilter  +  "</div>"
+                                 +  "</div>"
+                     +   "<div class='chooseitemdiv'>"
+                     +       "<div class='chooseitem'>" + "网络类型:" + "</div>"
+                     +  "<div>"
+                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "全网通" + "</a>"
+                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "联通" + "</a>"
+                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "移动" + "</a>"
+                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "中国电信" + "</a>"
+                     +       "</div>"
+                      +       "</div>"
+                     +   "<div class='chooseitemdiv'>"
+                     +       "<div class='chooseitem'>" + "最想要的功能" + "</div>"
+                     +       "<div>"
+                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "双卡双待" + "</a>"
+                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "人脸识别" + "</a>"
+                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "全面屏" + "</a>"
+                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "无锁" + "</a>"
+                     +       "</div>"
+                      +       "</div>";
+                }
+                $("#filterdiv").html(addfilter);
+             }
              products = data.products;
              if(products.length > 0)
              {
@@ -89,7 +206,7 @@ function search()
                                         +    "</div>";
                                         for(var j = 0; j < products[i].shopleveljingguanqty - 1; j++){
                                         adddiv = adddiv +    "<div class='kindresticons'>"
-                                                        +      "<img class='shopicon' src='../static/img/common/jinguan.pn'>"
+                                                        +      "<img class='shopicon' src='../static/img/common/jinguan.png'>"
                                                         +     "</div>";
                                         }
                         }
@@ -380,9 +497,138 @@ function search()
                 }
                 $("#productlistdiv").html(addBody);
                 $("#keywordspan").html(search_item);
+                if ($("#all").hasClass("active"))
+                {
+                   var shift_type = 'all';
+                }
+                else
+                {
+                   var shift_type = 'tmall';
+                }
+                var new_url = '/taobao?keyword=' + search_item + '&shift_type=' + shift_type;
+                var stateObject = {};
+                var title = "Wow Title";
+                history.pushState(stateObject,title,new_url);
              }
           }
        }
        });
 
+}
+
+function set_filterdiv(search_item)
+{
+                if (search_item == 'UNIQLO' || search_item == 'SUPERME' || search_item == 'clothes')
+                {
+                  var addfilter =  "<div class='chooseitemdiv'>"
+                                 +   "<div class='chooseitem'>" + "品牌:" + "</div>"
+                                 +    "<div>";
+                  if(search_item == 'UNIQLO')
+                  {
+                      var addfilter =  addfilter  +  "<a class='chooseitema' style='text-decoration:none;'>" + "UNIQLO" + "</a>";
+                  }
+                  else if(search_item == 'SUPERME')
+                  {
+                      var addfilter =  addfilter  +  "<a class='chooseitema' style='text-decoration:none;'>" + "SUPERME" + "</a>";
+                   }
+                  else
+                  {
+                     var addfilter =  addfilter  +  "<a class='chooseitema' style='text-decoration:none;'>" + "UNIQLO" + "</a>"
+                                                 +  "<a class='chooseitema' style='text-decoration:none;'>" + "SUPERME" + "</a>";
+                  }
+                  var addfilter =  addfilter  +  "</div>"
+                                 +  "</div>"
+                     +   "<div class='chooseitemdiv'>"
+                     +       "<div class='chooseitem'>" + "类别:" + "</div>"
+                     +  "<div>"
+                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "男装" + "</a>"
+                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "女装" + "</a>"
+                     +       "</div>"
+                      +       "</div>"
+                     +   "<div class='chooseitemdiv'>"
+                     +       "<div class='chooseitem'>" + "款式" + "</div>"
+                     +       "<div>"
+                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "衬衫" + "</a>"
+                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "长裤" + "</a>"
+                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "T恤" + "</a>"
+                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "牛仔裤" + "</a>"
+                     +       "</div>"
+                      +       "</div>";
+                }
+                if (search_item == 'NIKE' || search_item == 'ADIDAS' || search_item == 'shoes')
+                {
+                  var addfilter =  "<div class='chooseitemdiv'>"
+                                 +   "<div class='chooseitem'>" + "品牌:" + "</div>"
+                                 +    "<div>";
+                  if(search_item == 'NIKE')
+                  {
+                      var addfilter =  addfilter  +  "<a class='chooseitema' style='text-decoration:none;'>" + "NIKE" + "</a>";
+                  }
+                  else if(search_item == 'ADIDAS')
+                  {
+                      var addfilter =  addfilter  +  "<a class='chooseitema' style='text-decoration:none;'>" + "ADIDAS" + "</a>";
+                   }
+                  else
+                  {
+                     var addfilter =  addfilter  +  "<a class='chooseitema' style='text-decoration:none;'>" + "NIKE" + "</a>"
+                                                 +  "<a class='chooseitema' style='text-decoration:none;'>" + "ADIDAS" + "</a>";
+                  }
+                  var addfilter =  addfilter  +  "</div>"
+                                 +  "</div>"
+                     +   "<div class='chooseitemdiv'>"
+                     +       "<div class='chooseitem'>" + "类别:" + "</div>"
+                     +  "<div>"
+                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "外套" + "</a>"
+                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "鞋子" + "</a>"
+                     +       "</div>"
+                      +       "</div>"
+                     +   "<div class='chooseitemdiv'>"
+                     +       "<div class='chooseitem'>" + "鞋子款式" + "</div>"
+                     +       "<div>"
+                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "跑鞋" + "</a>"
+                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "板鞋" + "</a>"
+                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "球鞋" + "</a>"
+                     +       "</div>"
+                      +       "</div>";
+                }
+                if (search_item == 'APPLE' || search_item == 'HUAWEI' || search_item == 'electronic')
+                {
+                  var addfilter =  "<div class='chooseitemdiv'>"
+                                 +   "<div class='chooseitem'>" + "品牌:" + "</div>"
+                                 +    "<div>";
+                  if(search_item == 'APPLE')
+                  {
+                      var addfilter =  addfilter  +  "<a class='chooseitema' style='text-decoration:none;'>" + "苹果" + "</a>";
+                  }
+                  else if(search_item == 'HUAWEI')
+                  {
+                      var addfilter =  addfilter  +  "<a class='chooseitema' style='text-decoration:none;'>" + "华为" + "</a>";
+                   }
+                  else
+                  {
+                     var addfilter =  addfilter  +  "<a class='chooseitema' style='text-decoration:none;'>" + "苹果" + "</a>"
+                                                 +  "<a class='chooseitema' style='text-decoration:none;'>" + "华为" + "</a>";
+                  }
+                  var addfilter =  addfilter  +  "</div>"
+                                 +  "</div>"
+                     +   "<div class='chooseitemdiv'>"
+                     +       "<div class='chooseitem'>" + "网络类型:" + "</div>"
+                     +  "<div>"
+                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "全网通" + "</a>"
+                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "联通" + "</a>"
+                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "移动" + "</a>"
+                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "中国电信" + "</a>"
+                     +       "</div>"
+                      +       "</div>"
+                     +   "<div class='chooseitemdiv'>"
+                     +       "<div class='chooseitem'>" + "最想要的功能" + "</div>"
+                     +       "<div>"
+                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "双卡双待" + "</a>"
+                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "人脸识别" + "</a>"
+                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "全面屏" + "</a>"
+                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "无锁" + "</a>"
+                     +       "</div>"
+                      +       "</div>";
+                }
+                $("#filterdiv").html(addfilter);
 }
