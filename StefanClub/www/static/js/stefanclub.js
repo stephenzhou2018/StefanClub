@@ -1,10 +1,27 @@
-function search()
+function search(from_filter = 'false')
 {
-   var search_item = $("#searchinput").val();
+   if(from_filter == 'true')
+   {
+      var search_item =$("#keywordspan").html();
+   }
+   else
+   {
+      var search_item = $("#searchinput").val();
+   }
    var existed_search = $("#keywordspan").html();
+   var order_by = $("#RefreshOrderLi").html();
+   var specify_filter = $('#specifyfilterdiv').html();
+   if ($("#all").hasClass("active"))
+   {
+      var shift_type = 'all';
+   }
+   else
+   {
+      var shift_type = 'tmall';
+   }
    $.ajax({
        type: "GET",
-       url: "/api/search/products?search_item="+search_item,
+       url: "/api/search/products?search_item="+search_item + '&shift_type=' + shift_type + '&specify_filter=' + specify_filter + '&order_by=' + order_by,
        dataType: "json",
        contentType: "application/json; charset=utf-8",
        success: function (data) {
@@ -17,119 +34,7 @@ function search()
           {
              if(search_item != existed_search)
              {
-                if (search_item == 'UNIQLO' || search_item == 'SUPERME' || search_item == 'clothes')
-                {
-                  var addfilter =  "<div class='chooseitemdiv'>"
-                                 +   "<div class='chooseitem'>" + "品牌:" + "</div>"
-                                 +    "<div>";
-                  if(search_item == 'UNIQLO')
-                  {
-                      var addfilter =  addfilter  +  "<a class='chooseitema' style='text-decoration:none;'>" + "UNIQLO" + "</a>";
-                  }
-                  else if(search_item == 'SUPERME')
-                  {
-                      var addfilter =  addfilter  +  "<a class='chooseitema' style='text-decoration:none;'>" + "SUPERME" + "</a>";
-                   }
-                  else
-                  {
-                     var addfilter =  addfilter  +  "<a class='chooseitema' style='text-decoration:none;'>" + "UNIQLO" + "</a>"
-                                                 +  "<a class='chooseitema' style='text-decoration:none;'>" + "SUPERME" + "</a>";
-                  }
-                  var addfilter =  addfilter  +  "</div>"
-                                 +  "</div>"
-                     +   "<div class='chooseitemdiv'>"
-                     +       "<div class='chooseitem'>" + "类别:" + "</div>"
-                     +  "<div>"
-                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "男装" + "</a>"
-                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "女装" + "</a>"
-                     +       "</div>"
-                      +       "</div>"
-                     +   "<div class='chooseitemdiv'>"
-                     +       "<div class='chooseitem'>" + "款式" + "</div>"
-                     +       "<div>"
-                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "衬衫" + "</a>"
-                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "长裤" + "</a>"
-                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "T恤" + "</a>"
-                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "牛仔裤" + "</a>"
-                     +       "</div>"
-                      +       "</div>";
-                }
-                if (search_item == 'NIKE' || search_item == 'ADIDAS' || search_item == 'shoes')
-                {
-                  var addfilter =  "<div class='chooseitemdiv'>"
-                                 +   "<div class='chooseitem'>" + "品牌:" + "</div>"
-                                 +    "<div>";
-                  if(search_item == 'NIKE')
-                  {
-                      var addfilter =  addfilter  +  "<a class='chooseitema' style='text-decoration:none;'>" + "NIKE" + "</a>";
-                  }
-                  else if(search_item == 'ADIDAS')
-                  {
-                      var addfilter =  addfilter  +  "<a class='chooseitema' style='text-decoration:none;'>" + "ADIDAS" + "</a>";
-                   }
-                  else
-                  {
-                     var addfilter =  addfilter  +  "<a class='chooseitema' style='text-decoration:none;'>" + "NIKE" + "</a>"
-                                                 +  "<a class='chooseitema' style='text-decoration:none;'>" + "ADIDAS" + "</a>";
-                  }
-                  var addfilter =  addfilter  +  "</div>"
-                                 +  "</div>"
-                     +   "<div class='chooseitemdiv'>"
-                     +       "<div class='chooseitem'>" + "类别:" + "</div>"
-                     +  "<div>"
-                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "外套" + "</a>"
-                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "鞋子" + "</a>"
-                     +       "</div>"
-                      +       "</div>"
-                     +   "<div class='chooseitemdiv'>"
-                     +       "<div class='chooseitem'>" + "鞋子款式" + "</div>"
-                     +       "<div>"
-                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "跑鞋" + "</a>"
-                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "板鞋" + "</a>"
-                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "球鞋" + "</a>"
-                     +       "</div>"
-                      +       "</div>";
-                }
-                if (search_item == 'APPLE' || search_item == 'HUAWEI' || search_item == 'electronic')
-                {
-                  var addfilter =  "<div class='chooseitemdiv'>"
-                                 +   "<div class='chooseitem'>" + "品牌:" + "</div>"
-                                 +    "<div>";
-                  if(search_item == 'APPLE')
-                  {
-                      var addfilter =  addfilter  +  "<a class='chooseitema' style='text-decoration:none;'>" + "苹果" + "</a>";
-                  }
-                  else if(search_item == 'HUAWEI')
-                  {
-                      var addfilter =  addfilter  +  "<a class='chooseitema' style='text-decoration:none;'>" + "华为" + "</a>";
-                   }
-                  else
-                  {
-                     var addfilter =  addfilter  +  "<a class='chooseitema' style='text-decoration:none;'>" + "苹果" + "</a>"
-                                                 +  "<a class='chooseitema' style='text-decoration:none;'>" + "华为" + "</a>";
-                  }
-                  var addfilter =  addfilter  +  "</div>"
-                                 +  "</div>"
-                     +   "<div class='chooseitemdiv'>"
-                     +       "<div class='chooseitem'>" + "网络类型:" + "</div>"
-                     +  "<div>"
-                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "全网通" + "</a>"
-                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "联通" + "</a>"
-                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "移动" + "</a>"
-                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "中国电信" + "</a>"
-                     +       "</div>"
-                      +       "</div>"
-                     +   "<div class='chooseitemdiv'>"
-                     +       "<div class='chooseitem'>" + "最想要的功能" + "</div>"
-                     +       "<div>"
-                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "双卡双待" + "</a>"
-                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "人脸识别" + "</a>"
-                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "全面屏" + "</a>"
-                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "无锁" + "</a>"
-                     +       "</div>"
-                      +       "</div>";
-                }
-                $("#filterdiv").html(addfilter);
+                set_filterdiv(search_item);
              }
              products = data.products;
              if(products.length > 0)
@@ -496,20 +401,30 @@ function search()
                     addBody = addBody + adddiv;
                 }
                 $("#productlistdiv").html(addBody);
-                $("#keywordspan").html(search_item);
-                if ($("#all").hasClass("active"))
-                {
-                   var shift_type = 'all';
-                }
-                else
-                {
-                   var shift_type = 'tmall';
-                }
-                var new_url = '/taobao?keyword=' + search_item + '&shift_type=' + shift_type;
-                var stateObject = {};
-                var title = "Wow Title";
-                history.pushState(stateObject,title,new_url);
+                $(".samesimidiv").hide();
+                $(".productimgdiv").hover(function(){
+                   var imgdivid = this.id;
+                   var id = imgdivid.substring(0,imgdivid.length-6);
+                   var imgsubdivid = id + 'imgsubdiv';
+                   $("#" + imgsubdivid + "").show();
+                   $("#" + imgsubdivid + "").css("opacity",0.7);
+                  },function(){
+                   var imgdivid = this.id;
+                   var id = imgdivid.substring(0,imgdivid.length-6);
+                   var imgsubdivid = id + 'imgsubdiv';
+                   $("#" + imgsubdivid + "").hide();
+                  });
+
              }
+             else
+             {
+               $("#productlistdiv").html('没有符合条件的宝贝!');
+             }
+             $("#keywordspan").html(search_item);
+             var new_url = '/taobao?keyword=' + search_item + '&shift_type=' + shift_type + '&specify_filter=' + specify_filter + '&order_by=' + order_by;
+             var stateObject = {};
+             var title = "Wow Title";
+             history.pushState(stateObject,title,new_url);
           }
        }
        });
@@ -525,33 +440,33 @@ function set_filterdiv(search_item)
                                  +    "<div>";
                   if(search_item == 'UNIQLO')
                   {
-                      var addfilter =  addfilter  +  "<a class='chooseitema' style='text-decoration:none;'>" + "UNIQLO" + "</a>";
+                      var addfilter =  addfilter  +  "<a class='chooseitemspea' style='text-decoration:none;'>" + "UNIQLO" + "</a>";
                   }
                   else if(search_item == 'SUPERME')
                   {
-                      var addfilter =  addfilter  +  "<a class='chooseitema' style='text-decoration:none;'>" + "SUPERME" + "</a>";
+                      var addfilter =  addfilter  +  "<a class='chooseitemspea' style='text-decoration:none;'>" + "SUPERME" + "</a>";
                    }
                   else
                   {
-                     var addfilter =  addfilter  +  "<a class='chooseitema' style='text-decoration:none;'>" + "UNIQLO" + "</a>"
-                                                 +  "<a class='chooseitema' style='text-decoration:none;'>" + "SUPERME" + "</a>";
+                     var addfilter =  addfilter  +  "<a id='UNIQLOa' class='chooseitema' style='text-decoration:none;'>" + "UNIQLO" + "</a>"
+                                                 +  "<a id='SUPERMEa' class='chooseitema' style='text-decoration:none;'>" + "SUPERME" + "</a>";
                   }
                   var addfilter =  addfilter  +  "</div>"
                                  +  "</div>"
                      +   "<div class='chooseitemdiv'>"
-                     +       "<div class='chooseitem'>" + "类别:" + "</div>"
+                     +       "<div id='TYPEprediv' class='chooseitem'>" + "类别:" + "</div>"
                      +  "<div>"
-                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "男装" + "</a>"
-                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "女装" + "</a>"
+                     +           "<a id='ManTYPEa' class='chooseitema' style='text-decoration:none;'>" + "男装" + "</a>"
+                     +           "<a id='WomanTYPEa' class='chooseitema' style='text-decoration:none;'>" + "女装" + "</a>"
                      +       "</div>"
                       +       "</div>"
                      +   "<div class='chooseitemdiv'>"
-                     +       "<div class='chooseitem'>" + "款式" + "</div>"
+                     +       "<div id='CLASprediv' class='chooseitem'>" + "款式" + "</div>"
                      +       "<div>"
-                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "衬衫" + "</a>"
-                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "长裤" + "</a>"
-                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "T恤" + "</a>"
-                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "牛仔裤" + "</a>"
+                     +           "<a id='ShirtCLASa' class='chooseitema' style='text-decoration:none;'>" + "衬衫" + "</a>"
+                     +           "<a id='LongCLASa' class='chooseitema' style='text-decoration:none;'>" + "长裤" + "</a>"
+                     +           "<a id='TshirtCLASa' class='chooseitema' style='text-decoration:none;'>" + "T恤" + "</a>"
+                     +           "<a id='JeansCLASa' class='chooseitema' style='text-decoration:none;'>" + "牛仔裤" + "</a>"
                      +       "</div>"
                       +       "</div>";
                 }
@@ -562,32 +477,32 @@ function set_filterdiv(search_item)
                                  +    "<div>";
                   if(search_item == 'NIKE')
                   {
-                      var addfilter =  addfilter  +  "<a class='chooseitema' style='text-decoration:none;'>" + "NIKE" + "</a>";
+                      var addfilter =  addfilter  +  "<a class='chooseitemspea' style='text-decoration:none;'>" + "NIKE" + "</a>";
                   }
                   else if(search_item == 'ADIDAS')
                   {
-                      var addfilter =  addfilter  +  "<a class='chooseitema' style='text-decoration:none;'>" + "ADIDAS" + "</a>";
+                      var addfilter =  addfilter  +  "<a class='chooseitemspea' style='text-decoration:none;'>" + "ADIDAS" + "</a>";
                    }
                   else
                   {
-                     var addfilter =  addfilter  +  "<a class='chooseitema' style='text-decoration:none;'>" + "NIKE" + "</a>"
-                                                 +  "<a class='chooseitema' style='text-decoration:none;'>" + "ADIDAS" + "</a>";
+                     var addfilter =  addfilter  +  "<a id='NIKEa' class='chooseitema' style='text-decoration:none;'>" + "NIKE" + "</a>"
+                                                 +  "<a id='ADIDASa' class='chooseitema' style='text-decoration:none;'>" + "ADIDAS" + "</a>";
                   }
                   var addfilter =  addfilter  +  "</div>"
                                  +  "</div>"
                      +   "<div class='chooseitemdiv'>"
-                     +       "<div class='chooseitem'>" + "类别:" + "</div>"
+                     +       "<div id='SHTYprediv' class='chooseitem'>" + "类别:" + "</div>"
                      +  "<div>"
-                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "外套" + "</a>"
-                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "鞋子" + "</a>"
+                     +           "<a id='CoatSHTYa' class='chooseitema' style='text-decoration:none;'>" + "外套" + "</a>"
+                     +           "<a id='ShoesSHTYa' class='chooseitema' style='text-decoration:none;'>" + "鞋子" + "</a>"
                      +       "</div>"
                       +       "</div>"
                      +   "<div class='chooseitemdiv'>"
-                     +       "<div class='chooseitem'>" + "鞋子款式" + "</div>"
+                     +       "<div id='SHCLprediv' class='chooseitem'>" + "鞋子款式" + "</div>"
                      +       "<div>"
-                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "跑鞋" + "</a>"
-                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "板鞋" + "</a>"
-                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "球鞋" + "</a>"
+                     +           "<a id='RunSHCLa' class='chooseitema' style='text-decoration:none;'>" + "跑鞋" + "</a>"
+                     +           "<a id='BanSHCLa' class='chooseitema' style='text-decoration:none;'>" + "板鞋" + "</a>"
+                     +           "<a id='BallSHCLa' class='chooseitema' style='text-decoration:none;'>" + "球鞋" + "</a>"
                      +       "</div>"
                       +       "</div>";
                 }
@@ -598,37 +513,232 @@ function set_filterdiv(search_item)
                                  +    "<div>";
                   if(search_item == 'APPLE')
                   {
-                      var addfilter =  addfilter  +  "<a class='chooseitema' style='text-decoration:none;'>" + "苹果" + "</a>";
+                      var addfilter =  addfilter  +  "<a class='chooseitemspea' style='text-decoration:none;'>" + "苹果" + "</a>";
                   }
                   else if(search_item == 'HUAWEI')
                   {
-                      var addfilter =  addfilter  +  "<a class='chooseitema' style='text-decoration:none;'>" + "华为" + "</a>";
+                      var addfilter =  addfilter  +  "<a class='chooseitemspea' style='text-decoration:none;'>" + "华为" + "</a>";
                    }
                   else
                   {
-                     var addfilter =  addfilter  +  "<a class='chooseitema' style='text-decoration:none;'>" + "苹果" + "</a>"
-                                                 +  "<a class='chooseitema' style='text-decoration:none;'>" + "华为" + "</a>";
+                     var addfilter =  addfilter  +  "<a id='APPLEa' class='chooseitema' style='text-decoration:none;'>" + "苹果" + "</a>"
+                                                 +  "<a id='HUAWEIa' class='chooseitema' style='text-decoration:none;'>" + "华为" + "</a>";
                   }
                   var addfilter =  addfilter  +  "</div>"
                                  +  "</div>"
                      +   "<div class='chooseitemdiv'>"
-                     +       "<div class='chooseitem'>" + "网络类型:" + "</div>"
+                     +       "<div id='NETTprediv' class='chooseitem'>" + "网络类型:" + "</div>"
                      +  "<div>"
-                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "全网通" + "</a>"
-                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "联通" + "</a>"
-                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "移动" + "</a>"
-                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "中国电信" + "</a>"
+                     +           "<a id='GlobalNetNETTa' class='chooseitema' style='text-decoration:none;'>" + "全网通" + "</a>"
+                     +           "<a id='LiantongNETTa' class='chooseitema' style='text-decoration:none;'>" + "联通" + "</a>"
+                     +           "<a id='YidongNETTa' class='chooseitema' style='text-decoration:none;'>" + "移动" + "</a>"
+                     +           "<a id='DianxinNETTa' class='chooseitema' style='text-decoration:none;'>" + "中国电信" + "</a>"
                      +       "</div>"
                       +       "</div>"
                      +   "<div class='chooseitemdiv'>"
-                     +       "<div class='chooseitem'>" + "最想要的功能" + "</div>"
+                     +       "<div id='FAVIprediv' class='chooseitem'>" + "最想要的功能" + "</div>"
                      +       "<div>"
-                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "双卡双待" + "</a>"
-                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "人脸识别" + "</a>"
-                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "全面屏" + "</a>"
-                     +           "<a class='chooseitema' style='text-decoration:none;'>" + "无锁" + "</a>"
+                     +           "<a id='BothFAVIa' class='chooseitema' style='text-decoration:none;'>" + "双卡双待" + "</a>"
+                     +           "<a id='FaceFAVIa' class='chooseitema' style='text-decoration:none;'>" + "人脸识别" + "</a>"
+                     +           "<a id='AllFaceFAVIa' class='chooseitema' style='text-decoration:none;'>" + "全面屏" + "</a>"
+                     +           "<a id='NolockFAVIa' class='chooseitema' style='text-decoration:none;'>" + "无锁" + "</a>"
                      +       "</div>"
                       +       "</div>";
                 }
                 $("#filterdiv").html(addfilter);
+                $("#hideorshowfiltera").html("收起筛选 <span class='glyphicon glyphicon-chevron-up'></span>");
+                var clickatype = 'chooseitema';
+                AddEvent(clickatype);
+
+}
+
+function AddEvent(clickatype)
+{
+     if(clickatype == 'chooseitema')
+	 {
+        var chooseitemas = document.getElementsByClassName(clickatype);
+        for(var i = 0; i < chooseitemas.length; i++)
+        {
+	       chooseitemas[i].onclick = function()
+	       {
+	         var aid = this.id;
+	         var filter = aid.substring(0,aid.length-1);
+	         if (filter == 'UNIQLO' || filter == 'SUPERME' || filter == 'NIKE' || filter == 'ADIDAS' || filter == 'APPLE' || filter == 'HUAWEI')
+	         {
+	           shiftkeyword(filter);
+	         }
+	         else
+	         {
+	           var filterdetailclass = filter.substring(filter.length - 4, filter.length);
+	           var typedivid = filterdetailclass + 'prediv';
+	           var typedesc = $("#" + typedivid + "").html();
+	           if($("#usersetfilter").length > 0)
+	           {
+	              var existed_html = $("#usersetfilter").html();
+	              existed_html = existed_html + "<div style='margin-left:7.5px;float:left;border:solid 1px #D0D0D0;'>"
+	                                          +     "<a id='" + aid + "remove" + "' class='removeitema' style='opacity:0.7;color:black;'>"
+	                                          +        typedesc + "&nbsp;" + this.text + "&nbsp;<span class='glyphicon glyphicon-remove'></span>"
+	                                          +     "</a>"
+                                              + "</div>";
+                   $("#usersetfilter").html(existed_html);
+               }
+               else
+               {
+                   var insertHtml = "<div style='float:left;' id='usersetfilter'>"
+                                              + "<div style='margin-left:7.5px;float:left;border:solid 1px #D0D0D0;'>"
+	                                          +     "<a id='" + aid + "remove" + "' class='removeitema' style='opacity:0.7;color:black;'>"
+	                                          +        typedesc + "&nbsp;" + this.text + "&nbsp;<span class='glyphicon glyphicon-remove'></span>"
+	                                          +     "</a>"
+                                              + "</div>"
+                                  + "</div>";
+                   $('#statusbar').find('div').eq(0).after(insertHtml);
+               }
+                $(this).hide();
+                var set_type = 'disable';
+                set_disabled_item(filterdetailclass,aid,set_type);
+                var atext = this.text;
+                var existed_spe = $('#specifyfilterdiv').html();
+                if(existed_spe == '')
+                {
+                  $('#specifyfilterdiv').html(atext);
+                }
+                else
+                {
+                  existed_spe =  existed_spe + 'and' + atext;
+                  $('#specifyfilterdiv').html(existed_spe);
+                }
+                search('true');
+                var clickatype = 'removeitema';
+                AddEvent(clickatype);
+	         }
+	       }
+        }
+     }
+     if(clickatype == 'removeitema')
+	 {
+        var removeitemas = document.getElementsByClassName(clickatype);
+        for(var i = 0; i < removeitemas.length; i++)
+        {
+           if(!removeitemas[i].onclick)
+           {
+	          removeitemas[i].onclick = function()
+	          {
+	            var removeid = this.id;
+	            var aid = removeid.substring(0,removeid.length-6);
+	            var filter = aid.substring(0,aid.length-1);
+	            var filterdetailclass = filter.substring(filter.length - 4, filter.length);
+	            var set_type = 'able';
+	            $("#" + aid + "").show();
+	            set_disabled_item(filterdetailclass,aid,set_type);
+                $(this).parent().remove();
+                atext = $("#" + aid + "").html();
+                new_specify_filter = get_released_str(atext);
+                $('#specifyfilterdiv').html(new_specify_filter);
+                search('true');
+	          }
+	       }
+        }
+     }
+}
+
+function set_disabled_item(filterdetailclass,aid,set_type)
+{
+   var chooseitemas = document.getElementsByClassName('chooseitema');
+   for(var i = 0; i < chooseitemas.length; i++)
+   {
+     chooseitemaid = chooseitemas[i].id;
+     if(chooseitemaid.indexOf(filterdetailclass) != -1 && chooseitemaid != aid)
+     {
+        if(set_type == 'disable')
+        {
+          $("#" + chooseitemaid + "").css("pointer-events","none");
+        }
+        else
+        {
+          $("#" + chooseitemaid + "").css("pointer-events","");
+        }
+     }
+   }
+
+}
+
+function RefreshOrder(order_type)
+{
+   var exist_order_by = $("#RefreshOrderLi").html();
+   if (exist_order_by == '' || exist_order_by == 'None')
+   {
+      order_by = order_type + ' desc';
+   }
+   else
+   {
+      if(order_type == 'product_sales_qty')
+      {
+         if (exist_order_by == 'product_sales_qty desc')
+         {
+            order_by = 'product_sales_qty';
+         }
+         else
+         {
+            order_by = 'product_sales_qty desc';
+         }
+      }
+      if(order_type == 'shop_ave_score')
+      {
+         if (exist_order_by == 'shop_ave_score desc')
+         {
+            order_by = 'shop_ave_score';
+         }
+         else
+         {
+            order_by = 'shop_ave_score desc';
+         }
+      }
+      if(order_type == 'product_price_float')
+      {
+         if (exist_order_by == 'product_price_float desc')
+         {
+            order_by = 'product_price_float';
+         }
+         else
+         {
+            order_by = 'product_price_float desc';
+         }
+      }
+   }
+   if ($("#all").hasClass("active"))
+   {
+      var shift_type = 'all';
+   }
+   else
+   {
+      var shift_type = 'tmall';
+   }
+   keyword = $("#keywordspan").html();
+   var specify_filter = $('#specifyfilterdiv').html();
+   window.location.href = '/taobao?keyword=' + keyword + '&shift_type=' + shift_type + '&specify_filter=' + specify_filter + '&order_by=' + order_by;
+
+}
+
+function get_released_str(atext)
+{
+   var specify_filter = $('#specifyfilterdiv').html();
+   var and_index = specify_filter.indexOf("and");
+   if(and_index == -1)
+   {
+      var return_str = '';
+   }
+   else
+   {
+      var atext_index = specify_filter.indexOf(atext);
+      if(atext_index < and_index)
+      {
+        var return_str = specify_filter.substring(and_index + 3,specify_filter.length);
+      }
+      else
+      {
+        var return_str = specify_filter.substring(0,and_index);
+      }
+   }
+   return return_str;
+
 }

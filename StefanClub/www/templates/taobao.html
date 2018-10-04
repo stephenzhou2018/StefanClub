@@ -17,6 +17,10 @@ outline:none;
   color:black;
   margin-left:30px;
 }
+.chooseitemspea {
+  color:black;
+  margin-left:30px;
+}
 .chooseitemdiv {
  margin-top:10px;
  height:20px;
@@ -178,7 +182,38 @@ window.onload = function()
   }
   var keyword = '{{keyword}}';
   $("#keywordspan").html(keyword);
-  set_filterdiv(keyword);
+  if(keyword != 'all'){
+     set_filterdiv(keyword);
+  }
+  var order_by = '{{order_by}}';
+  $("#RefreshOrderLi").html(order_by);
+  if (order_by == 'product_price_float' || order_by == 'product_price_float desc')
+  {
+     $("#salesqty").removeAttr("class");
+     $("#salesqtya").css("color","black");
+     $("#shopscore").removeAttr("class");
+     $("#shopscorea").css("color","black");
+     $("#price").attr("class","active");
+     $("#pricea").css("color","OrangeRed");
+  }
+  else if (order_by == 'product_sales_qty' || order_by == 'product_sales_qty desc')
+  {
+     $("#salesqty").attr("class","active");
+     $("#salesqtya").css("color","OrangeRed");
+     $("#shopscore").removeAttr("class");
+     $("#shopscorea").css("color","black");
+     $("#price").removeAttr("class");
+     $("#pricea").css("color","black");
+  }
+  else if (order_by == 'shop_ave_score' || order_by == 'shop_ave_score desc')
+  {
+     $("#salesqty").removeAttr("class");
+     $("#salesqtya").css("color","black");
+     $("#shopscore").attr("class","active");
+     $("#shopscorea").css("color","OrangeRed");
+     $("#price").removeAttr("class");
+     $("#pricea").css("color","black");
+  }
 }
 
 $(document).ready(function(){
@@ -236,8 +271,46 @@ $(document).ready(function(){
 function shifttmall(shift_type)
 {
     var keyword = $('#keywordspan').html();
-    window.location.href = '/taobao?keyword=' + keyword + '&shift_type=' + shift_type;
+    var order_by = $("#RefreshOrderLi").html();
+    var specify_filter = $('#specifyfilterdiv').html();
+    window.location.href = '/taobao?keyword=' + keyword + '&shift_type=' + shift_type + '&specify_filter=' + specify_filter + '&order_by=' + order_by;
+}
 
+function shiftkeyword(keyword)
+{
+   if ($("#all").hasClass("active"))
+   {
+      var shift_type = 'all';
+   }
+   else
+   {
+      var shift_type = 'tmall';
+   }
+   var order_by = $("#RefreshOrderLi").html();
+   var specify_filter = $('#specifyfilterdiv').html();
+   window.location.href = '/taobao?keyword=' + keyword + '&shift_type=' + shift_type + '&specify_filter=' + specify_filter + '&order_by=' + order_by;
+}
+
+function hideorshowfilter()
+{
+   var keyword = $('#keywordspan').html();
+   if(keyword == 'all')
+   {
+     alert('Please specify what you want to search first!');
+   }
+   else
+   {
+     var filterdiv = $("#filterdiv").html();
+     if(filterdiv == '')
+     {
+       set_filterdiv(keyword);
+     }
+     else
+     {
+        $("#filterdiv").html('');
+        $("#hideorshowfiltera").html("显示筛选 <span class='glyphicon glyphicon-chevron-down'></span>");
+     }
+   }
 }
 
 </script>
@@ -272,23 +345,26 @@ function shifttmall(shift_type)
         <div id="myTabContent" class="tab-content">
             <div class="tab-pane fade in active" id="allpro">
                 <div style="width:1060px;margin-top:10px;">
-                    <div style="height:30px;">
+                    <div style="height:30px;" id="statusbar">
                         <div style="float:left;opacity:0.7;">所有分类></div>
+                        <div style="float:left;" id="usersetfilter"></div>
                         <div style="float:right;">
-                            <a style="text-decoration:none;color:black;opacity:0.7;">
-                                收起筛选 <span class="glyphicon glyphicon-chevron-up"></span>
+                            <a id="hideorshowfiltera" style="text-decoration:none;color:black;opacity:0.7;" onclick="hideorshowfilter()">
+                                显示筛选 <span class="glyphicon glyphicon-chevron-down"></span>
                             </a>
                         </div>
                     </div>
+                    <div style="display:none;" id="specifyfilterdiv"></div>
                     <div style="margin-top:10px;" id="filterdiv">
                     </div>
                 </div>
                 <div style="margin-top:20px;">
                     <div>
                         <ul class="nav nav-tabs">
-                            <li id="salesqty" class="active"><a id="salesqtya" class="orderbya" href="#">销量</a></li>
-                            <li id="shopscore"><a id="shopscorea" class="orderbya" href="#">综合店铺评分</a></li>
-                            <li id="price"><a id="pricea" class="orderbya" href="#">价格</a></li>
+                            <li id="salesqty" class="active"><a id="salesqtya" class="orderbya" onclick="RefreshOrder('product_sales_qty')">销量</a></li>
+                            <li id="shopscore"><a id="shopscorea" class="orderbya" onclick="RefreshOrder('shop_ave_score')">综合店铺评分</a></li>
+                            <li id="price"><a id="pricea" class="orderbya" onclick="RefreshOrder('product_price_float')">价格</a></li>
+                            <li id="RefreshOrderLi" style="display:none;"></li>
                         </ul>
                     </div>
                     <div style="margin-top:20px;height:30px;">
