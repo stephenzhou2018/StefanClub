@@ -214,6 +214,8 @@ window.onload = function()
      $("#price").removeAttr("class");
      $("#pricea").css("color","black");
   }
+  var specify_filter = '{{specify_filter}}';
+  set_choosed_spe(specify_filter);
 }
 
 $(document).ready(function(){
@@ -266,6 +268,36 @@ $(document).ready(function(){
   $(window).on('keypress', function(e) {
     if (e.keyCode === 13) $('#searchbutton').trigger('click')
    })
+  $('input:checkbox').change(function() {
+     if($(this).is(':checked'))
+     {
+        if(this.value == 'option1')
+        {
+          $('#deli_free_label').html('包邮');
+        }
+        if(this.value == 'option2')
+        {
+          $('#lovebaby_label').html('公益宝贝');
+        }
+     }
+     if(!$(this).is(':checked'))
+     {
+        if(this.value == 'option1')
+        {
+          $('#deli_free_label').html('');
+        }
+        if(this.value == 'option2')
+        {
+          $('#lovebaby_label').html('');
+        }
+     }
+     search('true');
+  });
+  $('#deli_location').change(function(){
+    var deli_location = $(this).children('option:selected').val();
+    $('#rec_deli_loc').html(deli_location);
+    search('true');
+  })
 });
 
 function shifttmall(shift_type)
@@ -375,26 +407,26 @@ function hideorshowfilter()
                             <label class="checkbox-inline">
                                 <input type="checkbox" id="inlineCheckbox2" value="option2"> 公益宝贝
                             </label>
-                            <label class="checkbox-inline">
-                                <input type="checkbox" id="inlineCheckbox3" value="option3"> 天猫
-                            </label>
+                            <label id="deli_free_label" class="checkbox-inline" style="display:none;"></label>
+                            <label id="lovebaby_label" class="checkbox-inline" style="display:none;"></label>
                         </div>
                         <div style="float:right;">
                             <div class="chooseprice">
-                                <input type="text" class="priceinput" placeholder="最低价格">
+                                <input id="lowest_price_input" type="text" class="priceinput" placeholder="最低价格">
                             </div>
                             <div class="chooseprice" style="margin-top:5px;">---</div>
                             <div class="chooseprice">
-                                <input type="text" class="priceinput" placeholder="最高价格">
+                                <input id="highest_price_input" type="text" class="priceinput" placeholder="最高价格">
                             </div>
                             <div class="chooseprice">
-                                <button style="background-color:OrangeRed;border:none;color:white;height:30px;width:50px;">确定</button>
+                                <button style="background-color:OrangeRed;border:none;color:white;height:30px;width:50px;" onclick="search('true')">确定</button>
                             </div>
                             <div class="chooseprice" style="margin-top:5px;">
                                 发货地区:
                             </div>
                             <div style="float:right;margin-left:10px;">
-                                <select style="width:60px;height:30px;">
+                                <select id="deli_location" style="width:60px;height:30px;">
+                                    <option></option>
                                     <option>上海</option>
                                     <option>北京</option>
                                     <option>广州</option>
@@ -402,6 +434,7 @@ function hideorshowfilter()
                                     <option>金华</option>
                                 </select>
                             </div>
+                            <div id="rec_deli_loc" style="display:none;"></div>
                         </div>
                     </div>
                 </div>

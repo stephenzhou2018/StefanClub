@@ -14,3 +14,18 @@ def analysis_specify_filter(specify_filter):
     else:
         pass
     return first_spe_filter, second_spe_filter
+
+
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        pass
+    try:
+        import unicodedata
+        unicodedata.numeric(s)
+        return True
+    except (TypeError, ValueError):
+        pass
+    return False

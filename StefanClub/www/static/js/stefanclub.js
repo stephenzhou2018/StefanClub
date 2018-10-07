@@ -19,9 +19,14 @@ function search(from_filter = 'false')
    {
       var shift_type = 'tmall';
    }
+   var deli_free = $('#deli_free_label').html();
+   var love_baby = $('#lovebaby_label').html();
+   var lowest_price = $("#lowest_price_input").val();
+   var highest_price = $("#highest_price_input").val();
+   var deli_location = $('#rec_deli_loc').html();
    $.ajax({
        type: "GET",
-       url: "/api/search/products?search_item="+search_item + '&shift_type=' + shift_type + '&specify_filter=' + specify_filter + '&order_by=' + order_by,
+       url: "/api/search/products?search_item="+search_item + '&shift_type=' + shift_type + '&specify_filter=' + specify_filter + '&order_by=' + order_by + '&deli_free=' + deli_free + '&love_baby=' + love_baby + '&lowest_price=' + lowest_price + '&highest_price=' + highest_price + '&deli_location=' + deli_location,
        dataType: "json",
        contentType: "application/json; charset=utf-8",
        success: function (data) {
@@ -741,4 +746,77 @@ function get_released_str(atext)
    }
    return return_str;
 
+}
+
+function set_choosed_spe(specify_filter)
+{
+  if(specify_filter.length > 0 && specify_filter != 'None')
+  {
+    var and_index = specify_filter.indexOf("and");
+    var first_spe_filter = '';
+    var second_spe_filter = '';
+    if(and_index == -1)
+    {
+       first_spe_filter = specify_filter;
+    }
+    else
+    {
+       first_spe_filter = specify_filter.substring(0,and_index);
+       second_spe_filter = specify_filter.substring(and_index + 3,specify_filter.length);
+    }
+    var filter_list = [first_spe_filter,second_spe_filter];
+    var chooseitemas = document.getElementsByClassName('chooseitema');
+    for(var i = 0; i < filter_list.length; i++)
+    {
+        for(var j = 0; j < chooseitemas.length; j++)
+        {
+	       if(chooseitemas[j].text == filter_list[i])
+	       {
+	         var aid = chooseitemas[j].id;
+	         break;
+	       }
+	    }
+	    var filter = aid.substring(0,aid.length-1);
+       	var filterdetailclass = filter.substring(filter.length - 4, filter.length);
+	    var typedivid = filterdetailclass + 'prediv';
+	    var typedesc = $("#" + typedivid + "").html();
+	    if($("#usersetfilter").length > 0)
+	    {
+	       var existed_html = $("#usersetfilter").html();
+	       existed_html = existed_html + "<div style='margin-left:7.5px;float:left;border:solid 1px #D0D0D0;'>"
+	                                          +     "<a id='" + aid + "remove" + "' class='removeitema' style='opacity:0.7;color:black;'>"
+	                                          +        typedesc + "&nbsp;" + filter_list[i] + "&nbsp;<span class='glyphicon glyphicon-remove'></span>"
+	                                          +     "</a>"
+                                              + "</div>";
+                   $("#usersetfilter").html(existed_html);
+        }
+        else
+        {
+           var insertHtml = "<div style='float:left;' id='usersetfilter'>"
+                                              + "<div style='margin-left:7.5px;float:left;border:solid 1px #D0D0D0;'>"
+	                                          +     "<a id='" + aid + "remove" + "' class='removeitema' style='opacity:0.7;color:black;'>"
+	                                          +        typedesc + "&nbsp;" + filter_list[i] + "&nbsp;<span class='glyphicon glyphicon-remove'></span>"
+	                                          +     "</a>"
+                                              + "</div>"
+                                  + "</div>";
+           $('#statusbar').find('div').eq(0).after(insertHtml);
+        }
+        $("#" + aid + "").hide();
+        var set_type = 'disable';
+        set_disabled_item(filterdetailclass,aid,set_type);
+        var atext = filter_list[i];
+        var existed_spe = $('#specifyfilterdiv').html();
+        if(existed_spe == '')
+        {
+           $('#specifyfilterdiv').html(atext);
+        }
+        else
+        {
+           existed_spe =  existed_spe + 'and' + atext;
+           $('#specifyfilterdiv').html(existed_spe);
+        }
+        var clickatype = 'removeitema';
+        AddEvent(clickatype);
+    }
+  }
 }
