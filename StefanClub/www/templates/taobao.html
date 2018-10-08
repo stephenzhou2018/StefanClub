@@ -147,6 +147,11 @@ outline:none;
 .icondiv{position:relative;float:left;}
 .subicondiv{display:none;width:255.5px;height:auto;position:absolute;top:20px;left:20px;cursor:default;border:solid 1px #D0D0D0;opacity:1;z-index:2000;background-color:white;}
 .icondiv:hover .subicondiv{display:block;}
+.numberpagea {
+  margin-left:20px;
+  color:black;
+
+}
 </style>
 <script>
 window.onload = function()
@@ -216,6 +221,8 @@ window.onload = function()
   }
   var specify_filter = '{{specify_filter}}';
   set_choosed_spe(specify_filter);
+  var page_num = '{{page_num}}';
+  set_turning_page(page_num);
 }
 
 $(document).ready(function(){
@@ -344,7 +351,10 @@ function hideorshowfilter()
      }
    }
 }
-
+function shift_page(turn_type)
+{
+  search('true',turn_type);
+}
 </script>
 
 
@@ -771,6 +781,17 @@ function hideorshowfilter()
                         </div>
                     </div>
                     {% endfor %}
+                </div>
+                <div style="height:15px; overflow:hidden; clear:both;"></div>
+                <div style="margin-top:30px;height:30px;">
+                    <a id="prepagea" style='margin-left:370px;color: black;text-decoration:none;' onclick="shift_page('pre')">上一页</a>
+                    <a id="firstpagea" class="numberpagea" style="text-decoration:none;" onclick="shift_page('1')">1</a>
+                    <a id="secondpagea" class="numberpagea" style="text-decoration:none;" onclick="shift_page('2')">2</a>
+                    <a id="thirdpagea" class="numberpagea" style="text-decoration:none;" onclick="shift_page('3')">3</a>
+                    <span id="spanpage" style="margin-left:20px;">...</span>
+                    <a id="lastpagea" class="numberpagea" style="text-decoration:none;" onclick="shift_page('last')">尾页</a>
+                    <a id="currentpage" style="display:none;"></a>
+                    <a id="nextpagea" class="numberpagea" style="text-decoration:none;" onclick="shift_page('next')">下一页</a>
                 </div>
             </div>
         </div>

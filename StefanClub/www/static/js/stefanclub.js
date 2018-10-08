@@ -1,4 +1,4 @@
-function search(from_filter = 'false')
+function search(from_filter = 'false', turn_type = '')
 {
    if(from_filter == 'true')
    {
@@ -24,9 +24,10 @@ function search(from_filter = 'false')
    var lowest_price = $("#lowest_price_input").val();
    var highest_price = $("#highest_price_input").val();
    var deli_location = $('#rec_deli_loc').html();
+   var curr_page = $('#currentpage').html();
    $.ajax({
        type: "GET",
-       url: "/api/search/products?search_item="+search_item + '&shift_type=' + shift_type + '&specify_filter=' + specify_filter + '&order_by=' + order_by + '&deli_free=' + deli_free + '&love_baby=' + love_baby + '&lowest_price=' + lowest_price + '&highest_price=' + highest_price + '&deli_location=' + deli_location,
+       url: "/api/search/products?search_item="+search_item + '&shift_type=' + shift_type + '&specify_filter=' + specify_filter + '&order_by=' + order_by + '&deli_free=' + deli_free + '&love_baby=' + love_baby + '&lowest_price=' + lowest_price + '&highest_price=' + highest_price + '&deli_location=' + deli_location + '&turn_type=' + turn_type + '&curr_page=' + curr_page,
        dataType: "json",
        contentType: "application/json; charset=utf-8",
        success: function (data) {
@@ -419,6 +420,16 @@ function search(from_filter = 'false')
                    var imgsubdivid = id + 'imgsubdiv';
                    $("#" + imgsubdivid + "").hide();
                   });
+                $(".shopnamea").hover(function(){
+                    $(this).css("color","OrangeRed");
+                },function(){
+                    $(this).css("color","black");
+                });
+                $(".productdiv").hover(function(){
+                    $(this).css("border-color","OrangeRed");
+                },function(){
+                    $(this).css("border-color","LightSteelBlue");
+                });
 
              }
              else
@@ -426,6 +437,16 @@ function search(from_filter = 'false')
                $("#productlistdiv").html('没有符合条件的宝贝!');
              }
              $("#keywordspan").html(search_item);
+             var page_num = data.page_num;
+             var curr_page = data.curr_page;
+             if (turn_type == '')
+             {
+               set_turning_page(page_num);
+             }
+             else
+             {
+               set_curr_page(curr_page,page_num);
+             }
              var new_url = '/taobao?keyword=' + search_item + '&shift_type=' + shift_type + '&specify_filter=' + specify_filter + '&order_by=' + order_by;
              var stateObject = {};
              var title = "Wow Title";
@@ -820,3 +841,124 @@ function set_choosed_spe(specify_filter)
     }
   }
 }
+
+function set_turning_page(page_num)
+{
+  $('#lastpagea').html(page_num);
+  $('#currentpage').html('1');
+  if(page_num == '1' || page_num == '0')
+  {
+    $('#secondpagea').css('display','none');
+    $('#thirdpagea').css('display','none');
+    $('#lastpagea').css('display','none');
+    $('#spanpage').css('display','none');
+  }
+  else if(page_num == '2')
+  {
+    $('#secondpagea').css('display','');
+    $('#thirdpagea').css('display','none');
+    $('#lastpagea').css('display','none');
+    $('#spanpage').css('display','none');
+  }
+  else if(page_num == '3')
+  {
+    $('#secondpagea').css('display','');
+    $('#thirdpagea').css('display','');
+    $('#lastpagea').css('display','none');
+    $('#spanpage').css('display','none');
+  }
+  else if(page_num == '4')
+  {
+    $('#secondpagea').css('display','');
+    $('#thirdpagea').css('display','');
+    $('#lastpagea').css('display','');
+    $('#spanpage').css('display','none');
+  }
+  else
+  {
+    $('#secondpagea').css('display','');
+    $('#thirdpagea').css('display','');
+    $('#lastpagea').css('display','');
+    $('#spanpage').css('display','');
+  }
+    $('#prepagea').css('pointer-events','none');
+    $('#firstpagea').css('pointer-events','none');
+    $('#firstpagea').css('color','OrangeRed');
+    $('#secondpagea').css('color','black');
+    $('#thirdpagea').css('color','black');
+    $('#lastpagea').css('color','black');
+    $('#lastpagea').css('pointer-events','');
+    $('#nextpagea').css('pointer-events','');
+
+}
+
+function set_curr_page(curr_page,page_num)
+{
+  $('#currentpage').html(curr_page);
+  if (curr_page == '1')
+  {
+    $('#prepagea').css('pointer-events','none');
+    $('#firstpagea').css('pointer-events','none');
+    $('#firstpagea').css('color','OrangeRed');
+    $('#secondpagea').css('color','black');
+    $('#secondpagea').css('pointer-events','');
+    $('#thirdpagea').css('color','black');
+    $('#thirdpagea').css('pointer-events','');
+    $('#lastpagea').css('color','black');
+    $('#lastpagea').css('pointer-events','');
+    $('#nextpagea').css('pointer-events','');
+  }
+  else if (curr_page == '2')
+  {
+    $('#prepagea').css('pointer-events','');
+    $('#firstpagea').css('pointer-events','');
+    $('#firstpagea').css('color','black');
+    $('#secondpagea').css('color','OrangeRed');
+    $('#secondpagea').css('pointer-events','none');
+    $('#thirdpagea').css('color','black');
+    $('#thirdpagea').css('pointer-events','');
+    $('#lastpagea').css('color','black');
+    $('#lastpagea').css('pointer-events','');
+    $('#nextpagea').css('pointer-events','');
+  }
+  else if (curr_page == '3')
+  {
+    $('#prepagea').css('pointer-events','');
+    $('#firstpagea').css('pointer-events','');
+    $('#firstpagea').css('color','black');
+    $('#secondpagea').css('color','black');
+    $('#secondpagea').css('pointer-events','');
+    $('#thirdpagea').css('pointer-events','none');
+    $('#thirdpagea').css('color','OrangeRed');
+    $('#lastpagea').css('color','black');
+    $('#lastpagea').css('pointer-events','');
+    $('#nextpagea').css('pointer-events','');
+  }
+  else if (curr_page == page_num)
+  {
+    $('#prepagea').css('pointer-events','');
+    $('#firstpagea').css('pointer-events','');
+    $('#firstpagea').css('color','black');
+    $('#secondpagea').css('color','black');
+    $('#secondpagea').css('pointer-events','');
+    $('#thirdpagea').css('color','black');
+    $('#thirdpagea').css('pointer-events','');
+    $('#lastpagea').css('color','OrangeRed');
+    $('#lastpagea').css('pointer-events','none');
+    $('#nextpagea').css('pointer-events','none');
+  }
+  else
+  {
+    $('#prepagea').css('pointer-events','');
+    $('#firstpagea').css('pointer-events','');
+    $('#firstpagea').css('color','black');
+    $('#secondpagea').css('color','black');
+    $('#secondpagea').css('pointer-events','');
+    $('#thirdpagea').css('color','black');
+    $('#thirdpagea').css('pointer-events','');
+    $('#lastpagea').css('color','black');
+    $('#lastpagea').css('pointer-events','');
+    $('#nextpagea').css('pointer-events','');
+  }
+}
+

@@ -145,6 +145,8 @@ async def taobao(*, keyword=None, shift_type=None, specify_filter=None, order_by
     parameter_list = [['UNIQLO'], ['APPLE'], ['NIKE'], ['SUPERME'], ['HUAWEI'], ['ADIDAS']]
     backup_parameter_list = [['UNIQLO'], ['APPLE'], ['NIKE'], ['SUPERME'], ['HUAWEI'], ['ADIDAS']]
     products = []
+    total_num = await TaobaoProducts.findNumber('count(id)')
+    page_num = total_num // 48 + (1 if total_num % 48 > 0 else 0)
     if keyword is None and shift_type is None:
         for i in range(4):
             if not operator.eq(parameter_list, backup_parameter_list):      # judgment whether the parameter_list changed as the limit parameter can join in
@@ -161,6 +163,7 @@ async def taobao(*, keyword=None, shift_type=None, specify_filter=None, order_by
             'keyword': keyword,
             'order_by': order_by,
             'specify_filter': specify_filter,
+            'page_num': page_num,
          }
     else:
         if not order_by or order_by == 'None' or order_by == '':
@@ -173,6 +176,8 @@ async def taobao(*, keyword=None, shift_type=None, specify_filter=None, order_by
                 for k in range(6):
                     parameter_list[k].extend('1')
                     backup_parameter_list[k].extend('1')
+                total_num = await TaobaoProducts.findNumber('count(id)', 'istmall=?', ['1'])
+                page_num = total_num // 48 + (1 if total_num % 48 > 0 else 0)
             for i in range(4):
                 if not operator.eq(parameter_list,backup_parameter_list):  # judgment whether the parameter_list changed as the limit parameter can join in
                     parameter_list = copy.deepcopy(backup_parameter_list)  # must use deep copy because both the two  ram address ref to one value
@@ -187,6 +192,7 @@ async def taobao(*, keyword=None, shift_type=None, specify_filter=None, order_by
                 'keyword': keyword,
                 'order_by': order_by,
                 'specify_filter': specify_filter,
+                'page_num': page_num,
             }
         else:
             parameter = []
@@ -211,6 +217,8 @@ async def taobao(*, keyword=None, shift_type=None, specify_filter=None, order_by
             if second_spe_filter != '':
                 where_clause = where_clause + ' and title like ?'
                 parameter.extend(['%' + second_spe_filter + '%'])
+            total_num = await TaobaoProducts.findNumber('count(id)', where_clause, parameter)
+            page_num = total_num // 48 + (1 if total_num % 48 > 0 else 0)
             products = await TaobaoProducts.findAll(where_clause, parameter, orderBy=order_by, limit=(0, 48))
             return {
                 '__template__': 'taobao.html',
@@ -219,6 +227,7 @@ async def taobao(*, keyword=None, shift_type=None, specify_filter=None, order_by
                 'keyword': keyword,
                 'order_by': order_by,
                 'specify_filter': specify_filter,
+                'page_num': page_num,
             }
 
 
@@ -487,38 +496,97 @@ async def api_zhihuhotcomments(*, hotid, page='1', swi_type='None'):
 
 
 @get('/api/search/products')
-async def api_search_products(*, search_item, shift_type, specify_filter, order_by, deli_free, love_baby, lowest_price, highest_price, deli_location):
+async def api_search_products(*, search_item, shift_type, specify_filter, order_by, deli_free, love_baby, lowest_price, highest_price, deli_location, turn_type, curr_page):
     error_msg = None
     products = []
     keywordlist = ['UNIQLO','SUPERME','NIKE','ADIDAS','APPLE','HUAWEI']
-    producttypelist = ['shoes','clothes','electronic']
-    if search_item not in keywordlist and search_item not in producttypelist:
+    producttypelist = ['shoes', 'clothes','electronic']
+    page_num = None
+    new_curr_page = 1
+
+    if search_item not in keywordlist and search_item not in producttypelist and search_item != 'all':
         error_msg = 'Please input limited search conditions'
     else:
         if order_by == 'None' or order_by == '':
             order_by = 'product_sales_qty desc'
-        first_spe_filter, second_spe_filter = analysis_specify_filter(specify_filter)
         where_clause = ''
+        '''if search_item == 'all':
+            parameter_list = [['UNIQLO'], ['APPLE'], ['NIKE'], ['SUPERME'], ['HUAWEI'], ['ADIDAS']]
+            backup_parameter_list = [['UNIQLO'], ['APPLE'], ['NIKE'], ['SUPERME'], ['HUAWEI'], ['ADIDAS']]
+            where_clause = where_clause + 'keyword=?'
+            if shift_type == 'tmall':
+                where_clause = where_clause + ' and istmall=?'
+                for k in range(6):
+                    parameter_list[k].extend('1')
+                    backup_parameter_list[k].extend('1')
+            if deli_free != '':
+                where_clause = where_clause + ' and title like ?'
+                for k in range(6):
+                    parameter_list[k].extend(['%' + deli_free + '%'])
+                    backup_parameter_list[k].extend(['%' + deli_free + '%'])
+            if love_baby != '':
+                where_clause = where_clause + ' and (iconkey1 = ? or iconkey2 = ? or iconkey3 = ? or iconkey4 = ? or iconkey5 = ?)'
+                for k in range(6):
+                    parameter_list[k].extend(['icon-fest-gongyibaobei','icon-fest-gongyibaobei','icon-fest-gongyibaobei','icon-fest-gongyibaobei','icon-fest-gongyibaobei'])
+                    backup_parameter_list[k].extend(['icon-fest-gongyibaobei','icon-fest-gongyibaobei','icon-fest-gongyibaobei','icon-fest-gongyibaobei','icon-fest-gongyibaobei'])
+            if lowest_price != '':
+                if not is_number(lowest_price):
+                    error_msg = 'Please input price only include the number!'
+                    return dict(products=products, error_msg=error_msg)
+                else:
+                    lowest_price = float(lowest_price)
+                where_clause = where_clause + ' and product_price_float >= ?'
+                for k in range(6):
+                    parameter_list[k].extend([lowest_price])
+                    backup_parameter_list[k].extend([lowest_price])
+            if highest_price != '':
+                if not is_number(highest_price):
+                    error_msg = 'Please input price only include the number!'
+                    return dict(products=products, error_msg=error_msg)
+                else:
+                    highest_price = float(highest_price)
+                where_clause = where_clause + ' and product_price_float <= ?'
+                for k in range(6):
+                    parameter_list[k].extend([highest_price])
+                    backup_parameter_list[k].extend([highest_price])
+            if deli_location != '':
+                where_clause = where_clause + ' and shopaddress like ?'
+                for k in range(6):
+                    parameter_list[k].extend(['%' + deli_location + '%'])
+                    backup_parameter_list[k].extend(['%' + deli_location + '%'])
+            for i in range(4):
+                if not operator.eq(parameter_list,backup_parameter_list):  # judgment whether the parameter_list changed as the limit parameter can join in
+                    parameter_list = copy.deepcopy(backup_parameter_list)  # must use deep copy because both the two  ram address ref to one value
+                for j in range(6):
+                    products_temp = await TaobaoProducts.findAll(where_clause, parameter_list[j],
+                                                                 orderBy=order_by, limit=(2 * i, 2))
+                    products = products + products_temp
+
+        else:'''
         parameter = []
+        first_spe_filter, second_spe_filter = analysis_specify_filter(specify_filter)
         if search_item in keywordlist:
             where_clause = where_clause + 'keyword=?'
-        else:
+            parameter.extend([search_item])
+        elif search_item in producttypelist:
             where_clause = where_clause + 'product_type=?'
-        parameter.extend([search_item])
+            parameter.extend([search_item])
+        else:
+            pass
         if shift_type == 'tmall':
-            where_clause = where_clause + ' and istmall=?'
+            where_clause = where_clause + (' and istmall=?' if where_clause != '' else 'istmall=?')
             parameter.extend('1')
         if first_spe_filter != '':
-            where_clause = where_clause + ' and title like ?'
+            where_clause = where_clause + (' and title like ?' if where_clause != '' else 'title like ?')
             parameter.extend(['%' + first_spe_filter + '%'])
         if second_spe_filter != '':
-            where_clause = where_clause + ' and title like ?'
+            where_clause = where_clause + (' and title like ?' if where_clause != '' else 'title like ?')
             parameter.extend(['%' + second_spe_filter + '%'])
         if deli_free != '':
-            where_clause = where_clause + ' and title like ?'
+            where_clause = where_clause + (' and title like ?' if where_clause != '' else 'title like ?')
             parameter.extend(['%' + deli_free + '%'])
         if love_baby != '':
-            where_clause = where_clause + ' and (iconkey1 = ? or iconkey2 = ? or iconkey3 = ? or iconkey4 = ? or iconkey5 = ?)'
+            where_clause = where_clause + (' and (iconkey1 = ? or iconkey2 = ? or iconkey3 = ? or iconkey4 = ? or iconkey5 = ?)' if where_clause != '' else '(iconkey1 = ? or iconkey2 = ? or iconkey3 = ? or iconkey4 = ? or iconkey5 = ?)')
             parameter.extend(['icon-fest-gongyibaobei','icon-fest-gongyibaobei','icon-fest-gongyibaobei','icon-fest-gongyibaobei','icon-fest-gongyibaobei'])
         if lowest_price != '':
             if not is_number(lowest_price):
@@ -526,7 +594,7 @@ async def api_search_products(*, search_item, shift_type, specify_filter, order_
                 return dict(products=products, error_msg=error_msg)
             else:
                 lowest_price = float(lowest_price)
-            where_clause = where_clause + ' and product_price_float >= ?'
+            where_clause = where_clause + (' and product_price_float >= ?' if where_clause != '' else 'product_price_float >= ?')
             parameter.extend([lowest_price])
         if highest_price != '':
             if not is_number(highest_price):
@@ -534,13 +602,30 @@ async def api_search_products(*, search_item, shift_type, specify_filter, order_
                 return dict(products=products, error_msg=error_msg)
             else:
                 highest_price = float(highest_price)
-            where_clause = where_clause + ' and product_price_float <= ?'
+            where_clause = where_clause + (' and product_price_float <= ?' if where_clause != '' else 'product_price_float <= ?')
             parameter.extend([highest_price])
         if deli_location != '':
-            where_clause = where_clause + ' and shopaddress like ?'
+            where_clause = where_clause + (' and shopaddress like ?' if where_clause != '' else 'shopaddress like ?')
             parameter.extend(['%' + deli_location + '%'])
-        products = await TaobaoProducts.findAll(where_clause, parameter, orderBy=order_by, limit=(0, 48))
-    return dict(products=products, error_msg=error_msg)
+        total_num = await TaobaoProducts.findNumber('count(id)',where_clause, parameter)
+        page_num = total_num // 48 + (1 if total_num % 48 > 0 else 0)
+        if turn_type != '':
+            if turn_type == '1':
+                new_curr_page = 1
+            elif turn_type == '2':
+                new_curr_page = 2
+            elif turn_type == '3':
+                new_curr_page = 3
+            elif turn_type == 'last':
+                new_curr_page = page_num
+            else:
+                int_curr_page = int(curr_page)
+                if turn_type == 'pre':
+                    new_curr_page = int_curr_page - 1
+                else:
+                    new_curr_page = int_curr_page + 1
+        products = await TaobaoProducts.findAll(where_clause, parameter, orderBy=order_by, limit=(48*(new_curr_page - 1), 48))
+    return dict(products=products, error_msg=error_msg, page_num=page_num, curr_page=new_curr_page)
 
 
 @post('/api/blogs/{id}/comments')
