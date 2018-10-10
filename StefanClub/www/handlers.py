@@ -12,7 +12,7 @@ import asyncio,time,re,hashlib,json,logging,operator,copy
 from apis import APIError,APIValueError,APIPermissionError,APIResourceNotFoundError,Page
 from config import configs
 from datetime import datetime
-from functions import analysis_specify_filter,is_number
+from functions import analysis_specify_filter,is_number,get_taobao_chart1,get_taobao_chart2
 
 
 
@@ -229,6 +229,57 @@ async def taobao(*, keyword=None, shift_type=None, specify_filter=None, order_by
                 'specify_filter': specify_filter,
                 'page_num': page_num,
             }
+
+
+@get('/taobaocharts')
+async def get_taobaocharts():
+    chart1 = {
+           'chart': {'renderTo': 'container1'},
+           'title': {'text': '消费力对比图'},
+           'xAxis': {
+              'title': {'text': '价格(元)'},
+              'categories': ['<=100', '100-500', '500-1000', '1000-5000', '>=5000']
+           },
+           'yAxis': {
+              'title': {'text': '销售量(单)'}
+           },
+           'series': [
+               {'name': 'APPLE', 'data': []},
+               {'name': 'HUAWEI', 'data': []},
+               {'name': 'NIKE', 'data': []},
+               {'name': 'ADIDAS', 'data': []},
+               {'name': 'UNIQLO', 'data': []},
+               {'name': 'SUPERME', 'data': []},
+               {'name': 'ALL','data': []}
+           ]
+         }
+    chart2 = {
+           'chart': {'renderTo': 'container2', 'type': 'column'},
+           'title': {'text': '销售量与店铺等级的关系'},
+           'xAxis': {
+              'title': {'text': '店铺等级'},
+              'categories': ['金冠以上', '皇冠', '钻石', '爱心']
+           },
+           'yAxis': {
+              'title': {'text': '销售量(单)'}
+           },
+           'series': [
+               {'name': 'APPLE', 'data': []},
+               {'name': 'HUAWEI', 'data': []},
+               {'name': 'NIKE', 'data': []},
+               {'name': 'ADIDAS', 'data': []},
+               {'name': 'UNIQLO', 'data': []},
+               {'name': 'SUPERME', 'data': []},
+               {'name': 'ALL','data': []}
+           ]
+         }
+    chart1 = await get_taobao_chart1(chart1)
+    chart2 = await get_taobao_chart2(chart2)
+    return {
+        '__template__': 'taobaocharts.html',
+        'chart1': chart1,
+        'chart2': chart2,
+    }
 
 
 @get('/blogs')
@@ -683,7 +734,7 @@ async def api_register_user(*, email, name, passwd):
         raise APIError('register:failed', 'email', 'Email is already in use.')
     uid = next_id()
     sha1_passwd = '%s:%s' % (uid, passwd)
-    user = User(id=uid, name=name.strip(), email=email, passwd=hashlib.sha1(sha1_passwd.encode('utf-8')).hexdigest(), image='http://www.gravatar.com/avatar/%s?d=mm&s=120' % hashlib.md5(email.encode('utf-8')).hexdigest())
+    user = User(id=uid, name=name.strip(), email=email, passwd=hashlib.sha1(sha1_passwd.encode('utf-8')).hexdigest(), admin=True, image='http://www.gravatar.com/avatar/%s?d=mm&s=120' % hashlib.md5(email.encode('utf-8')).hexdigest())
     await user.save()
     # make session cookie:
     r = web.Response()
@@ -754,3 +805,6 @@ async def api_updatehate_news(request, *, id):
     indexnews.hate_emails = new_hate_emails
     await indexnews.update()
     return indexnews
+
+
+
