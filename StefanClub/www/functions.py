@@ -117,10 +117,180 @@ async def get_taobao_chart2(chart2):
     return chart2
 
 
+async def get_taobao_chart3(chart3):
+    series = chart3['series']
+    xAxis = chart3['xAxis']
+    categories = xAxis['categories']
+    index = 0
+    for singleseries in series:
+        name = singleseries['name']
+        where_clause = ''
+        parameter = []
+        select_filed = 'sum(product_sales_qty)'
+        salesqty_list = []
+        if name != 'BOTH':
+            where_clause = where_clause + 'keyword=?'
+            parameter.extend([name])
+        else:
+            where_clause = where_clause + "(keyword = 'UNIQLO' or keyword = 'SUPERME')"
+        for category in categories:
+            real_where_clause = copy.deepcopy(where_clause)
+            real_parameter = copy.deepcopy(parameter)
+            if category == '男装':
+                real_where_clause = real_where_clause + " and title like ?"
+                real_parameter.extend(['%男%'])
+            else:
+                real_where_clause = real_where_clause + " and (title like ? or title like ?)"
+                real_parameter.extend(['%女%','%裙%'])
+            salesqty = await TaobaoProducts.findNumber(select_filed, real_where_clause, real_parameter)
+            if salesqty:
+                salesqty = int(salesqty)
+            else:
+                salesqty = 0
+            salesqty_list.append(salesqty)
+        new_singleseries = {'name': name, 'data': salesqty_list}
+        series[index] = new_singleseries
+        index += 1
+    chart3['series'] = series
+    return chart3
 
 
+async def get_taobao_chart4(chart4):
+    series = chart4['series']
+    subseries = series[0]
+    data = subseries['data']
+    index = 0
+    for singledata in data:
+        singledata_type = None
+        if isinstance(singledata,list):
+            name = singledata[0]
+            singledata_type = 'list'
+        else:
+            name = singledata['name']
+            singledata_type = 'dict'
+        where_clause = ''
+        parameter = []
+        select_filed = 'sum(product_sales_qty)'
+        if name == '长三角':
+            where_clause = where_clause + '(shopaddress like ? or shopaddress like ? or shopaddress like ?)'
+            parameter.extend(['%上海%', '%浙江%', '%江苏%'])
+        elif name == '珠三角':
+            where_clause = where_clause + '(shopaddress like ? or shopaddress like ? or shopaddress like ? or shopaddress like ?)'
+            parameter.extend(['%广东%', '%香港%', '%广西%', '%海南%'])
+        elif name == '京津冀':
+            where_clause = where_clause + '(shopaddress like ? or shopaddress like ? or shopaddress like ?)'
+            parameter.extend(['%北京%', '%天津%', '%河北%'])
+        elif name == '海外':
+            where_clause = where_clause + '(shopaddress like ? or shopaddress like ? or shopaddress like ? or shopaddress like ? or shopaddress like ? or shopaddress like ? or shopaddress like ? or shopaddress like ?)'
+            parameter.extend(['%日本%', '%海外%', '%越南%','%美国%', '%加拿大%', '%西班牙%','%韩国%', '%德国%'])
+        else:
+            where_clause = where_clause + '!(shopaddress like ? or shopaddress like ? or shopaddress like ? or shopaddress like ? or shopaddress like ? or shopaddress like ? or shopaddress like ? or shopaddress like ? or shopaddress like ? or shopaddress like ? or shopaddress like ? or shopaddress like ? or shopaddress like ? or shopaddress like ? or shopaddress like ? or shopaddress like ? or shopaddress like ? or shopaddress like ?)'
+            parameter.extend(['%日本%', '%海外%', '%越南%', '%美国%', '%加拿大%', '%西班牙%', '%韩国%', '%德国%', '%北京%', '%天津%', '%河北%', '%广东%', '%香港%', '%广西%', '%海南%', '%上海%', '%浙江%', '%江苏%'])
+        salesqty = await TaobaoProducts.findNumber(select_filed, where_clause, parameter)
+        if salesqty:
+            salesqty = int(salesqty)
+        else:
+            salesqty = 0
+        if singledata_type == 'list':
+            singledata[1] = salesqty
+        else:
+            singledata['y'] = salesqty
+        data[index] = singledata
+        index += 1
+    subseries['data'] = data
+    series[0] = subseries
+    return series
 
 
+async def get_taobao_chart5(chart5):
+    series = chart5['series']
+    xAxis = chart5['xAxis']
+    categories = xAxis['categories']
+    index = 0
+    for singleseries in series:
+        name = singleseries['name']
+        where_clause = ''
+        parameter = []
+        select_filed = 'max(product_sales_qty)'
+        salesqty_list = []
+        if name != 'ALL':
+            where_clause = where_clause + 'keyword=?'
+            parameter.extend([name])
+        for category in categories:
+            real_where_clause = copy.deepcopy(where_clause)
+            real_parameter = copy.deepcopy(parameter)
+            if name != 'ALL':
+                real_where_clause = real_where_clause + ' and '
+            real_where_clause = real_where_clause + '(iconkey1 = ? or iconkey2 = ? or iconkey3 = ? or iconkey4 = ? or iconkey5 = ?)'
+            if category == '天猫':
+                real_parameter.extend(['icon-service-tianmao','icon-service-tianmao','icon-service-tianmao','icon-service-tianmao','icon-service-tianmao'])
+            elif category == '金牌卖家':
+                real_parameter.extend(['icon-service-jinpaimaijia', 'icon-service-jinpaimaijia', 'icon-service-jinpaimaijia', 'icon-service-jinpaimaijia', 'icon-service-jinpaimaijia'])
+            elif category == '新品':
+                real_parameter.extend(['icon-service-xinpin', 'icon-service-xinpin', 'icon-service-xinpin','icon-service-xinpin','icon-service-xinpin'])
+            elif category == '热卖':
+                real_parameter.extend(['icon-service-remai', 'icon-service-remai', 'icon-service-remai', 'icon-service-remai','icon-service-remai'])
+            elif category == '天猫国际':
+                real_parameter.extend(['icon-service-tianmaoguoji', 'icon-service-tianmaoguoji', 'icon-service-tianmaoguoji','icon-service-tianmaoguoji','icon-service-tianmaoguoji'])
+            elif category == '保险':
+                real_parameter.extend(['icon-service-baoxian', 'icon-service-baoxian', 'icon-service-baoxian', 'icon-service-baoxian','icon-service-baoxian'])
+            elif category == '服务':
+                real_parameter.extend(['icon-service-fuwu', 'icon-service-fuwu', 'icon-service-fuwu', 'icon-service-fuwu','icon-service-fuwu'])
+            else:
+                real_parameter.extend(['icon-fest-tmallzhisongonly', 'icon-fest-tmallzhisongonly', 'icon-fest-tmallzhisongonly', 'icon-fest-tmallzhisongonly','icon-fest-tmallzhisongonly'])
+            salesqty = await TaobaoProducts.findNumber(select_filed, real_where_clause, real_parameter)
+            if salesqty:
+                salesqty = int(salesqty)
+            else:
+                salesqty = 0
+            salesqty_list.append(salesqty)
+        new_singleseries = {'name': name, 'data': salesqty_list}
+        series[index] = new_singleseries
+        index += 1
+    chart5['series'] = series
+    return chart5
+
+
+async def get_taobao_chart6(chart6):
+    series = chart6['series']
+    xAxis = chart6['xAxis']
+    categories = xAxis['categories']
+    index = 0
+    for singleseries in series:
+        name = singleseries['name']
+        if name == '描述':
+            keyword = 'shopdescscore'
+        elif name == '服务':
+            keyword = 'shopservicescore'
+        else:
+            keyword = 'shopdeliveryscore'
+        where_clause = ''
+        parameter = []
+        select_filed = 'count(id)'
+        productqty_list = []
+        for category in categories:
+            real_where_clause = copy.deepcopy(where_clause)
+            real_parameter = copy.deepcopy(parameter)
+            if category == '4.95以上':
+                real_where_clause = real_where_clause + keyword + ' > 4.95'
+            elif category == '4.9以上':
+                real_where_clause = real_where_clause + keyword + ' > 4.9 and ' +  keyword + ' <4.95'
+            elif category == '4.8以上':
+                real_where_clause = real_where_clause + keyword + ' > 4.8 and ' + keyword + ' <4.9'
+            elif category == '4.7以上':
+                real_where_clause = real_where_clause + keyword + ' > 4.7 and ' + keyword + ' <4.8'
+            else:
+                real_where_clause = real_where_clause + keyword + ' < 4.7'
+            productqty = await TaobaoProducts.findNumber(select_filed, real_where_clause, real_parameter)
+            if productqty:
+                productqty = int(productqty)
+            else:
+                productqty = 0
+            productqty_list.append(productqty)
+        new_singleseries = {'name': name, 'data': productqty_list}
+        series[index] = new_singleseries
+        index += 1
+    return series
 
 
 

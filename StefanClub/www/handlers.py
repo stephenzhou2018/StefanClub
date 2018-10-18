@@ -12,7 +12,8 @@ import asyncio,time,re,hashlib,json,logging,operator,copy
 from apis import APIError,APIValueError,APIPermissionError,APIResourceNotFoundError,Page
 from config import configs
 from datetime import datetime
-from functions import analysis_specify_filter,is_number,get_taobao_chart1,get_taobao_chart2
+from functions import analysis_specify_filter,is_number,get_taobao_chart1,get_taobao_chart2,get_taobao_chart3,get_taobao_chart4,get_taobao_chart5,get_taobao_chart6
+from Const import taobaochart1,taobaochart2,taobaochart3,taobaochart4,taobaochart5,taobaochart6
 
 
 
@@ -233,52 +234,20 @@ async def taobao(*, keyword=None, shift_type=None, specify_filter=None, order_by
 
 @get('/taobaocharts')
 async def get_taobaocharts():
-    chart1 = {
-           'chart': {'renderTo': 'container1'},
-           'title': {'text': '消费力对比图'},
-           'xAxis': {
-              'title': {'text': '价格(元)'},
-              'categories': ['<=100', '100-500', '500-1000', '1000-5000', '>=5000']
-           },
-           'yAxis': {
-              'title': {'text': '销售量(单)'}
-           },
-           'series': [
-               {'name': 'APPLE', 'data': []},
-               {'name': 'HUAWEI', 'data': []},
-               {'name': 'NIKE', 'data': []},
-               {'name': 'ADIDAS', 'data': []},
-               {'name': 'UNIQLO', 'data': []},
-               {'name': 'SUPERME', 'data': []},
-               {'name': 'ALL','data': []}
-           ]
-         }
-    chart2 = {
-           'chart': {'renderTo': 'container2', 'type': 'column'},
-           'title': {'text': '销售量与店铺等级的关系'},
-           'xAxis': {
-              'title': {'text': '店铺等级'},
-              'categories': ['金冠以上', '皇冠', '钻石', '爱心']
-           },
-           'yAxis': {
-              'title': {'text': '销售量(单)'}
-           },
-           'series': [
-               {'name': 'APPLE', 'data': []},
-               {'name': 'HUAWEI', 'data': []},
-               {'name': 'NIKE', 'data': []},
-               {'name': 'ADIDAS', 'data': []},
-               {'name': 'UNIQLO', 'data': []},
-               {'name': 'SUPERME', 'data': []},
-               {'name': 'ALL','data': []}
-           ]
-         }
-    chart1 = await get_taobao_chart1(chart1)
-    chart2 = await get_taobao_chart2(chart2)
+    chart1 = await get_taobao_chart1(taobaochart1)
+    chart2 = await get_taobao_chart2(taobaochart2)
+    chart3 = await get_taobao_chart3(taobaochart3)
+    chart4 = await get_taobao_chart4(taobaochart4)
+    chart5 = await get_taobao_chart5(taobaochart5)
+    chart6 = await get_taobao_chart6(taobaochart6)
     return {
         '__template__': 'taobaocharts.html',
         'chart1': chart1,
         'chart2': chart2,
+        'chart3': chart3,
+        'chart4': chart4,
+        'chart5': chart5,
+        'chart6': chart6,
     }
 
 

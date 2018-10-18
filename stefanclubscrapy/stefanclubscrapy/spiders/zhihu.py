@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-import scrapy,os,urllib,json,datetime
-from items import ZhihuHot,ZhihuHotComment
+import scrapy, os, urllib, json, datetime, time
+from items import ZhihuHot,ZhihuHotComment,ZhihuHotContent
 from bs4 import BeautifulSoup
 from scrapy import Request,Selector
 from selenium import webdriver
@@ -16,10 +16,8 @@ class ZhihuSpider(scrapy.Spider):
 
     zhuanlan_comment_url = 'https://www.zhihu.com/api/v4/articles/{hotid}/comments?include=data%5B*%5D.author%2Ccollapsed%2Creply_to_author%2Cdisliked%2Ccontent%2Cvoting%2Cvote_count%2Cis_parent_author%2Cis_author%2Calgorithm_right&order=normal&limit=20&offset={offset}&status=open'
     answer_comment_url = 'https://www.zhihu.com/api/v4/answers/{hotid}/comments?include=data%5B*%5D.author%2Ccollapsed%2Creply_to_author%2Cdisliked%2Ccontent%2Cvoting%2Cvote_count%2Cis_parent_author%2Cis_author%2Calgorithm_right&order=normal&limit=20&offset={offset}&status=open'
-    headers = {
-        'User-Agent':"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36",
-
-    }
+    # headers = {'User-Agent':"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36",}
+    headers = {}
     max_userimg_num = get_max_num('zhihuhotuser')
     if max_userimg_num is None:
         max_userimg_num = 0
@@ -40,32 +38,57 @@ class ZhihuSpider(scrapy.Spider):
         #display.start()
 
         browser = webdriver.Chrome()
-
-        browser.get("https://www.zhihu.com/signin")
-        browser.find_element_by_css_selector(".SignFlow-accountInput.Input-wrapper input").send_keys("13818248346")
-        browser.find_element_by_css_selector(".SignFlow-password input").send_keys("kaihua1010")
-        browser.find_element_by_css_selector(".Button.SignFlow-submitButton").click()
-        import time
-        time.sleep(10)
-        Cookies = browser.get_cookies()
-        cookie_dict = {}
-        for cookie in Cookies:
-            cookie_dict[cookie['name']] = cookie['value']
+        '''browser2 = webdriver.Firefox()
+        browser2.get("https://www.zhihu.com/signin")
+        browser2.find_element_by_css_selector(".SignFlow-accountInput.Input-wrapper input").send_keys("13818248346")
+        browser2.find_element_by_css_selector(".SignFlow-password input").send_keys("kaihua1010")
+        browser2.find_element_by_css_selector(".Button.SignFlow-submitButton").click()
+        time.sleep(5)
+        Cookies2 = browser2.get_cookies()'''
+        utmc = None
+        i = 1
+        extra_cookie_dict = {'__utma':'51854390.302433648.1539609652.1539609652.1539609652.1', '__utmc':'51854390', '__utmz':'51854390.1539609652.1.1.utmcsr=zhihu.com|utmccn=(referral)|utmcmd=referral|utmcct=/hot', '__utmv':'51854390.100--|2=registration_date=20160715=1^3=entry_date=20160715=1'}
+        while utmc is None:
+            if i == 1:
+                browser.get("https://www.zhihu.com/signin")
+                browser.find_element_by_css_selector(".SignFlow-accountInput.Input-wrapper input").send_keys("13818248346")
+                browser.find_element_by_css_selector(".SignFlow-password input").send_keys("kaihua1010")
+                browser.find_element_by_css_selector(".Button.SignFlow-submitButton").click()
+            else:
+                browser.get(self.start_urls[0])
+            time.sleep(1)
+            browser.add_cookie()
+            Cookies = browser.get_cookies()
+            cookie_dict = {}
+            '''cookie = [item["name"] + "=" + item["value"] for item in Cookies]
+          cookiestr = '; '.join(item for item in cookie)
+          self.headers['cookie'] = cookiestr'''
+            for cookie in Cookies:
+                cookie_dict[cookie['name']] = cookie['value']
+            if '__utmc' in cookie_dict.keys():
+                utmc = cookie_dict['__utmc']
+            i += 1
         browser.close()
 
         #display.stop()
 
-        '''
-        cookie_dict = {}
-        cookie_dict['_xsrf'] = 'YapfGwAZLMF0xG66MGRahebpwTWssiMp'
-        cookie_dict['_zap'] = 'aaeb426e-e3fe-4adc-a730-f21e54958363'
-        cookie_dict['d_c0'] = 'AMDl7N8ONw6PTqRBOgSe3VBcN1Sgso03uoY=|1536993055'
-        cookie_dict['capsion_ticket'] = '2|1:0|10:1537072100|14:capsion_ticket|44:ODkzNmNmNTExN2QwNDYzMmE2ZGQzZWMxNTFkNGIxYmE=|4477a216ce7dfa2047cc7641d4a63a577ec3b63a26faec26f8d315995881dad1'
-        cookie_dict['z_c0'] = '2|1:0|10:1537072102|4:z_c0|92:Mi4xV2ZvX0F3QUFBQUFBd09YczN3NDNEaVlBQUFCZ0FsVk41aW1MWEFCSWYteU8zVW9wSHlvdHlsN1RFT3hNb0Y0aVpn|c3865b669f7767a0cb7f7360dee384375aef29fba98d7cd3e8592e72790826b4'
-        cookie_dict['q_c1'] = '68adb565ac5f49b78fe08440a8927c2d|1536993067000|1536993067000'
-        cookie_dict['tgw_l7_route'] = '56f3b730f2eb8b75242a8095a22206f8'
-       '''
+        '''cookie_dict = {}
+        cookie_dict['_xsrf'] = 'a1807a2e-e8da-4464-bcc0-b11be259f42b'
+        cookie_dict['_zap'] = '1e5ccdb9-7860-466f-9a59-ff9cb19e072d'
+        cookie_dict['d_c0'] = 'ALAnFykIXg6PTtXBbHxOihH1-UmQKy8guOQ=|1539608541'
+        cookie_dict['capsion_ticket'] = '2|1:0|10:1539790364|14:capsion_ticket|44:NWIxZTRlYjUxOTg3NGI5MjgwODBhZjYwNmEwNTFhYTI=|4c1810d7fdf17461da2dc94a82756002cab3899386af9fef230ec3efd8f410f9'
+        cookie_dict['z_c0'] = '2|1:0|10:1539790372|4:z_c0|92:Mi4xV2ZvX0F3QUFBQUFBc0NjWEtRaGVEaVlBQUFCZ0FsVk5KS1MwWEFEXy0wZTFkX1I3SjhwTlRTSnUxSDRQajhfcHdR|a100b4ed646d6454be56a0be8f3257fddb1ead83eabe52056221759123a6d005'
+        cookie_dict['q_c1'] = '1d154dfb0c3c49b5afcdf6c78fc70148|1539608544000|1539608544000'
+        cookie_dict['tgw_l7_route'] = '170010e948f1b2a2d4c7f3737c85e98c'
+        cookie_dict['__utma'] = '51854390.302433648.1539609652.1539609652.1539609652.1'
+        cookie_dict['__utmc'] = '51854390'
+        cookie_dict['__utmz'] = '51854390.1539609652.1.1.utmcsr=zhihu.com|utmccn=(referral)|utmcmd=referral|utmcct=/hot'
+        cookie_dict['__utmv'] = '51854390.100--|2=registration_date=20160715=1^3=entry_date=20160715=1'
+        cookie_dict['tst'] = 'r'
+        cookie_dict['__gads'] = 'ID=fa1c97a341ad2943:T=1539696957:S=ALNI_MZJ7ws-b5ObURSAQlBAGi8pbTmD6g'
+'''
         yield Request(url=self.start_urls[0], dont_filter=True, meta={"cookies": cookie_dict}, cookies=cookie_dict, callback=self.parse_main)
+        #yield Request(url=self.start_urls[0], dont_filter=True, headers=self.headers, callback=self.parse_main)
 
     def parse_main(self, response):
         zhihuhot = ZhihuHot()
@@ -186,6 +209,7 @@ class ZhihuSpider(scrapy.Spider):
                 elif hottype == 'zhuanlan':
                     for i in range(comment_page):
                         yield Request(url=self.zhuanlan_comment_url.format(hotid=hotid, offset=i * 20), meta={"hotid": hotid}, cookies=cookie_dict, callback=self.parse_zhihuhot_comment)
+                yield Request(url=titleurl, meta={"hotid": hotid, "hottype": hottype}, cookies=cookie_dict, callback=self.parse_zhihuhot_content)
 
     def parse_zhihuhot_comment(self,response):
         hotid = response.meta.get("hotid", "")
@@ -231,5 +255,19 @@ class ZhihuSpider(scrapy.Spider):
             comment_item["infavorqty"] = infavorqty
 
             yield comment_item
+
+
+    def parse_zhihuhot_content(self,response):
+        hotid = response.meta.get("hotid", "")
+        partno = 1
+        hottype = response.meta.get("hottype", "")
+        zhihuhot_content = ZhihuHotContent()
+        soup = BeautifulSoup(response.text, 'lxml')
+        if hottype == 'question':
+            post_node = soup.select("span[class='CopyrightRichText-richText']")
+        else:
+            post_node = soup.select("div[class='Post-RichText']")
+        sel = Selector(text=str(post_node), type="html", )
+        test = sel.xpath('*')
 
 

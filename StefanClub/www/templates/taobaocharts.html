@@ -65,8 +65,82 @@
 			plotBorderWidth: 1
 		 }
 	    });
-        var chart1 =  new Highcharts.Chart({{chart1|tojson}})
-        var chart2 =  new Highcharts.Chart({{chart2|tojson}})
+	    var chart4main = {
+		    chart: {
+				plotBackgroundColor: null,
+				plotBorderWidth: null,
+				plotShadow: false
+		    },
+		    title: {
+				text: '各地区淘宝店销量分布'
+		    },
+		    tooltip: {
+				headerFormat: '{series.name}<br>',
+				pointFormat: '{point.name}: <b>{point.percentage:.1f}%</b>'
+		    },
+		    plotOptions: {
+				pie: {
+						allowPointSelect: true,
+						cursor: 'pointer',
+						dataLabels: {
+								enabled: true,
+								format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+								style: {
+										color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+								}
+						},
+						states: {
+								hover: {
+										enabled: false
+								}
+						},
+						slicedOffset: 20,         // 突出间距
+						point: {                  // 每个扇区是数据点对象，所以事件应该写在 point 下面
+								events: {
+										// 鼠标滑过是，突出当前扇区
+										mouseOver: function() {
+												this.slice();
+										},
+										// 鼠标移出时，收回突出显示
+										mouseOut: function() {
+												this.slice();
+										},
+										// 默认是点击突出，这里屏蔽掉
+										click: function() {
+												return false;
+										}
+								}
+						}
+				    }
+		    },
+		    series: {{chart4|tojson}}
+        }
+        var chart1 =  new Highcharts.Chart({{chart1|tojson}});
+        var chart2 =  new Highcharts.Chart({{chart2|tojson}});
+        var chart3 =  new Highcharts.Chart({{chart3|tojson}});
+        var chart4 = Highcharts.chart('container4',chart4main);
+        var chart5 =  new Highcharts.Chart({{chart5|tojson}});
+        $('#container6').highcharts({
+		     chart: {type: 'area'},
+		     title: {text: '描述/服务/快递评分分布'},
+		     xAxis: {categories: ['4.95以上', '4.9以上', '4.8以上', '4.7以上', '4.7以下']},
+		     yAxis: {title: {text: '店铺(家数)'}},
+		     tooltip: {
+			    pointFormat: '{series.name} 有 <b>{point.y:,.0f}</b>家'
+		     },
+		     plotOptions: {
+			    area: {
+				   fillOpacity: 0.3, // 指定所有面积图的透明度
+				   marker: {
+					   enabled: false,
+					   symbol: 'circle',
+					   radius: 2,
+					   states: {hover: {enabled: true}}
+				   }
+			    }
+		     },
+		     series: {{chart6|tojson}}
+	    });
     });
 
 </script>
@@ -140,11 +214,13 @@
     </div>
 </nav>
     <div style="width:2800px,margin: 0 auto;">
-        <div style="width:1800px;height:1000px;">
+        <div style="width:1800px;height:1300px;">
             <div id="container1" class="chartdiv" style="margin-left:120px;"></div>
             <div id="container2" class="chartdiv" style="margin-left:40px;"></div>
             <div id="container3" class="chartdiv" style="margin-left:120px;margin-top:40px;"></div>
             <div id="container4" class="chartdiv" style="margin-left:40px;margin-top:40px;"></div>
+            <div id="container5" class="chartdiv" style="margin-left:120px;margin-top:40px;"></div>
+            <div id="container6" class="chartdiv" style="margin-left:40px;margin-top:40px;"></div>
         </div>
     </div>
     <div class="uk-margin-large-top" style="background-color:#eee; border-top:1px solid #ccc;">

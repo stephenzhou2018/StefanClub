@@ -216,3 +216,13 @@ class TaobaoProducts(scrapy.Item):
     product_price_float = scrapy.Field()
     product_sales_qty = scrapy.Field()
     shop_ave_score = scrapy.Field()
+
+
+class ZhihuHotContent(scrapy.Item):
+    hotid = scrapy.Field()
+    partno = scrapy.Field()
+    parttype = scrapy.Field()
+    imgurl = scrapy.Field()
+    imgnumber = scrapy.Field()
+    videourl = scrapy.Field()
+    text = scrapy.Field()

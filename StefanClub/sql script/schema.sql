@@ -292,3 +292,17 @@ create table TaobaoProducts (
     key `idx_created_at` (`created_at`),
     primary key (`id`)
 ) engine=innodb default charset=utf8;
+
+create table ZhihuHot_Content (
+    `id` int not null auto_increment,
+    `hotid` varchar(30) not null,
+    `partno` int,
+    `parttype` varchar(30) not null,
+    `imgurl` varchar(300),
+    `imgnumber` int,
+    `videourl` varchar(300),
+    `text` varchar(3000),
+    `created_at` TIMESTAMP not null,
+    key `idx_created_at` (`created_at`),
+    primary key (`id`)
+) engine=innodb default charset=utf8;
