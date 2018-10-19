@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import scrapy, os, urllib, json, datetime, time
+import scrapy, os, urllib, json, datetime, time, requests
 from items import ZhihuHot,ZhihuHotComment,ZhihuHotContent
 from bs4 import BeautifulSoup
 from scrapy import Request,Selector
@@ -36,7 +36,8 @@ class ZhihuSpider(scrapy.Spider):
     def start_requests(self):
         #display = Display(visible=0, size=(800, 600))
         #display.start()
-
+        s = requests.Session()
+        s.headers.clear()
         browser = webdriver.Chrome()
         '''browser2 = webdriver.Firefox()
         browser2.get("https://www.zhihu.com/signin")
@@ -45,31 +46,27 @@ class ZhihuSpider(scrapy.Spider):
         browser2.find_element_by_css_selector(".Button.SignFlow-submitButton").click()
         time.sleep(5)
         Cookies2 = browser2.get_cookies()'''
-        utmc = None
-        i = 1
-        extra_cookie_dict = {'__utma':'51854390.302433648.1539609652.1539609652.1539609652.1', '__utmc':'51854390', '__utmz':'51854390.1539609652.1.1.utmcsr=zhihu.com|utmccn=(referral)|utmcmd=referral|utmcct=/hot', '__utmv':'51854390.100--|2=registration_date=20160715=1^3=entry_date=20160715=1'}
-        while utmc is None:
-            if i == 1:
-                browser.get("https://www.zhihu.com/signin")
-                browser.find_element_by_css_selector(".SignFlow-accountInput.Input-wrapper input").send_keys("13818248346")
-                browser.find_element_by_css_selector(".SignFlow-password input").send_keys("kaihua1010")
-                browser.find_element_by_css_selector(".Button.SignFlow-submitButton").click()
-            else:
-                browser.get(self.start_urls[0])
-            time.sleep(1)
-            browser.add_cookie()
-            Cookies = browser.get_cookies()
-            cookie_dict = {}
-            '''cookie = [item["name"] + "=" + item["value"] for item in Cookies]
-          cookiestr = '; '.join(item for item in cookie)
-          self.headers['cookie'] = cookiestr'''
-            for cookie in Cookies:
-                cookie_dict[cookie['name']] = cookie['value']
-            if '__utmc' in cookie_dict.keys():
-                utmc = cookie_dict['__utmc']
-            i += 1
-        browser.close()
 
+        browser.get("https://www.zhihu.com/signin")
+        browser.find_element_by_css_selector(".SignFlow-accountInput.Input-wrapper input").send_keys("13818248346")
+        browser.find_element_by_css_selector(".SignFlow-password input").send_keys("kaihua1010")
+        browser.find_element_by_css_selector(".Button.SignFlow-submitButton").click()
+        time.sleep(10)
+        Cookies = browser.get_cookies()
+        cookie_dict = {}
+        '''cookie = [item["name"] + "=" + item["value"] for item in Cookies]
+        cookiestr = '; '.join(item for item in cookie)
+        self.headers['cookie'] = cookiestr'''
+        for cookie in Cookies:
+            cookie_dict[cookie['name']] = cookie['value']
+            s.cookies.set(cookie['name'], cookie['value'])
+
+        browser.close()
+        html2 = s.get('https://www.zhihu.com/question/263892920/answer/405697336').text
+        print(html2)
+        html3 = s.get(self.start_urls[0]).text
+        print(html3)
+        self.headers = s.headers
         #display.stop()
 
         '''cookie_dict = {}
@@ -87,7 +84,8 @@ class ZhihuSpider(scrapy.Spider):
         cookie_dict['tst'] = 'r'
         cookie_dict['__gads'] = 'ID=fa1c97a341ad2943:T=1539696957:S=ALNI_MZJ7ws-b5ObURSAQlBAGi8pbTmD6g'
 '''
-        yield Request(url=self.start_urls[0], dont_filter=True, meta={"cookies": cookie_dict}, cookies=cookie_dict, callback=self.parse_main)
+        yield Request(url=self.start_urls[0], dont_filter=True, meta={"cookies": cookie_dict}, cookies=cookie_dict, callback=self.parse_main,)
+        #yield Request(url=self.start_urls[0], dont_filter=True, meta={"cookies": cookie_dict}, cookies=cookie_dict,callback=self.parse_main, )
         #yield Request(url=self.start_urls[0], dont_filter=True, headers=self.headers, callback=self.parse_main)
 
     def parse_main(self, response):
