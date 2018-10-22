@@ -301,7 +301,7 @@ create table ZhihuHot_Content (
     `imgurl` varchar(300),
     `imgnumber` int,
     `videourl` varchar(300),
-    `text` varchar(3000),
+    `text` mediumtext,
     `created_at` TIMESTAMP not null,
     key `idx_created_at` (`created_at`),
     primary key (`id`)

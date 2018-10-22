@@ -59,8 +59,7 @@ class DuplicatesRecord(object):
     def __init__(self):
         self.zhihuhot_seen = set()
         self.zhihuhotcom_seen = set()
-        self.zhihuhotcontentid_seen = set()
-        self.zhihuhotcontentpart_seen = set()
+        self.zhihuhotcontent_seen = set()
 
     def process_item(self, item):
         if isinstance(item, ZhihuHot):
@@ -78,11 +77,10 @@ class DuplicatesRecord(object):
                 return item
 
         elif isinstance(item, ZhihuHotContent):
-            if item['hotid'] in self.zhihuhotcontentid_seen and item['partno'] in self.zhihuhotcontentpart_seen:
+            if (item['hotid'] + str(item['partno'])) in self.zhihuhotcontent_seen:
                 return None
             else:
-                self.zhihuhotcontentid_seen.add(item['hotid'])
-                self.zhihuhotcontentpart_seen.add(item['partno'])
+                self.zhihuhotcontent_seen.add(item['hotid'] + str(item['partno']))
                 return item
         else:
             return item
@@ -92,8 +90,7 @@ redis_db = Redis(host='127.0.0.1', port=6379, db=0) #连接redis
 
 redis_data_dict6 = "k_zhihuhot_hotids"
 redis_data_dict7 = "k_zhihuhotcom_ids"
-redis_data_dict9 = "k_zhihuhotcontent_ids"
-redis_data_dict10 = "k_zhihuhotcontent_parts"
+redis_data_dict9 = "k_zhihuhot_contents"
 
 
 class RedisDeDuplicate(object):
@@ -113,15 +110,10 @@ class RedisDeDuplicate(object):
             for zhihuhotcom_id in df['commentid'].get_values():
                 redis_db.hset(redis_data_dict7, zhihuhotcom_id, 0)
         if redis_db.hlen(redis_data_dict9) == 0:
-            sql = "SELECT hotid FROM ZhihuHot_Content;"
+            sql = "SELECT concat(hotid,cast(partno as char(8))) as contentid FROM ZhihuHot_Content;"
             df = pd.read_sql(sql, self.connect)
-            for hot_id in df['hotid'].get_values():
-                redis_db.hset(redis_data_dict9, hot_id, 0)
-        if redis_db.hlen(redis_data_dict10) == 0:
-            sql = "SELECT partno FROM ZhihuHot_Content;"
-            df = pd.read_sql(sql, self.connect)
-            for part_no in df['partno'].get_values():
-                redis_db.hset(redis_data_dict10, part_no, 0)
+            for hotcontent_id in df['contentid'].get_values():
+                redis_db.hset(redis_data_dict9, hotcontent_id, 0)
 
     def process_item(self, item):
         if isinstance(item, ZhihuHot):
@@ -135,7 +127,7 @@ class RedisDeDuplicate(object):
             else:
                 return item
         elif isinstance(item, ZhihuHotContent):
-            if redis_db.hexists (redis_data_dict9, item['hotid']) and redis_db.hexists (redis_data_dict10, item['partno']):
+            if redis_db.hexists (redis_data_dict9, (item['hotid'] + str(item['partno']))):
                 return None
             else:
                 return item

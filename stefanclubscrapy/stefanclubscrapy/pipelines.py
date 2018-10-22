@@ -418,6 +418,10 @@ def get_max_num(num_type,indexcar_type=None):
         select_sql = '''
             select max(imgnumber) from TaobaoProducts 
              '''
+    elif num_type == 'zhihucontent':
+        select_sql = '''
+            select max(imgnumber) from ZhihuHot_Content 
+             '''
     else:
         pass
 

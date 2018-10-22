@@ -44,7 +44,8 @@ window.onload = function()
 	       }
 
 	  }
-      }
+    }
+    set_default_html();
 }
 
 function LoadOrRefreshComment(hotid,page,type,commenttitle)
@@ -203,6 +204,61 @@ function AddEvent(hotid,commenttitle){
 	    }
       }
 }
+function showtotalcontent(hotid)
+{
+  $.ajax({
+        type: "GET",
+        url: "/api/zhihuhotcontent?hotid="+hotid,
+        dataType: "json",
+        contentType: "application/json; charset=utf-8",
+        success: function (data) {
+          contents = data.contents;
+          addbody = '';
+          for(var i = 0; i < contents.length; i++){
+             if (contents[i].parttype == 'text')
+             {
+               adddiv = "<div>" + contents[i].text + "</div>";
+             }
+             else if (contents[i].parttype == 'video')
+             {
+               adddiv = "<div><video src='" + contents[i].videourl+ "' controls></video></div>";
+             }
+             else
+             {
+               adddiv = "<div><img src='" + contents[i].imgurl+ "' style='width:800px;height:500px;'></div>";
+             }
+             addbody = addbody + adddiv;
+          }
+          contentdivid = 'contentdiv' + hotid;
+          $("#" + contentdivid + "").html(addbody);
+          hidecontentid = 'hidecontent' + hotid;
+          $("#" + hidecontentid + "").css("display","");
+         }
+      });
+}
+
+function hidecontent(hotid)
+{
+  defaulthtmldivid = hotid + 'defcontdiv';
+  defaulthtml = $("#" + defaulthtmldivid + "").html();
+  contentdivid = 'contentdiv' + hotid;
+  $("#" + contentdivid + "").html(defaulthtml);
+  hidecontentid = 'hidecontent' + hotid;
+  $("#" + hidecontentid + "").css("display","none");
+}
+
+function set_default_html()
+{
+   var defcontdivs = document.getElementsByClassName("defaultcontentdiv");
+   for(var i = 0; i < defcontdivs.length; i++)
+   {
+	  var id = defcontdivs[i].id;
+	  hotid = id.substring(0,id.length - 10);
+	  contentid = 'contentdiv' + hotid;
+	  html = $("#" + contentid + "").html();
+	  $("#" + id + "").html(html);
+    }
+}
 </script>
 
 
@@ -215,6 +271,7 @@ function AddEvent(hotid,commenttitle){
          {% for zhihuhot in zhihuhots %}
          <div style="margin-top:40px;">
             <div>
+               {% if zhihuhot.feedsourcetag != None %}
                <div>
                   <div style="width:560px;height:30px;">
                      <div style="float:left;opacity:0.7;font-size:110%;">
@@ -258,6 +315,7 @@ function AddEvent(hotid,commenttitle){
                      </div>
                   </div>
                </div>
+               {% endif %}
                <div style="width:100%;height:100%;">
                   <h5>
                      <div>
@@ -265,11 +323,11 @@ function AddEvent(hotid,commenttitle){
                      </div>
                   </h5>
                   {% if zhihuhot.newsimgsrcurl != None %}
-                  <div id="contentdiv" style="width:660px;height:150px;border:none;">
+                  <div id="contentdiv{{zhihuhot.hotid}}" style="width:660px;height:auto;border:none;">
                   {% else %}
-                  <div id="contentdiv" style="width:660px;height:100%;border:none;">
+                  <div id="contentdiv{{zhihuhot.hotid}}" style="width:660px;height:auto;border:none;">
                   {% endif %}
-                     <a style="text-decoration:none;">
+                     <a style="text-decoration:none;" onclick="showtotalcontent({{zhihuhot.hotid}})">
                         <div style="width:100%;height:100%;">
                            {% if zhihuhot.newsimgsrcurl != None %}
                            <div style='float:left;width:185px;height:150px;'>
@@ -307,9 +365,13 @@ function AddEvent(hotid,commenttitle){
                      <a class="bottoma"><span class="glyphicon glyphicon-heart-empty"></span> 感谢</a>
                      <a class="bottoma">...</a>
                      <a id="{{zhihuhot.hotid}}a" style="visibility:hidden;">{{zhihuhot.comment_title}}</a>
+                     <a id="hidecontent{{zhihuhot.hotid}}" onclick="hidecontent({{zhihuhot.hotid}})" style="float:right;display:none;text-decoration:none;">收起</a>
                   </span>
                </div>
                <div id="{{zhihuhot.hotid}}div" style="width:560px;">
+
+               </div>
+               <div id="{{zhihuhot.hotid}}defcontdiv" style="width:560px;display:none;" class="defaultcontentdiv">
 
                </div>
             </div>

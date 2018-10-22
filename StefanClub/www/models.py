@@ -285,3 +285,17 @@ class TaobaoProducts(Model):
     product_sales_qty = IntegerField()
     shop_ave_score = FloatField()
     created_at = DateTimeField()
+
+
+class ZhihuHotContent(Model):
+    __table__ = 'ZhihuHot_Content'
+
+    id = IntegerField(primary_key=True)
+    hotid = StringField(ddl='varchar(30)')
+    partno = IntegerField()
+    parttype = StringField(ddl='varchar(30)')
+    imgurl = StringField(ddl='varchar(300)')
+    imgnumber = IntegerField()
+    videourl = StringField(ddl='varchar(300)')
+    text = TextField()
+    created_at = DateTimeField()

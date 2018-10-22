@@ -7,7 +7,7 @@ __author__ = 'Stephen Zhou'
 import markdown2
 from aiohttp import web
 from coroweb import get,post
-from models import User,Blog,Comment,next_id,IndexCarouselItems,IndexNews,HotMatches,SinaCarousel,HotMatchNews,NbaNews,ZhihuHot,ZhihuHotComment,TaobaoProducts
+from models import User,Blog,Comment,next_id,IndexCarouselItems,IndexNews,HotMatches,SinaCarousel,HotMatchNews,NbaNews,ZhihuHot,ZhihuHotComment,TaobaoProducts,ZhihuHotContent
 import asyncio,time,re,hashlib,json,logging,operator,copy
 from apis import APIError,APIValueError,APIPermissionError,APIResourceNotFoundError,Page
 from config import configs
@@ -134,7 +134,7 @@ async def sports():
 
 @get('/zhihu')
 async def zhihu():
-    zhihuhots = await ZhihuHot.findAll(orderBy='id desc', limit=(0,30))
+    zhihuhots = await ZhihuHot.findAll(orderBy='id desc')
     return {
         '__template__': 'zhihu.html',
         'zhihuhots': zhihuhots,
@@ -646,6 +646,12 @@ async def api_search_products(*, search_item, shift_type, specify_filter, order_
                     new_curr_page = int_curr_page + 1
         products = await TaobaoProducts.findAll(where_clause, parameter, orderBy=order_by, limit=(48*(new_curr_page - 1), 48))
     return dict(products=products, error_msg=error_msg, page_num=page_num, curr_page=new_curr_page)
+
+
+@get('/api/zhihuhotcontent')
+async def api_get_zhihuhotcontent(*, hotid):
+    contents = await ZhihuHotContent.findAll('hotid=?', [hotid], orderBy='partno')
+    return dict(contents=contents)
 
 
 @post('/api/blogs/{id}/comments')

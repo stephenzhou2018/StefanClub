@@ -1,6 +1,6 @@
 from items import NbaNews,TaobaoProducts
 from scrapy import Selector
-import os,urllib,copy
+import os,urllib,copy, requests
 from pipelines import get_max_num
 
 
@@ -335,8 +335,14 @@ def get_comment_qty(comment_title):
         if comment_title_list[i] == '条':
             max_index = i
     comment_qty = comment_title[0:max_index]
-    comment_qty = int(comment_qty)
-    return comment_qty
+    if comment_qty == '添加评':
+        return 0
+    else:
+        if comment_qty[-1:] == ' ':
+            comment_qty = comment_qty[:-1]
+        comment_qty  =  remove_comma(comment_qty)
+        comment_qty = int(comment_qty)
+        return comment_qty
 
 
 def get_utfurl_from_unicode(url):
@@ -387,3 +393,125 @@ def auto_download(imgsrcurl,file_path):
     except urllib.ContentTooShortError:
         print ('Network conditions is not good.Reloading.')
         auto_download(imgsrcurl,file_path)
+
+
+def remove_comma(str):
+    strlist = list(str)
+    while ',' in strlist:
+        for i in range(len(strlist)):
+            if strlist[i] == ',':
+                del strlist[i]
+                break
+    return ''.join(strlist)
+
+
+def get_attribute(re_part_str,element):
+    attributes = element.attrib
+    for item in attributes.items():
+        re_part_str = re_part_str + ' ' + item[0] + '=' + '"' + item[1] + '"'
+    return re_part_str
+
+
+def recursive(element):
+    if element.tag == 'br':
+        re_part_str = '<br/>'
+        if element.tail is not None:
+            re_part_str = re_part_str + element.tail
+        return re_part_str
+    elif element.tag == 'img':
+        re_part_str = '<img'
+        re_part_str = get_attribute(re_part_str,element)
+        re_part_str = re_part_str + '>'
+        if element.tail is not None:
+            re_part_str = re_part_str + element.tail
+        return re_part_str
+    else:
+        re_part_str = '<' + element.tag
+        re_part_str = get_attribute(re_part_str, element)
+        re_part_str = re_part_str + '>'
+        if element.text is not None:
+            re_part_str = re_part_str + element.text
+        temp = element.getchildren()
+        for j in range(len(temp)):
+            re_part_str = re_part_str + recursive(temp[j])
+        re_part_str = re_part_str + '</' + element.tag + '>'
+        if element.tail is not None:
+            re_part_str = re_part_str + element.tail
+        return re_part_str
+
+
+def get_real_videourl(video_id):
+    HEADERS = {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36',
+    }
+    headers = {}
+    headers['Referer'] = 'https://v.vzuu.com/video/{}'.format(video_id)
+    headers['Origin'] = 'https://v.vzuu.com'
+    headers['Host'] = 'lens.zhihu.com'
+    headers['Content-Type'] = 'application/json'
+    headers['Authorization'] = 'oauth c3cef7c66a1843f8b3a9e6a1e3160e20'
+
+    api_video_url = 'https://lens.zhihu.com/api/videos/{}'.format(int(video_id))
+
+    r = requests.get(api_video_url, headers={**HEADERS, **headers})
+    # print(json.dumps(dict(r.request.headers), indent=2, ensure_ascii=False))
+    # print(r.text.encode('utf-8').decode('unicode_escape'))
+    playlist = r.json()['playlist']
+    real_url = playlist['ld']['play_url']
+    return real_url
+
+
+def get_videourl(element):
+    temp1 = element.getchildren()
+    if len(temp1) < 2:
+        real_videourl = None
+        part_str = recursive(element)
+    else:
+        part_str = None
+        content = temp1[1]
+        temp2 = content.getchildren()
+        if len(temp2) < 2:
+            real_videourl = None
+            part_str = recursive(element)
+        else:
+            url = temp2[1]
+            temp3 = url.getchildren()
+            if len(temp3) < 1:
+                real_videourl = None
+                part_str = recursive(element)
+            else:
+                video = temp3[0]
+                surface_url = video.tail
+                if surface_url is not None:
+                    video_id = surface_url[28:]
+                    real_videourl = get_real_videourl(video_id)
+                    '''filename = '{}.mp4'.format(video_id)
+                    opener = urllib.request.build_opener()
+                    data = opener.open(real_videourl).read()
+                    with open('D:\StefanClub\StefanClub\www\static\\video\zhihu\\' + filename, "wb") as code:
+                        code.write(data)'''
+                else:
+                    real_videourl = None
+                    part_str = recursive(element)
+    return real_videourl, part_str
+
+
+def get_img_info(element,curr_num_of_content, s, agentheaders):
+    temp1 = element.getchildren()
+    noscript = temp1[0]
+    temp2 = noscript.getchildren()
+    img = temp2[0]
+    attributes = img.attrib
+    items = attributes.items()
+    for item in items:
+        if item[0] == 'src':
+            imgsrc = item[1]
+            break
+    file_name = "zhihuhotcontent_%s.jpg" % curr_num_of_content
+    file_path = os.path.join("D:\StefanClub\StefanClub\www\static\img\zhihu", file_name)
+    data = s.get(imgsrc, headers=agentheaders).content
+    with open(file_path, "wb") as code:
+        code.write(data)
+    #urllib.request.urlretrieve(imgsrc, file_path)
+    imgurl = "../static/img/zhihu/%s" % file_name
+    return imgurl, curr_num_of_content
