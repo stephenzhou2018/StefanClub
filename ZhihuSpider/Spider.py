@@ -168,12 +168,17 @@ def parse_main(response):
                     if inserttomysql.process_item(zhihuhot) == 'toinsert':
                         if hottype == 'question':
                             for i in range(comment_page):
-                                html = s.get(answer_comment_url.format(hotid=hotid, offset=i * 20), headers=jsonheaders).text
-                                parse_zhihuhot_comment(html,hotid)
+                                # html = s.get(answer_comment_url.format(hotid=hotid, offset=i * 20), headers=jsonheaders).text
+                                html = s.get(answer_comment_url.format(hotid=hotid, offset=i * 20), headers=jsonheaders)
+                                #result = json.dumps(html.json(), ensure_ascii=False)
+                                result = html.json()
+                                # parse_zhihuhot_comment(html,hotid)
+                                parse_zhihuhot_comment(result, hotid)
                         elif hottype == 'zhuanlan':
                             for i in range(comment_page):
-                                html = s.get(zhuanlan_comment_url.format(hotid=hotid, offset=i * 20), headers=jsonheaders).text
-                                parse_zhihuhot_comment(html, hotid)
+                                html = s.get(zhuanlan_comment_url.format(hotid=hotid, offset=i * 20), headers=jsonheaders)
+                                result = html.json()
+                                parse_zhihuhot_comment(result, hotid)
                         contenturl = 'https:' + titleurl
                         mainhtml = s.get(contenturl).text
                         parse_zhihuhot_content(mainhtml,hotid,hottype)
@@ -184,7 +189,8 @@ def parse_zhihuhot_comment(response,hotid):
     if max_comuserimg_num is None:
         max_comuserimg_num = 0
     curr_num_of_comuser = max_comuserimg_num + 1
-    resultjson = json.loads(response)
+    #resultjson = json.loads(response)
+    resultjson = response
     comments = resultjson['data']
     comment_item  = ZhihuHotComment()
     for comment in comments:
