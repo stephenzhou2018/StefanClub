@@ -21,8 +21,7 @@
     <meta charset="utf-8" />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
-    {% block meta %}<!-- block meta  -->{% endblock %}
-    <title>{% block title %} ? {% endblock %} - Stefan Club</title>
+    <title>猎聘/拉勾数据图表 - Stefan Club</title>
     <link rel="stylesheet" href="/static/css/uikit.min.css">
     <link rel="stylesheet" href="/static/css/uikit.gradient.min.css">
     <link rel="stylesheet" href="/static/css/awesome.css" />
@@ -40,7 +39,40 @@
     <script src="/static/js/jqthumb.js"></script>
     <script src="/static/js/stefanclub.js"></script>
     <script src="/static/js/highcharts.js"></script>
-    {% block beforehead %}<!-- before head  -->{% endblock %}
+    <style>
+        .chartdiv
+        {
+           float:left;
+           width:800px;
+           height:400px;
+        }
+    </style>
+    <script>
+      $(function() {
+	  // 全局配置，针对页面上所有图表有效
+	    Highcharts.setOptions({
+		  chart: {
+		    	backgroundColor: {
+				  linearGradient: [0, 0, 500, 500],
+			   	  stops: [
+				  	 [0, 'rgb(255, 255, 255)'],
+					 [1, 'rgb(240, 240, 255)']
+				  ]
+			    },
+			borderWidth: 2,
+			plotBackgroundColor: 'rgba(255, 255, 255, .9)',
+			plotShadow: true,
+			plotBorderWidth: 1
+		 }
+	    });
+        var chart1 =  new Highcharts.Chart({{chart1|tojson}});
+        var chart2 =  new Highcharts.Chart({{chart2|tojson}});
+
+
+
+    });
+
+</script>
 </head>
 <body>
 
@@ -94,7 +126,7 @@
                          {% endif %}
                 </ul>
                 <form class="navbar-form navbar-right">
-                    <a href="/manage/blogs/create" class="btn" style="border:none;opacity:0.7;color:black;">
+                    <a href="#" class="btn" style="border:none;opacity:0.7;color:black;">
                        <span class="glyphicon glyphicon-edit"></span> 写博客
                     </a>
                 </form>
@@ -110,12 +142,14 @@
         </div>
     </div>
 </nav>
-    <div class="uk-container uk-container-center" style="width:2800px,margin: 0 auto;">
-        <div class="uk-grid" style="width:2500px,margin: 0 auto;">
-            <!-- content -->
-            {% block content %}
-            {% endblock %}
-            <!-- // content -->
+    <div style="width:2800px,margin: 0 auto;">
+        <div style="width:1800px;height:1300px;">
+            <div id="container1" class="chartdiv" style="margin-left:120px;"></div>
+            <div id="container2" class="chartdiv" style="margin-left:40px;"></div>
+            <div id="container3" class="chartdiv" style="margin-left:120px;margin-top:40px;"></div>
+            <div id="container4" class="chartdiv" style="margin-left:40px;margin-top:40px;"></div>
+            <div id="container5" class="chartdiv" style="margin-left:120px;margin-top:40px;"></div>
+            <div id="container6" class="chartdiv" style="margin-left:40px;margin-top:40px;"></div>
         </div>
     </div>
     <div class="uk-margin-large-top" style="background-color:#eee; border-top:1px solid #ccc;">

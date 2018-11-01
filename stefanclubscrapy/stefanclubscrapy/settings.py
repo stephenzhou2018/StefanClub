@@ -14,6 +14,9 @@ BOT_NAME = 'stefanclubscrapy'
 SPIDER_MODULES = ['stefanclubscrapy.spiders']
 NEWSPIDER_MODULE = 'stefanclubscrapy.spiders'
 
+MY_USER_AGENT = [
+    "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36"
+]
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'stefanclubscrapy (+http://www.yourdomain.com)'
@@ -54,7 +57,9 @@ ROBOTSTXT_OBEY = False
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
    # 'stefanclubscrapy.middlewares.StefanclubscrapyDownloaderMiddleware': 543,
-    'stefanclubscrapy.middlewares.RandomUserAgentMiddleware': 543,
+   # 'stefanclubscrapy.middlewares.ProxyMiddleWare': 540,
+   # 'stefanclubscrapy.middlewares.RandomUserAgentMiddleware': 543,
+    'stefanclubscrapy.middlewares.MyUserAgentMiddleware': 543,
     'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
 }
 

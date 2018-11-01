@@ -6,7 +6,7 @@
 # See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 import pymysql
 import datetime
-from items import IndexCarouselItem,IndexNews,HotMatches,SinaCarousel,HotMatchNews,NbaNews,ZhihuHot,ZhihuHotComment,TaobaoProducts
+from items import IndexCarouselItem,IndexNews,HotMatches,SinaCarousel,HotMatchNews,NbaNews,ZhihuHot,ZhihuHotComment,TaobaoProducts,ZhaoPinJobs
 from scrapy.exceptions import DropItem
 from redis import Redis
 import pandas as pd
@@ -126,6 +126,17 @@ class MysqlPipeline(object):
             item["shopdeliveryscore"],item["shopdeliveryscorediff"],item["shopdeliverycompare"],item["shopservicescore"],item["shopservicescorediff"],item["shopservicecompare"],
             item["product_price_float"], item["product_sales_qty"], item["shop_ave_score"],item["title1"], item["title2"], item["titlehaskey"], datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
 
+        elif isinstance(item, ZhaoPinJobs):
+            insert_sql = '''
+            insert into ZhaoPinJobs(source,jobkey,jobid,jobtitle,salarystr,salary_month_min,salary_year_min,salary_month_max,salary_year_max,address,
+            education,workexperience,release_time,response_time,companyname,industry,financing_situation,numberofpeople,welfare1,welfare2,welfare3,
+            welfare4,welfare5,created_at) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            '''
+            self.cursor.execute(insert_sql, (
+            item["source"],item["jobkey"],item["jobid"],item["jobtitle"],item["salarystr"], item["salary_month_min"], item["salary_year_min"], item["salary_month_max"], item["salary_year_max"],item["address"],
+            item["education"],item["workexperience"],item["release_time"],item["response_time"],item["companyname"],item["industry"],item["financing_situation"],item["numberofpeople"],
+            item["welfare1"],item["welfare2"],item["welfare3"],item["welfare4"],item["welfare5"],datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
+
         else:
             pass
         self.conn.commit()
@@ -143,6 +154,7 @@ class DuplicatesPipeline(object):
         self.zhihuhot_seen = set()
         self.zhihuhotcom_seen = set()
         self.taobaoproid_seen = set()
+        self.zhaopinjobid_seen = set()
 
     def process_item(self, item, spider):
         if isinstance(item, HotMatches):
@@ -208,6 +220,13 @@ class DuplicatesPipeline(object):
                 self.taobaoproid_seen.add(item['product_id'])
                 return item
 
+        elif isinstance(item, ZhaoPinJobs):
+            if item['jobid'] in self.zhaopinjobid_seen:
+                raise DropItem("(Scrapy)Duplicate item found: %s" % item)
+            else:
+                self.zhaopinjobid_seen.add(item['jobid'])
+                return item
+
         else:
             return item
 
@@ -223,6 +242,8 @@ redis_data_dict5 = "k_nbanews_titles"
 redis_data_dict6 = "k_zhihuhot_hotids"
 redis_data_dict7 = "k_zhihuhotcom_ids"
 redis_data_dict8 = "k_taobaoproduct_ids"
+redis_data_dict10 = "k_zhaopinjob_ids"
+
 
 
 
@@ -285,6 +306,11 @@ class RedisPipeline(object):
             df = pd.read_sql(sql, self.connect)
             for tbproduct_id in df['product_id'].get_values():
                 redis_db.hset(redis_data_dict8, tbproduct_id, 0)
+        if redis_db.hlen(redis_data_dict10) == 0:
+            sql = "SELECT jobid FROM ZhaoPinJobs;"
+            df = pd.read_sql(sql, self.connect)
+            for jobid in df['jobid'].get_values():
+                redis_db.hset(redis_data_dict10, jobid, 0)
 
     def process_item(self, item, spider):
         if isinstance(item, HotMatches):
@@ -337,6 +363,12 @@ class RedisPipeline(object):
 
         elif isinstance(item, TaobaoProducts):
             if redis_db.hexists (redis_data_dict8, item['product_id']):
+                raise DropItem("(Redis)Duplicate item found: %s" % item)
+            else:
+                return item
+
+        elif isinstance(item, ZhaoPinJobs):
+            if redis_db.hexists (redis_data_dict10, item['jobid']):
                 raise DropItem("(Redis)Duplicate item found: %s" % item)
             else:
                 return item

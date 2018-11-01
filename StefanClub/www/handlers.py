@@ -12,8 +12,8 @@ import asyncio,time,re,hashlib,json,logging,operator,copy
 from apis import APIError,APIValueError,APIPermissionError,APIResourceNotFoundError,Page
 from config import configs
 from datetime import datetime
-from functions import analysis_specify_filter,is_number,get_taobao_chart1,get_taobao_chart2,get_taobao_chart3,get_taobao_chart4,get_taobao_chart5,get_taobao_chart6
-from Const import taobaochart1,taobaochart2,taobaochart3,taobaochart4,taobaochart5,taobaochart6
+from functions import analysis_specify_filter,is_number,get_taobao_chart1,get_taobao_chart2,get_taobao_chart3,get_taobao_chart4,get_taobao_chart5,get_taobao_chart6,get_zhaopin_chart1,get_zhaopin_chart2
+from Const import taobaochart1,taobaochart2,taobaochart3,taobaochart4,taobaochart5,taobaochart6,zhaopinchart1,zhaopinchart2
 
 
 
@@ -248,6 +248,17 @@ async def get_taobaocharts():
         'chart4': chart4,
         'chart5': chart5,
         'chart6': chart6,
+    }
+
+
+@get('/zhaopincharts')
+async def get_zhaopincharts():
+    chart1 = await get_zhaopin_chart1(zhaopinchart1)
+    chart2 = await get_zhaopin_chart2(zhaopinchart2)
+    return {
+        '__template__': 'zhaopincharts.html',
+        'chart1': chart1,
+        'chart2': chart2,
     }
 
 

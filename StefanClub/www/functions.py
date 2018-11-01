@@ -1,5 +1,5 @@
 import copy
-from models import TaobaoProducts
+from models import TaobaoProducts,ZhaoPinJobs
 
 def analysis_specify_filter(specify_filter):
     and_index = -1
@@ -293,6 +293,102 @@ async def get_taobao_chart6(chart6):
     return series
 
 
+async def get_zhaopin_chart1(chart1):
+    series = chart1['series']
+    xAxis = chart1['xAxis']
+    categories = xAxis['categories']
+    index = 0
+    for singleseries in series:
+        name = singleseries['name']
+        where_clause = ''
+        parameter = []
+        select_filed = 'count(id)'
+        qty_list = []
+        where_clause = where_clause + 'address like ?'
+        parameter.extend(['%' + name + '%'])
+        for category in categories:
+            real_where_clause = copy.deepcopy(where_clause)
+            real_parameter = copy.deepcopy(parameter)
+            if category == '<=4000':
+                real_where_clause = real_where_clause + ' and salary_month_max <= ?'
+                real_parameter.extend([4000])
+            elif category == '>=15000':
+                real_where_clause = real_where_clause + ' and salary_month_min >= ?'
+                real_parameter.extend([15000])
+            else:
+                real_where_clause = real_where_clause + ' and salary_month_min >= ?' + ' and salary_month_max <= ?'
+                if category == '4000-8000':
+                    real_parameter.extend([4000, 8000])
+                elif category == '8000-10000':
+                    real_parameter.extend([8000, 10000])
+                elif category == '10000-15000':
+                    real_parameter.extend([10000, 15000])
+            qty = await ZhaoPinJobs.findNumber(select_filed, real_where_clause, real_parameter)
+            if qty:
+                qty = int(qty)
+            else:
+                qty = 0
+            qty_list.append(qty)
+        new_singleseries = {'name': name, 'data': qty_list}
+        series[index] = new_singleseries
+        index += 1
+    chart1['series'] = series
+    return chart1
 
 
+async def get_zhaopin_chart2(chart2):
+    series = chart2['series']
+    xAxis = chart2['xAxis']
+    categories = xAxis['categories']
+    index = 0
+    for singleseries in series:
+        name = singleseries['name']
+        where_clause = ''
+        parameter = []
+        select_filed = 'count(id)'
+        qty_list = []
+        if name == '<=4000':
+            where_clause = where_clause + 'salary_month_max <= ?'
+            parameter.extend([4000])
+        elif name == '>=15000':
+            where_clause = where_clause + 'salary_month_min >= ?'
+            parameter.extend([15000])
+        else:
+            where_clause = where_clause + 'salary_month_min >= ?' + ' and salary_month_max <= ?'
+            if name == '4000-8000':
+                parameter.extend([4000, 8000])
+            elif name == '8000-10000':
+                parameter.extend([8000, 10000])
+            elif name == '10000-15000':
+                parameter.extend([10000, 15000])
+
+        for category in categories:
+            real_where_clause = copy.deepcopy(where_clause)
+            real_parameter = copy.deepcopy(parameter)
+            if category == '不限经验':
+                real_where_clause = real_where_clause + ' and workexperience like ?'
+                real_parameter.extend(['%不限%'])
+            elif category == '1-3年':
+                real_where_clause = real_where_clause + ' and (workexperience like ? or workexperience like ? or workexperience like ?)'
+                real_parameter.extend(['%1%','%2%','%3%'])
+            elif category == '3-5年':
+                real_where_clause = real_where_clause + ' and (workexperience like ? or workexperience like ? or workexperience like ?)'
+                real_parameter.extend(['%3%','%4%','%5%'])
+            elif category == '5-10年':
+                real_where_clause = real_where_clause + ' and (workexperience like ? or workexperience like ? or workexperience like ? or workexperience like ? or workexperience like ? or workexperience like ?)'
+                real_parameter.extend(['%5%','%6%','%7%','%8%','%9%','%10%'])
+            else:
+                real_where_clause = real_where_clause + ' and (workexperience like ? or workexperience like ? or workexperience like ?)'
+                real_parameter.extend(['%10%', '%11%', '%12%'])
+            qty = await ZhaoPinJobs.findNumber(select_filed, real_where_clause, real_parameter)
+            if qty:
+                qty = int(qty)
+            else:
+                qty = 0
+            qty_list.append(qty)
+        new_singleseries = {'name': name, 'data': qty_list}
+        series[index] = new_singleseries
+        index += 1
+    chart2['series'] = series
+    return chart2
 

@@ -299,3 +299,33 @@ class ZhihuHotContent(Model):
     videourl = StringField(ddl='varchar(300)')
     text = TextField()
     created_at = DateTimeField()
+
+
+class ZhaoPinJobs(Model):
+    __table__ = 'ZhaoPinJobs'
+
+    id = IntegerField(primary_key=True)
+    source = StringField(ddl='varchar(30)')
+    jobkey = StringField(ddl='varchar(30)')
+    jobid = StringField(ddl='varchar(30)')
+    jobtitle = StringField(ddl='varchar(100)')
+    salarystr = StringField(ddl='varchar(100)')
+    salary_month_min = IntegerField()
+    salary_year_min = IntegerField()
+    salary_month_max = IntegerField()
+    salary_year_max = IntegerField()
+    address = StringField(ddl='varchar(300)')
+    education = StringField(ddl='varchar(100)')
+    workexperience = StringField(ddl='varchar(50)')
+    release_time = StringField(ddl='varchar(100)')
+    response_time = StringField(ddl='varchar(100)')
+    companyname = StringField(ddl='varchar(200)')
+    industry = StringField(ddl='varchar(200)')
+    financing_situation = StringField(ddl='varchar(100)')
+    numberofpeople = StringField(ddl='varchar(100)')
+    welfare1 = StringField(ddl='varchar(100)')
+    welfare2 = StringField(ddl='varchar(100)')
+    welfare3 = StringField(ddl='varchar(100)')
+    welfare4 = StringField(ddl='varchar(100)')
+    welfare5 = StringField(ddl='varchar(100)')
+    created_at = DateTimeField()

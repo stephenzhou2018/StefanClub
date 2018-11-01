@@ -515,3 +515,35 @@ def get_img_info(element,curr_num_of_content, s, agentheaders):
     #urllib.request.urlretrieve(imgsrc, file_path)
     imgurl = "../static/img/zhihu/%s" % file_name
     return imgurl, curr_num_of_content
+
+
+def analysis_salary(salary_str,source):
+    if source == 'liepin':
+        index_ = salary_str.index('-')
+        ten_thousand_index = salary_str.index('万')
+        salary_year_min = int(salary_str[:index_]) * 10000
+        salary_month_min = salary_year_min // 13
+        salary_year_max = int(salary_str[index_ + 1:ten_thousand_index]) * 10000
+        salary_month_max = salary_year_max // 13
+        return salary_year_min,salary_month_min,salary_year_max,salary_month_max
+    elif source == 'lagou':
+        firstk_index = salary_str.index('k')
+        secondk_index = salary_str.find('k',firstk_index + 1)
+        index_ = salary_str.index('-')
+        salary_month_min = int(salary_str[:firstk_index]) * 1000
+        salary_year_min = salary_month_min * 13
+        salary_month_max = int(salary_str[index_ + 1:secondk_index]) * 1000
+        salary_year_max = salary_month_max * 13
+        return salary_year_min, salary_month_min, salary_year_max, salary_month_max
+
+
+def get_jobid(url,source):
+    last_index = -1
+    for i,element in enumerate(url):
+        if element == '/':
+            last_index = i
+    if source == 'liepin':
+        suffix_index = url.index('.shtml')
+    elif source == 'lagou':
+        suffix_index = url.index('.html')
+    return url[last_index + 1:suffix_index]

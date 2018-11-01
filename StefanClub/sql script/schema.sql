@@ -306,3 +306,33 @@ create table ZhihuHot_Content (
     key `idx_created_at` (`created_at`),
     primary key (`id`)
 ) engine=innodb default charset=utf8;
+
+create table ZhaoPinJobs (
+    `id` int not null auto_increment,
+    `source` varchar(30) not null,
+    `jobkey` varchar(30) not null,
+    `jobid` varchar(100) not null,
+    `jobtitle` varchar(100) not null,
+    `salarystr` varchar(100) not null,
+    `salary_month_min` int,
+    `salary_year_min` int,
+    `salary_month_max` int,
+    `salary_year_max` int,
+    `address` varchar(300),
+    `education` varchar(100),
+    `workexperience` varchar(50),
+    `release_time` varchar(100),
+    `response_time` varchar(100),
+    `companyname` varchar(200),
+    `industry` varchar(200),
+    `financing_situation` varchar(100),
+    `numberofpeople` varchar(100),
+    `welfare1` varchar(100),
+    `welfare2` varchar(100),
+    `welfare3` varchar(100),
+    `welfare4` varchar(100),
+    `welfare5` varchar(100),
+    `created_at` TIMESTAMP not null,
+    key `idx_created_at` (`created_at`),
+    primary key (`id`)
+) engine=innodb default charset=utf8;

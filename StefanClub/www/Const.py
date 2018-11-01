@@ -150,3 +150,40 @@ taobaochart6 = {
 			      'data': []
 				 }]
 	    }
+
+zhaopinchart1 = {
+           'chart': {'renderTo': 'container1'},
+           'title': {'text': '各大城市销售助理工资分布'},
+           'xAxis': {
+              'title': {'text': '月薪(元)'},
+              'categories': ['<=4000', '4000-8000', '8000-10000', '10000-15000', '>=15000']
+           },
+           'yAxis': {
+              'title': {'text': '职位数(个)'}
+           },
+           'series': [
+               {'name': '上海', 'data': []},
+               {'name': '北京', 'data': []},
+               {'name': '广州', 'data': []},
+               {'name': '深圳', 'data': []}
+           ]
+         }
+
+zhaopinchart2 = {
+           'chart': {'renderTo': 'container2', 'type': 'column'},
+           'title': {'text': '销售助理工资与工作经验的关系'},
+           'xAxis': {
+              'title': {'text': '工作经验年限'},
+              'categories': ['不限经验', '1-3年', '3-5年', '5-10年','10年以上']
+           },
+           'yAxis': {
+              'title': {'text': '职位数(个)'}
+           },
+           'series': [
+               {'name': '<=4000', 'data': []},
+               {'name': '4000-8000', 'data': []},
+               {'name': '8000-10000', 'data': []},
+               {'name': '10000-15000', 'data': []},
+               {'name': '>=15000', 'data': []}
+           ]
+         }
