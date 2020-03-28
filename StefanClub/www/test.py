@@ -1,16 +1,12 @@
-import orm
-from models import User, Blog, Comment
-import asyncio
+import cx_Oracle
 
 
-@asyncio.coroutine
-def test(loop):
-    yield from orm.create_pool(loop=loop, user='root', password='Kaihua1010', database='stefan')
+connstr = 'ifsapp/ifsapp@DEV'
+conn = cx_Oracle.connect(connstr)
+curs = conn.cursor()
 
-    u = User(name='Test', email='test@example.com', passwd='1234567890', image='about:blank')
-
-    yield from u.save()
-
-loop = asyncio.get_event_loop()
-loop.run_until_complete(test(loop))
-loop.run_forever()
+curs.execute('select * from site_tab')
+print(curs.description)
+for row in curs:
+    print(row[0])
+conn.close()

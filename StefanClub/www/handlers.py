@@ -13,7 +13,10 @@ from apis import APIError,APIValueError,APIPermissionError,APIResourceNotFoundEr
 from config import configs
 from datetime import datetime
 from functions import analysis_specify_filter,is_number,get_taobao_chart1,get_taobao_chart2,get_taobao_chart3,get_taobao_chart4,get_taobao_chart5,get_taobao_chart6,get_zhaopin_chart1,get_zhaopin_chart2
-from Const import taobaochart1,taobaochart2,taobaochart3,taobaochart4,taobaochart5,taobaochart6,zhaopinchart1,zhaopinchart2
+from Const import taobaochart1,taobaochart2,taobaochart3,taobaochart4,taobaochart5,taobaochart6,zhaopinchart1,zhaopinchart2,appid,appsecret
+import requests
+from wxmp_basic import Basic
+from wxmp_sign import Sign
 
 
 
@@ -83,6 +86,25 @@ def cookie2user(cookie_str):
 
 @get('/index')
 async def index(request):
+    #获取微信用户信息
+    query_string = request.query_string
+    if 'code=' in query_string:
+        code_index = query_string.index('code=') + 5
+        state_index = query_string.index('state=')
+        code = query_string[code_index:state_index - 1]
+        r = requests.get('https://api.weixin.qq.com/sns/oauth2/access_token', params={'appid': appid, 'secret': appsecret, 'code': code, 'grant_type':'authorization_code'})
+        access_token_json = json.loads(r.text)
+        userinfo_r = requests.get('https://api.weixin.qq.com/sns/userinfo', params={'access_token': access_token_json['access_token'], 'openid': access_token_json['openid'], 'lang': 'en'})
+        print(userinfo_r.text)
+
+    #JS-SDK使用权限签名算法
+    accessToken = Basic().get_access_token()
+    jsapi_ticket_r  = requests.get('https://api.weixin.qq.com/cgi-bin/ticket/getticket', params={'access_token': accessToken, 'type': 'jsapi'})
+    jsapi_ticket_r_json = json.loads(jsapi_ticket_r.text)
+    jsapi_ticket = jsapi_ticket_r_json['ticket']
+    sign = Sign(jsapi_ticket, 'https://stephenzhou.utools.club/index').sign()
+
+
     Carousel1 = await IndexCarouselItems.findAll('item_class=?', ['Carousel'], orderBy='id desc', limit=(0,1))
     Carousels = await IndexCarouselItems.findAll('item_class=?', ['Carousel'], orderBy='id desc', limit=(1,4))
     CarouselRights =  await IndexCarouselItems.findAll('item_class=?', ['Carousel_R'], orderBy='id desc', limit=(0,2))
@@ -98,6 +120,7 @@ async def index(request):
         'CarouselRights': CarouselRights,
         'Rights': Rights,
         'News': News,
+        'wxsign': sign
     }
 
 
@@ -701,6 +724,12 @@ async def api_get_users(*, page='1'):
     for u in users:
         u.passwd = '******'
     return dict(page=p, users=users)
+
+
+@get('/api/user')
+async def api_get_user(*, username):
+    num = await User.findNumber('count(id)', 'name=?', username)
+    return dict(num=num)
 
 
 _RE_EMAIL = re.compile(r'^[a-z0-9\.\-\_]+\@[a-z0-9\-\_]+(\.[a-z0-9\-\_]+){1,4}$')

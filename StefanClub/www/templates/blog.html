@@ -16,7 +16,7 @@ $(function () {
             return $form.showFormError('请输入评论内容！');
         }
         $form.postJSON(comment_url, { content: content }, function (err, result) {
-            if (err) {
+            if (err) {/api/blogs
                 return $form.showFormError(err);
             }
             refresh();

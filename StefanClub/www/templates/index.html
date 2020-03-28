@@ -218,7 +218,13 @@ window.onload = function()
            $("#" + liid + "").hide();
            });
 	  }
-      }
+     }
+
+     var timestamp = {{wxsign.timestamp}};
+     var nonceStr = '{{wxsign.nonceStr}}';
+     var signature = '{{wxsign.signature}}';
+     WxConfig(timestamp,nonceStr,signature);
+
 }
 
 function AddEvent(){
@@ -237,7 +243,52 @@ function AddEvent(){
            $("#" + liid + "").hide();
            });
 	  }
-      }
+     }
+
+}
+
+function WxConfig(timestamp,noncestr,signature){
+     wx.config({
+        debug: false,
+        appId: 'wxc2877ea2538494fd',
+        timestamp: timestamp,
+        nonceStr: noncestr,
+        signature: signature,
+        jsApiList: ['updateAppMessageShareData','chooseImage']
+     });
+     wx.ready(function () {
+        wx.checkJsApi({
+           jsApiList: ['updateAppMessageShareData','chooseImage'],
+           success: function (res) {}
+        });
+     });
+     wx.error(function(res){
+        console.log(res);
+     });
+}
+
+function share_to_friends(){
+   wx.updateAppMessageShareData({
+    title: 'stefan club的首页',
+    desc: 'Stefan Club,一个个人博客',
+    link: 'https://stephenzhou.xyz/index',
+    imgUrl: 'https://ss.csdn.net/p?https://mmbiz.qpic.cn/mmbiz_png/trm5VMeFp9mUkNZJ0rwSibogy0Eic685InMIeYjbgpLQiaGdkKvTYAsd9zc8u22lqj6iaagoKZ7eibxvibK39MzP4gHg/640?wx_fmt=png',
+    success: function () {
+      console.log('success');
+
+    }
+  })
+}
+
+function chooseImage(){
+   wx.chooseImage({
+    count: 1,
+    sizeType: ['original', 'compressed'],
+    sourceType: ['album', 'camera'],
+    success: function (res) {
+      var localIds = res.localIds;
+    }
+});
 }
 </script>
 
@@ -255,6 +306,8 @@ function AddEvent(){
            <li><a href="#" class="leftnavli">娱乐</a></li>
            <li><a href="#" class="leftnavli">视频</a></li>
            <li><a href="#" class="leftnavli">游戏</a></li>
+           <li><button onclick="share_to_friends()">分享给朋友</button></li>
+           <li><button onclick="chooseImage()">选择图片</button></li>
        </ul>
    </div>
    <div class="uk-width-medium-6-10">

@@ -11,6 +11,7 @@ async web application.
 import logging; logging.basicConfig(level=logging.INFO)
 import orm
 import asyncio, os, json, time
+#import ssl
 from datetime import datetime
 
 from aiohttp import web
@@ -73,6 +74,7 @@ async def logger_factory(app, handler):
         # await asyncio.sleep(0.3)
         return (await handler(request))
     return logger
+
 
 async def data_factory(app, handler):
     async def parse_data(request):
@@ -150,9 +152,13 @@ def init(loop):
     init_jinja2(app, filters=dict(datetime=datetime_filter))
     add_routes(app, 'handlers')
     add_static(app)
+    #context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+    #context.load_cert_chain('C:/Users/stephen/PycharmProjects/StefanClub/StefanClub/www/static/ssl/2034685_www.stephenzhou.xyz.pem', 'C:/Users/stephen/PycharmProjects/StefanClub/StefanClub/www/static/ssl/2034685_www.stephenzhou.xyz.key')
+    #srv = yield from loop.create_server(app.make_handler(), '127.0.0.1', 9000, ssl=context)
     srv = yield from loop.create_server(app.make_handler(), '127.0.0.1', 9000)
     logging.info('server started at http://127.0.0.1:9000...')
     return srv
+
 
 loop = asyncio.get_event_loop()
 loop.run_until_complete(init(loop))

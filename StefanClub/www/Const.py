@@ -187,3 +187,6 @@ zhaopinchart2 = {
                {'name': '>=15000', 'data': []}
            ]
          }
+
+appid = 'wxc2877ea2538494fd'
+appsecret = '184874da053bd244364fde2d69b98dc2'
